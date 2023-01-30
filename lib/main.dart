@@ -6,6 +6,7 @@ import 'package:spending_tracker/category/category_state.dart';
 import 'package:spending_tracker/examples.dart';
 import 'package:spending_tracker/pages/home_page.dart';
 import 'package:spending_tracker/old_home_page.dart';
+import 'package:spending_tracker/pages/manage_categories_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -69,13 +70,13 @@ class _MainPageState extends State<MainPage> {
         page = const HomePage();
         break;
       case 1:
-        page = const FavoritesPage();
+        page = const ManageCategoriesPage();
         break;
       case 2:
         page = const Placeholder();
         break;
       case 3:
-        page = const Placeholder();
+        page = const FavoritesPage();
         break;
       case 4:
         page = const OldHomePage();

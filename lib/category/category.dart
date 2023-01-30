@@ -9,7 +9,7 @@ class Category {
 
   Category({required this.name, required this.enabled});
 
-  Category.name(String name) : this(name: name, enabled: false);
+  Category.name(String name) : this(name: name, enabled: true);
 
   factory Category.fromJson(Map<String, dynamic> jsonData) {
     return Category(
