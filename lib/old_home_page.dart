@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:spending_tracker/category/category.dart';
+import 'package:spending_tracker/category/category_state.dart';
+import 'package:spending_tracker/examples.dart';
 import 'package:spending_tracker/main.dart';
 
 class OldHomePage extends StatelessWidget {
@@ -7,7 +10,7 @@ class OldHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
+    var appState = context.watch<CategoryState>();
     var currentValue = appState.current;
 
     IconData icon;
@@ -22,7 +25,7 @@ class OldHomePage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Text("Olás"),
-          BigCard(currentNumber: currentValue),
+          BigCard(text: currentValue),
           const SizedBox(
             height: 10,
           ),
@@ -46,6 +49,12 @@ class OldHomePage extends StatelessWidget {
                 child: const Text('Next'),
               ),
             ],
+          ),
+          ElevatedButton(
+            onPressed: () {
+              appState.addCategory(Category(name: "name", enabled: true));
+            },
+            child: const Text('add cat'),
           ),
         ],
       ),

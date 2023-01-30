@@ -1,8 +1,10 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/home_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spending_tracker/category/category.dart';
+import 'package:spending_tracker/category/category_state.dart';
+import 'package:spending_tracker/examples.dart';
+import 'package:spending_tracker/pages/home_page.dart';
 import 'package:spending_tracker/old_home_page.dart';
 
 void main() {
@@ -16,7 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => MyAppState(),
+      create: (context) => CategoryState(),
       child: MaterialApp(
         title: 'Spending tracker',
         theme: ThemeData(
@@ -30,7 +32,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
@@ -40,6 +41,25 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   var selectedIndex = 0;
+  bool firstLoad = true;
+
+  void loadCategories() async {
+    var appState = context.watch<CategoryState>();
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    CategoryState().loadCategories(prefs);
+    appState.addCategory(Category(name: "Sushi", enabled: true));
+    appState.addCategory(Category(name: "Restaurants", enabled: true));
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (firstLoad) {
+      loadCategories();
+      firstLoad = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +138,10 @@ class _MainPageState extends State<MainPage> {
                   // instead of using anonymous ones where possible.
                   // we can also use colors from the theme.
                   color: Theme.of(context).colorScheme.background,
-                  child: page,
+                  child: Container(
+                    margin: const EdgeInsets.all(10.0),
+                    child: page,
+                  ),
                 ),
               ),
             ),
@@ -126,82 +149,6 @@ class _MainPageState extends State<MainPage> {
         ),
       );
     });
-  }
-}
-
-class FavoritesPage extends StatelessWidget {
-  const FavoritesPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-
-    if (appState.favorites.isEmpty) {
-      return const Center(child: Text('No favorites yet'));
-    }
-
-    return ListView(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: Text('You have ${appState.favorites.length} facorites:'),
-        ),
-        for (var current in appState.favorites)
-          ListTile(
-            leading: const Icon(Icons.favorite),
-            title: Text(current),
-          )
-      ],
-    );
-  }
-}
-
-class BigCard extends StatelessWidget {
-  const BigCard({
-    Key? key,
-    required this.currentNumber,
-  }) : super(key: key);
-
-  final String currentNumber;
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {},
-      style: ButtonStyle(
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))),
-      child: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Text(
-          currentNumber,
-        ),
-      ),
-    );
-  }
-}
-
-
-// Global state
-class MyAppState extends ChangeNotifier {
-  var current = "test 2";
-  var favorites = <String>[];
-  List<String> categories = ["Sushi", "Restaurantes"];
-
-
-
-  void toggleFavorite() {
-    if (favorites.contains(current)) {
-      favorites.remove(current);
-    } else {
-      favorites.add(current);
-    }
-    notifyListeners();
-  }
-
-  void genNext() {
-    current = "Current number: ${Random().nextInt(100)}";
-    notifyListeners();
   }
 }
 
