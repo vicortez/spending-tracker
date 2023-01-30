@@ -34,3 +34,10 @@ class Category {
           .map<Category>((item) => Category.fromJson(item))
           .toList();
 }
+
+List<Category> getDefaultCategories(){
+  return [
+    Category(name: "Sushi", enabled: true),
+    Category(name: "Restaurants", enabled: true),
+  ];
+}

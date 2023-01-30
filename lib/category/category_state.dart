@@ -12,8 +12,7 @@ class CategoryState extends ChangeNotifier {
     // Category(name: "Sushi", enabled: true),
     // Category(name: "Restaurants", enabled: true),
   ];
-  // var cat = Category(name: "Sushi", enabled: true);
-  // CategoryState.addCategory(cat);
+
 
   void setCategories(List<Category> newCategories) {
     categories = newCategories;
@@ -48,6 +47,11 @@ class CategoryState extends ChangeNotifier {
 
   void addCategory(Category category) {
     categories.add(category);
+    notifyListeners();
+  }
+
+  void removeCategory(String name) {
+    categories.removeWhere((cat) => cat.name == name);
     notifyListeners();
   }
 }

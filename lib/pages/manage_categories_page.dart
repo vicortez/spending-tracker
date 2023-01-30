@@ -67,11 +67,10 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
         for (var name in categories.map((cat) => cat.name))
           Card(
             child: ListTile(
-              // leading: const Icon(Icons.favorite),
               title: Text(name),
               trailing: IconButton(
                 onPressed: (){
-                  debugPrint("BOOM deleted");
+                  categoryState.removeCategory(name);
                 }, icon: const Icon(Icons.delete_outline),
               ),
             ),
