@@ -12,35 +12,41 @@ class SpendingReportPage extends StatelessWidget {
 
     return Column(
       children: [
-        Table(
-          border: TableBorder(horizontalInside: BorderSide(color: Colors.white)),
-          columnWidths: const {
-            0: FlexColumnWidth(2),
-            1: FlexColumnWidth(1.5),
-            2: FlexColumnWidth(1),
-          },
-          children: [
-            const TableRow(children: [
-              Text(
-                'Category',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'Date',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'Amount',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ]),
-            for (var expense in expenses)
-              TableRow(decoration: BoxDecoration(color: Colors.black), children: [
-                Text(expense.categoryName),
-                Text(expense.date.toString().substring(0, 10)),
-                Text(expense.amount.toString()),
-              ]),
-          ],
+        Expanded(
+          child: ListView(
+            children: [
+              Table(
+                border: const TableBorder(horizontalInside: BorderSide(color: Colors.white)),
+                columnWidths: const {
+                  0: FlexColumnWidth(2),
+                  1: FlexColumnWidth(1.5),
+                  2: FlexColumnWidth(1),
+                },
+                children: [
+                  const TableRow(children: [
+                    Text(
+                      'Category',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Date',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Amount',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ]),
+                  for (var expense in expenses)
+                    TableRow(decoration: BoxDecoration(color: Colors.black), children: [
+                      Text(expense.categoryName),
+                      Text(expense.date.toString().substring(0, 10)),
+                      Text(expense.amount.toString()),
+                    ]),
+                ],
+              )
+            ],
+          ),
         ),
       ],
     );
