@@ -4,9 +4,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/category/category.dart';
 import 'package:spending_tracker/category/category_state.dart';
 import 'package:spending_tracker/examples.dart';
+import 'package:spending_tracker/expense/expense_state.dart';
 import 'package:spending_tracker/pages/home_page.dart';
-import 'package:spending_tracker/old_home_page.dart';
+import 'package:spending_tracker/pages/old_home_page.dart';
 import 'package:spending_tracker/pages/manage_categories_page.dart';
+import 'package:spending_tracker/pages/spending_report_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,15 +21,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => CategoryState(),
-      child: MaterialApp(
-        title: 'Spending tracker',
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: const ColorScheme.dark(primary: Colors.teal),
-          // colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+      create: (context) => ExpenseState(),
+      child: ChangeNotifierProvider(
+        create: (context) => CategoryState(),
+        child: MaterialApp(
+          title: 'Spending tracker',
+          theme: ThemeData(
+            useMaterial3: true,
+            colorScheme: const ColorScheme.dark(primary: Colors.teal),
+            // colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+          ),
+          home: const MainPage(),
         ),
-        home: const MainPage(),
       ),
     );
   }
@@ -46,10 +51,11 @@ class _MainPageState extends State<MainPage> {
 
   void loadCategories() async {
     var categoryState = context.watch<CategoryState>();
+    var expenseState = context.watch<ExpenseState>();
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     categoryState.loadCategoriesFromLocalStorage(prefs);
-
+    expenseState.loadFromLocalStorage(prefs);
   }
 
   @override
@@ -72,7 +78,7 @@ class _MainPageState extends State<MainPage> {
         page = const ManageCategoriesPage();
         break;
       case 2:
-        page = const Placeholder();
+        page = const SpendingReportPage();
         break;
       case 3:
         page = const FavoritesPage();

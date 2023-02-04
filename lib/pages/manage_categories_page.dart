@@ -65,29 +65,30 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
           height: 10,
         ),
         Expanded(
-            child: ListView(
+            child: SelectionArea (
+              child: ListView(
           children: [
-            for (var name in categories.map((cat) => cat.name))
-              Card(
-                child: ListTile(
-                  title: Text(name),
-                  trailing: IconButton(
-                    onPressed: () {
-                      categoryState.removeCategory(name);
-                    },
-                    icon: const Icon(Icons.delete_outline),
+              for (var name in categories.map((cat) => cat.name))
+                Card(
+                  child: ListTile(
+                    title: Text(name),
+                    trailing: IconButton(
+                      onPressed: () {
+                        categoryState.removeCategory(name);
+                      },
+                      icon: const Icon(Icons.delete_outline),
+                    ),
                   ),
-                ),
-              )
+                )
           ],
-        ))
+        ),
+            ))
       ],
     );
   }
 
   void submitCategory() {
     String currentText = _currentCategoryNameTextController.text;
-    debugPrint(currentText);
     var categoryState = context.read<CategoryState>();
     Category categoryToAdd = Category.name(currentText);
     categoryState.addCategory(categoryToAdd);
