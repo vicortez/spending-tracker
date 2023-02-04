@@ -45,12 +45,11 @@ class _MainPageState extends State<MainPage> {
   bool firstLoad = true;
 
   void loadCategories() async {
-    var appState = context.watch<CategoryState>();
+    var categoryState = context.watch<CategoryState>();
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    CategoryState().loadCategories(prefs);
-    appState.addCategory(Category(name: "Sushi", enabled: true));
-    appState.addCategory(Category(name: "Restaurants", enabled: true));
+    categoryState.loadCategoriesFromLocalStorage(prefs);
+
   }
 
   @override

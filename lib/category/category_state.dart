@@ -12,13 +12,17 @@ class CategoryState extends ChangeNotifier {
     // Category(name: "Sushi", enabled: true),
     // Category(name: "Restaurants", enabled: true),
   ];
+  SharedPreferences? prefs;
 
-
-  void setCategories(List<Category> newCategories) {
+  void setCategories(List<Category> newCategories, {bool syncStorage = true}) {
     categories = newCategories;
     notifyListeners();
+    if (syncStorage && prefs != null) {
+      updateLocalStorage();
+    }
   }
 
+  // TODO remove
   void toggleFavorite() {
     if (favorites.contains(current)) {
       favorites.remove(current);
@@ -28,6 +32,7 @@ class CategoryState extends ChangeNotifier {
     notifyListeners();
   }
 
+  // TODO remove
   void genNext() {
     current = "Current number: ${Random().nextInt(100)}";
     notifyListeners();
@@ -37,8 +42,9 @@ class CategoryState extends ChangeNotifier {
     return categories.where((element) => element.enabled).toList();
   }
 
-  void loadCategories(SharedPreferences prefs) {
-    final String? categoriesStr = prefs.getString(Category.PERSIST_NAME);
+  void loadCategoriesFromLocalStorage(SharedPreferences prefs) {
+    this.prefs = prefs;
+    final String? categoriesStr = prefs?.getString(Category.PERSIST_NAME);
     if (categoriesStr != null) {
       categories = Category.decode(categoriesStr);
       notifyListeners();
@@ -47,11 +53,22 @@ class CategoryState extends ChangeNotifier {
 
   void addCategory(Category category) {
     categories.add(category);
+
+    if (prefs != null) {
+      updateLocalStorage();
+    }
     notifyListeners();
   }
 
   void removeCategory(String name) {
     categories.removeWhere((cat) => cat.name == name);
+    if (prefs != null) {
+      updateLocalStorage();
+    }
     notifyListeners();
+  }
+
+  void updateLocalStorage() {
+    prefs?.setString(Category.PERSIST_NAME, Category.encode(categories));
   }
 }

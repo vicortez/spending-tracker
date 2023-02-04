@@ -64,17 +64,23 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
         const SizedBox(
           height: 10,
         ),
-        for (var name in categories.map((cat) => cat.name))
-          Card(
-            child: ListTile(
-              title: Text(name),
-              trailing: IconButton(
-                onPressed: (){
-                  categoryState.removeCategory(name);
-                }, icon: const Icon(Icons.delete_outline),
-              ),
-            ),
-          )
+        Expanded(
+            child: ListView(
+          children: [
+            for (var name in categories.map((cat) => cat.name))
+              Card(
+                child: ListTile(
+                  title: Text(name),
+                  trailing: IconButton(
+                    onPressed: () {
+                      categoryState.removeCategory(name);
+                    },
+                    icon: const Icon(Icons.delete_outline),
+                  ),
+                ),
+              )
+          ],
+        ))
       ],
     );
   }
