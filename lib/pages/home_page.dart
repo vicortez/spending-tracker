@@ -39,6 +39,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           TextField(
+              autofocus: true,
               decoration: const InputDecoration(hintText: '💸 Register expense'),
               keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
               controller: expenseAmountTextController,
