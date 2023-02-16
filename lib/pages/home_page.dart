@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/category/category_state.dart';
 import 'package:spending_tracker/common_widgets/my_button.dart';
-import 'package:spending_tracker/examples.dart';
 import 'package:spending_tracker/expense/expense_state.dart';
 
 class HomePage extends StatefulWidget {
@@ -20,6 +19,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     var categoryState = context.watch<CategoryState>();
     var categories = categoryState.getEnabledCategories();
+    categories.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
     return Center(
       child: Column(

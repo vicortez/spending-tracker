@@ -37,8 +37,7 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
                       if (value == null || value.isEmpty) {
                         return "Category must have a name";
                       }
-                      bool isDuplicate =
-                          categories.any((cat) => cat.name == value);
+                      bool isDuplicate = categories.any((cat) => cat.name == value);
                       if (isDuplicate) {
                         return "Category already exists";
                       }
@@ -65,9 +64,9 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
           height: 10,
         ),
         Expanded(
-            child: SelectionArea (
-              child: ListView(
-          children: [
+            child: SelectionArea(
+          child: ListView(
+            children: [
               for (var name in categories.map((cat) => cat.name))
                 Card(
                   child: ListTile(
@@ -80,9 +79,9 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
                     ),
                   ),
                 )
-          ],
-        ),
-            ))
+            ],
+          ),
+        ))
       ],
     );
   }

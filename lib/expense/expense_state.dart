@@ -1,9 +1,10 @@
 // Global state
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
-import 'package:spending_tracker/expense/expense.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spending_tracker/expense/expense.dart';
 
 class ExpenseState extends ChangeNotifier {
   List<Expense> expenses = [];
@@ -15,6 +16,21 @@ class ExpenseState extends ChangeNotifier {
     if (syncStorage && prefs != null) {
       updateLocalStorage();
     }
+  }
+
+  bool updateExpense(int id, String categoryName, double amount, DateTime date) {
+    Expense? expense = expenses.firstWhereOrNull((exp) => exp.id == id);
+    if (expense == null) {
+      return false;
+    }
+    expense.categoryName = categoryName;
+    expense.amount = amount;
+    expense.date = date;
+    if (prefs != null) {
+      updateLocalStorage();
+    }
+    notifyListeners();
+    return true;
   }
 
   void loadFromLocalStorage(SharedPreferences prefs) {
