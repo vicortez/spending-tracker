@@ -62,6 +62,14 @@ class ExpenseState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void removeALl() {
+    expenses.clear();
+    if (prefs != null) {
+      updateLocalStorage();
+    }
+    notifyListeners();
+  }
+
   void updateLocalStorage() {
     prefs?.setString(Expense.PERSIST_NAME, Expense.encode(expenses));
   }

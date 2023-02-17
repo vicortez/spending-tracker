@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:spending_tracker/category/category.dart';
 import 'package:spending_tracker/category/category_state.dart';
-import 'package:spending_tracker/examples.dart';
 import 'package:spending_tracker/expense/expense_state.dart';
+import 'package:spending_tracker/pages/config_page.dart';
 import 'package:spending_tracker/pages/home_page.dart';
-import 'package:spending_tracker/pages/old_home_page.dart';
 import 'package:spending_tracker/pages/manage_categories_page.dart';
+import 'package:spending_tracker/pages/old_home_page.dart';
 import 'package:spending_tracker/pages/spending_report_page.dart';
 
 void main() {
@@ -81,7 +80,7 @@ class _MainPageState extends State<MainPage> {
         page = const SpendingReportPage();
         break;
       case 3:
-        page = const FavoritesPage();
+        page = const ConfigPage();
         break;
       case 4:
         page = const OldHomePage();

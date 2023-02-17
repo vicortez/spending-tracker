@@ -23,32 +23,16 @@ class SpendingReportPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var expenseState = context.watch<ExpenseState>();
-    var expenses = expenseState.expenses;
-
-    final SplayTreeMap<String, List<Expense>> orderedExpensesMap =
-        SplayTreeMap<String, List<Expense>>((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
-    for (var expense in expenses) {
-      orderedExpensesMap.putIfAbsent(expense.categoryName, () => <Expense>[]).add(expense);
-    }
-
+    var expenses = [...expenseState.expenses];
+    expenses.sort((a, b) => a.date.compareTo(b.date));
     // Quick and dirty way. Not scalable. Ideally we want a global object dictionary with theme name as keys.
     // or maybe there is a "fluttery" way to do it.
     bool isDarkMode = Theme.of(context).colorScheme.brightness == Brightness.dark;
     Color? tableBackground1 = Theme.of(context).colorScheme.background;
     Color? tableBackground2 = isDarkMode ? Colors.grey[850] : Colors.grey[300];
 
-    List<TableLineData> tableLinesData = [];
-    for (var expenseGroupEntry in orderedExpensesMap.entries) {
-      String catName = expenseGroupEntry.key;
-      List<Expense> groupExpenses = expenseGroupEntry.value;
-      for (var expense in groupExpenses) {
-        var backgroundColor = tableLinesData.length % 2 == 0 ? tableBackground1 : tableBackground2;
-        tableLinesData.add(TableLineData(expense, backgroundColor!, false, null, catName));
-      }
-      var backgroundColor = tableLinesData.length % 2 == 0 ? tableBackground1 : tableBackground2;
-      double total = groupExpenses.map((exp) => exp.amount).reduce((acc, element) => acc + element);
-      tableLinesData.add(TableLineData(null, backgroundColor!, true, total, catName));
-    }
+    List<TableLineData> tableLinesData = getTableLinesData(
+        expenses, tableBackground1, tableBackground2, Theme.of(context).colorScheme.primary.withOpacity(0.5));
     return Column(
       children: [
         Expanded(
@@ -85,10 +69,13 @@ class SpendingReportPage extends StatelessWidget {
                       TableRow(decoration: BoxDecoration(color: tableLine.backgroundColor), children: [
                         TableCell(
                             verticalAlignment: TableCellVerticalAlignment.middle,
-                            child: Text(
-                              tableLine.catName,
-                              style: TextStyle(
-                                  fontWeight: tableLine.expense != null ? FontWeight.normal : FontWeight.bold),
+                            child: Container(
+                              padding: const EdgeInsets.only(left: 5),
+                              child: Text(
+                                tableLine.catName,
+                                style: TextStyle(
+                                    fontWeight: tableLine.expense != null ? FontWeight.normal : FontWeight.bold),
+                              ),
                             )),
                         TableCell(
                             verticalAlignment: TableCellVerticalAlignment.middle,
@@ -130,5 +117,28 @@ class SpendingReportPage extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  List<TableLineData> getTableLinesData(
+      List<Expense> expenses, Color tableBackground1, Color? tableBackground2, Color aggBackgroundColor) {
+    final SplayTreeMap<String, List<Expense>> orderedExpensesMap =
+        SplayTreeMap<String, List<Expense>>((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    for (var expense in expenses) {
+      orderedExpensesMap.putIfAbsent(expense.categoryName, () => <Expense>[]).add(expense);
+    }
+
+    List<TableLineData> tableLinesData = [];
+    for (var expenseGroupEntry in orderedExpensesMap.entries) {
+      String catName = expenseGroupEntry.key;
+      List<Expense> groupExpenses = expenseGroupEntry.value;
+      for (var expense in groupExpenses) {
+        var backgroundColor = tableLinesData.length % 2 == 0 ? tableBackground1 : tableBackground2;
+        tableLinesData.add(TableLineData(expense, backgroundColor!, false, null, catName));
+      }
+      var backgroundColor = aggBackgroundColor;
+      double total = groupExpenses.map((exp) => exp.amount).reduce((acc, element) => acc + element);
+      tableLinesData.add(TableLineData(null, backgroundColor!, true, total, catName));
+    }
+    return tableLinesData;
   }
 }
