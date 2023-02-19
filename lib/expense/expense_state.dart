@@ -81,4 +81,10 @@ class ExpenseState extends ChangeNotifier {
       return expenses.map((e) => e.id).reduce(max) + 1;
     }
   }
+
+  bool existsEspenseForCategory(String catName) {
+    return expenses.any(
+      (exp) => exp.categoryName == catName,
+    );
+  }
 }

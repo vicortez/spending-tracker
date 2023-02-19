@@ -5,6 +5,7 @@ import 'package:spending_tracker/category/category_state.dart';
 import 'package:spending_tracker/expense/expense_state.dart';
 import 'package:spending_tracker/pages/config_page.dart';
 import 'package:spending_tracker/pages/home_page.dart';
+import 'package:spending_tracker/pages/info_page.dart';
 import 'package:spending_tracker/pages/manage_categories_page.dart';
 import 'package:spending_tracker/pages/old_home_page.dart';
 import 'package:spending_tracker/pages/spending_report_page.dart';
@@ -83,7 +84,7 @@ class _MainPageState extends State<MainPage> {
         page = const ConfigPage();
         break;
       case 4:
-        page = const OldHomePage();
+        page = const InfoPage();
         break;
       default:
         throw UnimplementedError('no widget for $selectedIndex index');

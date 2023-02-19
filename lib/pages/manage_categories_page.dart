@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/category/category.dart';
 import 'package:spending_tracker/category/category_state.dart';
+import 'package:spending_tracker/expense/expense_state.dart';
 
 class ManageCategoriesPage extends StatefulWidget {
   const ManageCategoriesPage({super.key});
@@ -13,11 +14,17 @@ class ManageCategoriesPage extends StatefulWidget {
 class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
   final _currentCategoryNameTextController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  FocusNode myFocusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
     var categoryState = context.watch<CategoryState>();
+    var expenseState = context.watch<ExpenseState>();
+
     var categories = categoryState.getEnabledCategories();
+    categories.sort(
+      (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+    );
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -31,6 +38,8 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
+                    textCapitalization: TextCapitalization.words,
+                    textInputAction: TextInputAction.done,
                     controller: _currentCategoryNameTextController,
                     decoration: const InputDecoration(hintText: 'New category'),
                     validator: (value) {
@@ -42,6 +51,14 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
                         return "Category already exists";
                       }
                       return null;
+                    },
+                    onFieldSubmitted: (value) {
+                      if (_formKey.currentState!.validate()) {
+                        submitCategory();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Category added')),
+                        );
+                      }
                     },
                   ),
                 ),
@@ -73,7 +90,13 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
                     title: Text(name),
                     trailing: IconButton(
                       onPressed: () {
-                        categoryState.removeCategory(name);
+                        if (canRemoveCategory(name, expenseState)) {
+                          categoryState.removeCategory(name);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Can\'t delete category. Delete expenses using it')),
+                          );
+                        }
                       },
                       icon: const Icon(Icons.delete_outline),
                     ),
@@ -92,5 +115,10 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
     Category categoryToAdd = Category.name(currentText);
     categoryState.addCategory(categoryToAdd);
     _currentCategoryNameTextController.clear();
+    myFocusNode.requestFocus();
+  }
+
+  bool canRemoveCategory(String catName, expenseState) {
+    return !expenseState.existsEspenseForCategory(catName);
   }
 }
