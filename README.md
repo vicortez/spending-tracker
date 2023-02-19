@@ -2,15 +2,15 @@
 
 An app to easily manage my spendings. Version 2, made with Flutter.
 
-## Getting Started
+The project was created for me to use, but also to check out Flutter and Dart.
 
-This project is a starting point for a Flutter application.
+## features
 
-A few resources to get you started if this is your first Flutter project:
+- Register exenses for a category of expense in one click
+- Manage existing exepenses and categories
+- see a report of expenses grouped by category
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+![main screen](docs_assets/spendingtracker_screenshot_main_page.png)
+![spending report](docs_assets/spendingtracker_screenshot_spending_report.png)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+This is beta software and might have incomplete funcionality.
