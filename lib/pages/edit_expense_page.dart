@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/category/category_state.dart';
+import 'package:spending_tracker/models/category/category_state.dart';
 import 'package:spending_tracker/common_widgets/my_button.dart';
-import 'package:spending_tracker/expense/expense.dart';
-import 'package:spending_tracker/expense/expense_state.dart';
+import 'package:spending_tracker/models/expense/expense.dart';
+import 'package:spending_tracker/models/expense/expense_state.dart';
 
 class EditExpensePage extends StatefulWidget {
   const EditExpensePage({super.key, required this.expense});

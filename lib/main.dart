@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:spending_tracker/category/category_state.dart';
-import 'package:spending_tracker/expense/expense_state.dart';
+import 'package:spending_tracker/config/config_name.dart';
+import 'package:spending_tracker/config/config_state.dart';
+import 'package:spending_tracker/models/category/category_state.dart';
+import 'package:spending_tracker/common_widgets/month_button.dart';
+import 'package:spending_tracker/models/expense/expense_state.dart';
+import 'package:spending_tracker/models/focused_month/focused_month_state.dart';
 import 'package:spending_tracker/pages/config_page.dart';
 import 'package:spending_tracker/pages/home_page.dart';
 import 'package:spending_tracker/pages/info_page.dart';
 import 'package:spending_tracker/pages/manage_categories_page.dart';
 import 'package:spending_tracker/pages/old_home_page.dart';
 import 'package:spending_tracker/pages/spending_report_page.dart';
+import 'package:month_year_picker/month_year_picker.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,14 +30,20 @@ class MyApp extends StatelessWidget {
       create: (context) => ExpenseState(),
       child: ChangeNotifierProvider(
         create: (context) => CategoryState(),
-        child: MaterialApp(
-          title: 'Spending tracker',
-          theme: ThemeData(
-            useMaterial3: true,
-            colorScheme: const ColorScheme.dark(primary: Colors.teal),
-            // colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+        child: ChangeNotifierProvider(
+          create: (context) => ConfigState(),
+          child: ChangeNotifierProvider(
+            create: (context) => FocusedMonthState(),
+            child: MaterialApp(
+              title: 'Spending tracker',
+              theme: ThemeData(
+                useMaterial3: true,
+                colorScheme: const ColorScheme.dark(primary: Colors.teal),
+                // colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+              ),
+              home: const MainPage(),
+            ),
           ),
-          home: const MainPage(),
         ),
       ),
     );
@@ -49,20 +61,24 @@ class _MainPageState extends State<MainPage> {
   var selectedIndex = 0;
   bool firstLoad = true;
 
-  void loadCategories() async {
+  void loadState() async {
     var categoryState = context.watch<CategoryState>();
     var expenseState = context.watch<ExpenseState>();
+    var configState = context.watch<ConfigState>();
+    var focusedMonthState = context.watch<FocusedMonthState>();
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     categoryState.loadCategoriesFromLocalStorage(prefs);
     expenseState.loadFromLocalStorage(prefs);
+    configState.loadFromLocalStorage(prefs);
+    focusedMonthState.loadFromLocalStorage(prefs);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (firstLoad) {
-      loadCategories();
+      loadState();
       firstLoad = false;
     }
   }
@@ -70,6 +86,9 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     Widget page;
+    var configState = context.watch<ConfigState>();
+    var focusedMonthState = context.watch<FocusedMonthState>();
+
     switch (selectedIndex) {
       case 0:
         page = const HomePage();
@@ -96,11 +115,21 @@ class _MainPageState extends State<MainPage> {
           children: [
             SafeArea(
               child: NavigationRail(
-                leading: const FloatingActionButton(
-                  onPressed: null,
-                  disabledElevation: 0,
-                  backgroundColor: Colors.grey,
-                  child: Icon(Icons.calendar_month_outlined),
+                leading: MonthButton(
+                  month: focusedMonthState.getMonth().month,
+                  allMonths: configState.getConfig(ConfigName.seeAllMonths),
+                  onPressed: () {
+                    showMonthPicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(1990),
+                      lastDate: DateTime(DateTime.now().year + 50),
+                    ).then((DateTime? monthDate) {
+                      if (monthDate != null) {
+                        focusedMonthState.setFocusedMonth(monthDate);
+                      }
+                    });
+                  },
                 ),
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 extended: constraints.maxWidth >= 600,
@@ -126,7 +155,7 @@ class _MainPageState extends State<MainPage> {
                     label: Text('About'),
                   ),
                 ],
-                groupAlignment: -.8,
+                groupAlignment: -.5,
                 selectedIndex: selectedIndex,
                 onDestinationSelected: (int value) {
                   setState(() {

@@ -22,22 +22,6 @@ class CategoryState extends ChangeNotifier {
     }
   }
 
-  // TODO remove
-  void toggleFavorite() {
-    if (favorites.contains(current)) {
-      favorites.remove(current);
-    } else {
-      favorites.add(current);
-    }
-    notifyListeners();
-  }
-
-  // TODO remove
-  void genNext() {
-    current = "Current number: ${Random().nextInt(100)}";
-    notifyListeners();
-  }
-
   List<Category> getEnabledCategories() {
     return categories.where((element) => element.enabled).toList();
   }

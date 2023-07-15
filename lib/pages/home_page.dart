@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/category/category_state.dart';
+import 'package:spending_tracker/models/category/category_state.dart';
 import 'package:spending_tracker/common_widgets/my_button.dart';
-import 'package:spending_tracker/expense/expense_state.dart';
+import 'package:spending_tracker/models/expense/expense_state.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

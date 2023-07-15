@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:spending_tracker/expense/expense.dart';
+import 'package:spending_tracker/models/expense/expense.dart';
 
 class ExpenseState extends ChangeNotifier {
   List<Expense> expenses = [];

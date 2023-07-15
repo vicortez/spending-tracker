@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/category/category.dart';
-import 'package:spending_tracker/category/category_state.dart';
+import 'package:spending_tracker/models/category/category.dart';
+import 'package:spending_tracker/models/category/category_state.dart';
 import 'package:spending_tracker/examples.dart';
 import 'package:spending_tracker/main.dart';
 
@@ -34,7 +34,7 @@ class OldHomePage extends StatelessWidget {
             children: [
               ElevatedButton.icon(
                 onPressed: () {
-                  appState.toggleFavorite();
+                  // appState.toggleFavorite();
                 },
                 icon: Icon(icon),
                 label: const Text('Like'),
@@ -44,7 +44,7 @@ class OldHomePage extends StatelessWidget {
               ),
               ElevatedButton(
                 onPressed: () {
-                  appState.genNext();
+                  // appState.genNext();
                 },
                 child: const Text('Next'),
               ),

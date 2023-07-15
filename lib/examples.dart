@@ -2,7 +2,7 @@
 // Example page
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/category/category_state.dart';
+import 'package:spending_tracker/models/category/category_state.dart';
 
 class FavoritesPage extends StatelessWidget {
   const FavoritesPage({super.key});

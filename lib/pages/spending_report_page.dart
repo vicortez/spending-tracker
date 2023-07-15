@@ -2,8 +2,12 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/expense/expense.dart';
-import 'package:spending_tracker/expense/expense_state.dart';
+import 'package:spending_tracker/config/config_name.dart';
+import 'package:spending_tracker/config/config_state.dart';
+import 'package:spending_tracker/models/expense/expense.dart';
+import 'package:spending_tracker/models/expense/expense_state.dart';
+import 'package:spending_tracker/models/focused_month/focused_month_state.dart';
+import 'package:spending_tracker/models/month_names.dart';
 
 import 'edit_expense_page.dart';
 
@@ -23,8 +27,17 @@ class SpendingReportPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var expenseState = context.watch<ExpenseState>();
-    var expenses = [...expenseState.expenses];
+    var focusedMonthState = context.watch<FocusedMonthState>();
+    var configState = context.watch<ConfigState>();
+
+    bool seeAllMonths = configState.getConfig(ConfigName.seeAllMonths);
+    DateTime month = focusedMonthState.getMonth();
+    List<Expense> expenses = [...expenseState.expenses];
     expenses.sort((a, b) => a.date.compareTo(b.date));
+    if (!seeAllMonths) {
+      expenses =
+          expenses.where((expense) => expense.date.year == month.year && expense.date.month == month.month).toList();
+    }
     // Quick and dirty way. Not scalable. Ideally we want a global object dictionary with theme name as keys.
     // or maybe there is a "fluttery" way to do it.
     bool isDarkMode = Theme.of(context).colorScheme.brightness == Brightness.dark;
@@ -35,6 +48,12 @@ class SpendingReportPage extends StatelessWidget {
         expenses, tableBackground1, tableBackground2, Theme.of(context).colorScheme.primary.withOpacity(0.5));
     return Column(
       children: [
+        if (!seeAllMonths) Column(
+          children: [
+            Text("Showing report for ${monthNames[month.month]}"),
+            const SizedBox(height: 10),
+          ],
+        ),
         Expanded(
           child: ListView(
             children: [
