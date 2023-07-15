@@ -2,19 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spending_tracker/common_widgets/month_button.dart';
 import 'package:spending_tracker/config/config_name.dart';
 import 'package:spending_tracker/config/config_state.dart';
 import 'package:spending_tracker/models/category/category_state.dart';
-import 'package:spending_tracker/common_widgets/month_button.dart';
 import 'package:spending_tracker/models/expense/expense_state.dart';
 import 'package:spending_tracker/models/focused_month/focused_month_state.dart';
 import 'package:spending_tracker/pages/config_page.dart';
 import 'package:spending_tracker/pages/home_page.dart';
 import 'package:spending_tracker/pages/info_page.dart';
 import 'package:spending_tracker/pages/manage_categories_page.dart';
-import 'package:spending_tracker/pages/old_home_page.dart';
 import 'package:spending_tracker/pages/spending_report_page.dart';
-import 'package:month_year_picker/month_year_picker.dart';
 
 void main() {
   runApp(const MyApp());

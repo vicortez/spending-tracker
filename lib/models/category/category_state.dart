@@ -1,6 +1,3 @@
-// Global state
-import 'dart:math';
-
 import 'package:flutter/foundation.dart' hide Category;
 import 'category.dart';
 import 'package:shared_preferences/shared_preferences.dart';
