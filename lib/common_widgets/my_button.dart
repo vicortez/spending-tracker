@@ -4,11 +4,10 @@ enum ButtonType { normal, danger }
 
 class MyButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final ButtonType type;
 
-  const MyButton({Key? key, required this.text, required this.onPressed, this.type = ButtonType.normal})
-      : super(key: key);
+  const MyButton({Key? key, required this.text, this.onPressed, this.type = ButtonType.normal}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +28,7 @@ class MyButton extends StatelessWidget {
         break;
     }
     return ElevatedButton(
-      onPressed: () => onPressed(),
+      onPressed: onPressed != null ? () => onPressed!() : null,
       style: ButtonStyle(
           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),

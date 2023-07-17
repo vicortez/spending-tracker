@@ -18,6 +18,11 @@ class ExpenseState extends ChangeNotifier {
     }
   }
 
+  void setDataFromImport(dynamic data) {
+    prefs?.setString(Expense.PERSIST_NAME, data);
+    loadFromLocalStorage(prefs!);
+  }
+
   bool updateExpense(int id, String categoryName, double amount, DateTime date) {
     Expense? expense = expenses.firstWhereOrNull((exp) => exp.id == id);
     if (expense == null) {

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart' hide Category;
-import 'category.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'category.dart';
 
 class CategoryState extends ChangeNotifier {
   var current = "test 2";
@@ -30,6 +31,11 @@ class CategoryState extends ChangeNotifier {
       categories = Category.decode(categoriesStr);
       notifyListeners();
     }
+  }
+
+  void setDataFromImport(dynamic data) {
+    prefs?.setString(Category.PERSIST_NAME, data);
+    loadCategoriesFromLocalStorage(prefs!);
   }
 
   void addCategory(Category category) {
