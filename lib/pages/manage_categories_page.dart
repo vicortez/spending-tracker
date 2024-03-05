@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/models/expense/expense_state.dart';
-import 'package:spending_tracker/models/category/category.dart';
 import 'package:spending_tracker/models/category/category_state.dart';
+import 'package:spending_tracker/models/expense/expense_state.dart';
 
 class ManageCategoriesPage extends StatefulWidget {
   const ManageCategoriesPage({super.key});
@@ -112,13 +111,12 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
   void submitCategory() {
     String currentText = _currentCategoryNameTextController.text;
     var categoryState = context.read<CategoryState>();
-    Category categoryToAdd = Category.name(currentText);
-    categoryState.addCategory(categoryToAdd);
+    categoryState.addCategory(currentText);
     _currentCategoryNameTextController.clear();
     myFocusNode.requestFocus();
   }
 
-  bool canRemoveCategory(String catName, expenseState) {
+  bool canRemoveCategory(String catName, ExpenseState expenseState) {
     return !expenseState.existsEspenseForCategory(catName);
   }
 }

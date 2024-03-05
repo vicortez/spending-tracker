@@ -98,7 +98,7 @@ class ConfigPage extends StatelessWidget {
 
   void handleToastFileExportResult(bool res, BuildContext context, String fileName) {
     if (res) {
-      String topLevelFolderName = Platform.isAndroid ? "app" : "Download";
+      String topLevelFolderName = Platform.isAndroid ? "Android/data" : "Download";
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("File exported to $topLevelFolderName folder as $fileName")),
       );
@@ -153,7 +153,8 @@ class ConfigPage extends StatelessWidget {
       BuildContext context, ConfigState configState, CategoryState categoryState, ExpenseState expenseState) async {
     Map<String, dynamic>? jsonData = await configState.importJsonDataFile();
     if (jsonData != null) {
-      categoryState.setDataFromImport(jsonData[Category.PERSIST_NAME]);
+      // categoryState.setDataFromImport(jsonData[Category.PERSIST_NAME]);
+      categoryState.setDataFromImportWithId(jsonData[Category.PERSIST_NAME]);
       expenseState.setDataFromImport(jsonData[Expense.PERSIST_NAME]);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Data imported"), duration: Duration(seconds: 2)),

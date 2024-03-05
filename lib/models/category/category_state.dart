@@ -1,11 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'category.dart';
 
 class CategoryState extends ChangeNotifier {
-  var current = "test 2";
-  var favorites = <String>[];
   List<Category> categories = [
     // Category(name: "Sushi", enabled: true),
     // Category(name: "Restaurants", enabled: true),
@@ -26,10 +26,28 @@ class CategoryState extends ChangeNotifier {
 
   void loadCategoriesFromLocalStorage(SharedPreferences prefs) {
     this.prefs = prefs;
-    final String? categoriesStr = prefs?.getString(Category.PERSIST_NAME);
+    final String? categoriesStr = prefs.getString(Category.PERSIST_NAME);
     if (categoriesStr != null) {
       categories = Category.decode(categoriesStr);
       notifyListeners();
+    }
+  }
+
+  void loadCategoriesFromLocalStorageWithIdMigration(SharedPreferences prefs) {
+    this.prefs = prefs;
+    final String? categoriesStr = prefs.getString(Category.PERSIST_NAME);
+    if (categoriesStr != null) {
+      categories = Category.decodeOld(categoriesStr);
+      migrateToId();
+      notifyListeners();
+    }
+  }
+
+  void migrateToId() {
+    int cont = 1;
+    for (Category cat in categories) {
+      cat.id = cont;
+      cont++;
     }
   }
 
@@ -38,7 +56,14 @@ class CategoryState extends ChangeNotifier {
     loadCategoriesFromLocalStorage(prefs!);
   }
 
-  void addCategory(Category category) {
+  void setDataFromImportWithId(dynamic jsonData) {
+    prefs?.setString(Category.PERSIST_NAME, jsonData);
+    loadCategoriesFromLocalStorageWithIdMigration(prefs!);
+    updateLocalStorage();
+  }
+
+  void addCategory(String name) {
+    Category category = Category(id: getNextId(), name: name, enabled: true);
     categories.add(category);
 
     if (prefs != null) {
@@ -53,6 +78,14 @@ class CategoryState extends ChangeNotifier {
       updateLocalStorage();
     }
     notifyListeners();
+  }
+
+  int getNextId() {
+    if (categories.isEmpty) {
+      return 1;
+    } else {
+      return categories.map((e) => e.id).reduce(max) + 1;
+    }
   }
 
   void updateLocalStorage() {

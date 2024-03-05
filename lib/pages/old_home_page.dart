@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/models/category/category.dart';
-import 'package:spending_tracker/models/category/category_state.dart';
 import 'package:spending_tracker/examples.dart';
-import 'package:spending_tracker/main.dart';
+import 'package:spending_tracker/models/category/category_state.dart';
 
 class OldHomePage extends StatelessWidget {
   const OldHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<CategoryState>();
-    var currentValue = appState.current;
+    var catState = context.watch<CategoryState>();
+    var currentValue = "asdf";
 
     IconData icon;
-    if (appState.favorites.contains(currentValue)) {
+    if (true) {
       icon = Icons.favorite;
     } else {
       icon = Icons.favorite_border;
@@ -52,7 +50,7 @@ class OldHomePage extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              appState.addCategory(Category(name: "name", enabled: true));
+              catState.addCategory("name");
             },
             child: const Text('add cat'),
           ),

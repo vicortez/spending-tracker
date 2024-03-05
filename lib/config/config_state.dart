@@ -105,20 +105,19 @@ class ConfigState extends ChangeNotifier {
         type: FileType.custom,
         allowedExtensions: ['json'],
       );
-
-      if (result != null) {
-        PlatformFile file = result.files.first;
-
-        // Read the file contents as a string
-        String jsonString = await File(file.path!).readAsString();
-
-        // Decode the JSON string to a Map
-        Map<String, dynamic> jsonData = json.decode(jsonString);
-
-        return jsonData;
-      } else {
+      if (result == null) {
         return null;
       }
+
+      PlatformFile file = result.files.first;
+
+      // Read the file contents as a string
+      String jsonString = await File(file.path!).readAsString();
+
+      // Decode the JSON string to a Map
+      Map<String, dynamic> jsonData = json.decode(jsonString);
+
+      return jsonData;
     } catch (e) {
       return null;
     }
