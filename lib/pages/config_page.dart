@@ -153,8 +153,7 @@ class ConfigPage extends StatelessWidget {
       BuildContext context, ConfigState configState, CategoryState categoryState, ExpenseState expenseState) async {
     Map<String, dynamic>? jsonData = await configState.importJsonDataFile();
     if (jsonData != null) {
-      // categoryState.setDataFromImport(jsonData[Category.PERSIST_NAME]);
-      categoryState.setDataFromImportWithId(jsonData[Category.PERSIST_NAME]);
+      categoryState.setDataFromImport(jsonData[Category.PERSIST_NAME]);
       expenseState.setDataFromImport(jsonData[Expense.PERSIST_NAME]);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Data imported"), duration: Duration(seconds: 2)),

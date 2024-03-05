@@ -23,11 +23,12 @@ class ExpenseState extends ChangeNotifier {
     loadFromLocalStorage(prefs!);
   }
 
-  bool updateExpense(int id, String categoryName, double amount, DateTime date) {
+  bool updateExpense(int id, int? categoryId, String categoryName, double amount, DateTime date) {
     Expense? expense = expenses.firstWhereOrNull((exp) => exp.id == id);
     if (expense == null) {
       return false;
     }
+    expense.categoryId = categoryId;
     expense.categoryName = categoryName;
     expense.amount = amount;
     expense.date = date;
@@ -47,10 +48,11 @@ class ExpenseState extends ChangeNotifier {
     }
   }
 
-  void addExpense(String categoryName, double amount) {
+  void addExpense(int? categoryId, String categoryName, double amount) {
     DateTime date = DateTime.now();
     date = DateTime(date.year, date.month, date.day, date.hour, date.minute);
-    Expense expense = Expense(id: getNextId(), categoryName: categoryName, amount: amount, date: date);
+    Expense expense =
+        Expense(id: getNextId(), categoryId: categoryId, categoryName: categoryName, amount: amount, date: date);
     expenses.add(expense);
 
     if (prefs != null) {
@@ -87,7 +89,8 @@ class ExpenseState extends ChangeNotifier {
     }
   }
 
-  bool existsEspenseForCategory(String catName) {
+  // TODO in the future, use cat id
+  bool existsExpenseForCategory(String catName) {
     return expenses.any(
       (exp) => exp.categoryName == catName,
     );

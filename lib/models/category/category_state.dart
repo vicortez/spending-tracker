@@ -33,33 +33,9 @@ class CategoryState extends ChangeNotifier {
     }
   }
 
-  void loadCategoriesFromLocalStorageWithIdMigration(SharedPreferences prefs) {
-    this.prefs = prefs;
-    final String? categoriesStr = prefs.getString(Category.PERSIST_NAME);
-    if (categoriesStr != null) {
-      categories = Category.decodeOld(categoriesStr);
-      migrateToId();
-      notifyListeners();
-    }
-  }
-
-  void migrateToId() {
-    int cont = 1;
-    for (Category cat in categories) {
-      cat.id = cont;
-      cont++;
-    }
-  }
-
   void setDataFromImport(dynamic data) {
     prefs?.setString(Category.PERSIST_NAME, data);
     loadCategoriesFromLocalStorage(prefs!);
-  }
-
-  void setDataFromImportWithId(dynamic jsonData) {
-    prefs?.setString(Category.PERSIST_NAME, jsonData);
-    loadCategoriesFromLocalStorageWithIdMigration(prefs!);
-    updateLocalStorage();
   }
 
   void addCategory(String name) {

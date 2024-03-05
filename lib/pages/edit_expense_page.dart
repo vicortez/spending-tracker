@@ -1,8 +1,10 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/models/category/category_state.dart';
 import 'package:spending_tracker/common_widgets/my_button.dart';
+import 'package:spending_tracker/models/category/category.dart';
+import 'package:spending_tracker/models/category/category_state.dart';
 import 'package:spending_tracker/models/expense/expense.dart';
 import 'package:spending_tracker/models/expense/expense_state.dart';
 
@@ -20,6 +22,7 @@ class _EditExpensePageState extends State<EditExpensePage> {
   final TextEditingController _expenseAmountTextController = TextEditingController();
   final TextEditingController dateTextController = TextEditingController();
   String categoryName = "";
+  int? categoryId;
   DateTime currentDate = DateTime.now();
   DateTime? selectedDate;
 
@@ -28,6 +31,7 @@ class _EditExpensePageState extends State<EditExpensePage> {
     super.initState();
 
     categoryName = widget.expense.categoryName;
+    categoryId = widget.expense.categoryId;
     RegExp trailingZeroesRegex = RegExp(r'([.]*0)(?!.*\d)');
     _expenseAmountTextController.text = widget.expense.amount.toString().replaceAll(trailingZeroesRegex, '');
     selectedDate = widget.expense.date;
@@ -38,7 +42,7 @@ class _EditExpensePageState extends State<EditExpensePage> {
   Widget build(BuildContext context) {
     var categoryState = context.watch<CategoryState>();
     var expenseState = context.watch<ExpenseState>();
-    var categories = categoryState.getEnabledCategories();
+    List<Category> categories = categoryState.getEnabledCategories();
 
     var options = categories.map((cat) => cat.name);
     return Scaffold(
@@ -68,6 +72,8 @@ class _EditExpensePageState extends State<EditExpensePage> {
                                       value: options.contains(categoryName) ? categoryName : options.first,
                                       onChanged: (String? selectedOption) {
                                         categoryName = selectedOption!;
+                                        categoryId =
+                                            categories.firstWhereOrNull((cat) => cat.name == selectedOption)?.id;
                                       },
                                       items: options.map<DropdownMenuItem<String>>((String value) {
                                         return DropdownMenuItem<String>(
@@ -165,7 +171,7 @@ class _EditExpensePageState extends State<EditExpensePage> {
                                               bool success = false;
                                               if (amount != null && selectedDate != null) {
                                                 success = expenseState.updateExpense(
-                                                    widget.expense.id, categoryName, amount, selectedDate!);
+                                                    widget.expense.id, categoryId, categoryName, amount, selectedDate!);
                                               }
                                               if (success) {
                                                 ScaffoldMessenger.of(context).showSnackBar(

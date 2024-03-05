@@ -117,6 +117,6 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
   }
 
   bool canRemoveCategory(String catName, ExpenseState expenseState) {
-    return !expenseState.existsEspenseForCategory(catName);
+    return !expenseState.existsExpenseForCategory(catName);
   }
 }

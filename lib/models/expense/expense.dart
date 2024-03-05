@@ -3,25 +3,32 @@ import 'dart:convert';
 // TODO extends persistable?
 class Expense {
   int id;
+  int? categoryId;
   String categoryName;
   double amount;
   DateTime date;
 
   static const PERSIST_NAME = "expenses";
 
-  Expense({required this.id, required this.categoryName, required this.amount, required this.date});
+  Expense({required this.id, this.categoryId, required this.categoryName, required this.amount, required this.date});
 
   factory Expense.fromJson(Map<String, dynamic> jsonData) {
     return Expense(
       id: jsonData['id'],
+      categoryId: jsonData['categoryId'],
       categoryName: jsonData['categoryName'],
       amount: jsonData['amount'],
       date: DateTime.fromMillisecondsSinceEpoch(jsonData['date']),
     );
   }
 
-  static Map<String, dynamic> toMap(Expense expense) =>
-      {'id':expense.id, 'categoryName': expense.categoryName, 'amount': expense.amount, 'date': expense.date.millisecondsSinceEpoch};
+  static Map<String, dynamic> toMap(Expense expense) => {
+        'id': expense.id,
+        'categoryId': expense.id,
+        'categoryName': expense.categoryName,
+        'amount': expense.amount,
+        'date': expense.date.millisecondsSinceEpoch
+      };
 
   static String encode(List<Expense> expenses) => json.encode(
         expenses.map<Map<String, dynamic>>((expense) => Expense.toMap(expense)).toList(),

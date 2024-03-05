@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/models/category/category_state.dart';
 import 'package:spending_tracker/common_widgets/my_button.dart';
+import 'package:spending_tracker/models/category/category_state.dart';
 import 'package:spending_tracker/models/expense/expense_state.dart';
 
 class HomePage extends StatefulWidget {
@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> {
               ),
               itemBuilder: (BuildContext ctx, int index) => MyButton(
                 onPressed: () {
-                  handleSubmitExpense(categories[index].name, expenseAmountTextController);
+                  handleSubmitExpense(categories[index].id, categories[index].name, expenseAmountTextController);
                 },
                 text: categories[index].name,
               ),
@@ -51,7 +51,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void handleSubmitExpense(String categoryName, TextEditingController expenseAmountTextController) {
+  void handleSubmitExpense(int categoryId, String categoryName, TextEditingController expenseAmountTextController) {
     double? amount = double.tryParse(expenseAmountTextController.text);
     if (amount == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -61,7 +61,7 @@ class _HomePageState extends State<HomePage> {
       );
     } else {
       var expenseState = context.read<ExpenseState>();
-      expenseState.addExpense(categoryName, amount);
+      expenseState.addExpense(categoryId, categoryName, amount);
       expenseAmountTextController.clear();
     }
   }
