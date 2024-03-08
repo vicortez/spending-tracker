@@ -19,7 +19,8 @@ class ExpenseState extends ChangeNotifier {
   }
 
   void setDataFromImport(dynamic data) {
-    prefs?.setString(Expense.PERSIST_NAME, data);
+    dynamic value = data ?? "[]";
+    prefs?.setString(Expense.PERSIST_NAME, value);
     loadFromLocalStorage(prefs!);
   }
 
@@ -48,7 +49,7 @@ class ExpenseState extends ChangeNotifier {
     }
   }
 
-  void addExpense(int? categoryId, String categoryName, double amount) {
+  void addExpense(int categoryId, String categoryName, double amount) {
     DateTime date = DateTime.now();
     date = DateTime(date.year, date.month, date.day, date.hour, date.minute);
     Expense expense =
@@ -90,9 +91,9 @@ class ExpenseState extends ChangeNotifier {
   }
 
   // TODO in the future, use cat id
-  bool existsExpenseForCategory(String catName) {
+  bool existsExpenseForCategory(int catId, String catName) {
     return expenses.any(
-      (exp) => exp.categoryName == catName,
+      (exp) => (exp.categoryName == catName || exp.categoryId == catId),
     );
   }
 }

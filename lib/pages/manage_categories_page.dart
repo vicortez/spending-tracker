@@ -1,7 +1,14 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/models/category/category_state.dart';
+import 'package:spending_tracker/models/domain/domain.dart';
+import 'package:spending_tracker/models/domain/domain_state.dart';
 import 'package:spending_tracker/models/expense/expense_state.dart';
+import 'package:spending_tracker/pages/edit_category_page.dart';
+
+import '../models/category/category.dart';
 
 class ManageCategoriesPage extends StatefulWidget {
   const ManageCategoriesPage({super.key});
@@ -10,6 +17,7 @@ class ManageCategoriesPage extends StatefulWidget {
   State<ManageCategoriesPage> createState() => _ManageCategoriesPageState();
 }
 
+// could have passed most of this to a generic "textual form" component
 class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
   final _currentCategoryNameTextController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -19,39 +27,73 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
   Widget build(BuildContext context) {
     var categoryState = context.watch<CategoryState>();
     var expenseState = context.watch<ExpenseState>();
+    var domainState = context.watch<DomainState>();
 
     var categories = categoryState.getEnabledCategories();
+    List<Domain> domains = domainState.domains;
+    domains.sort(
+      (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+    );
     categories.sort(
       (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
     );
+    LinkedHashMap<Domain, List<Category>> catByDomain = LinkedHashMap();
+    for (var domain in domains) {
+      catByDomain[domain] = categories.where((cat) => cat.domainId == domain.id).toList();
+    }
+    catByDomain[Domain(id: -1, name: "")] = categories.where((cat) => cat.domainId == null).toList();
+    List<Category> noDomainCategories = categories.where((cat) => cat.domainId == null).toList();
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Form(
-          key: _formKey,
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextFormField(
-                    textCapitalization: TextCapitalization.words,
-                    textInputAction: TextInputAction.done,
-                    controller: _currentCategoryNameTextController,
-                    decoration: const InputDecoration(hintText: 'New category'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Category must have a name";
-                      }
-                      bool isDuplicate = categories.any((cat) => cat.name == value);
-                      if (isDuplicate) {
-                        return "Category already exists";
-                      }
-                      return null;
-                    },
-                    onFieldSubmitted: (value) {
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pop(context);
+        return false; // Prevents the automatic pop of the current
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: const BackButton(),
+          title: const Text("Manage categories"),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.background,
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Form(
+              key: _formKey,
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        textCapitalization: TextCapitalization.words,
+                        textInputAction: TextInputAction.done,
+                        controller: _currentCategoryNameTextController,
+                        decoration: const InputDecoration(hintText: 'New category'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Category must have a name";
+                          }
+                          bool isDuplicate = categoryState.existsCategoryWithName(value);
+                          if (isDuplicate) {
+                            return "Category already exists";
+                          }
+                          return null;
+                        },
+                        onFieldSubmitted: (value) {
+                          if (_formKey.currentState!.validate()) {
+                            submitCategory();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Category added')),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         submitCategory();
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -59,52 +101,62 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
                         );
                       }
                     },
-                  ),
-                ),
+                    icon: const Icon(Icons.add_outlined),
+                  )
+                ],
               ),
-              IconButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    submitCategory();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Category added')),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Expanded(
+              child: ListView.builder(
+                  itemCount: catByDomain.keys.length,
+                  itemBuilder: (context, index) {
+                    Domain domain = catByDomain.keys.elementAt(index);
+                    return SelectionArea(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Divider(
+                            color: Theme.of(context).colorScheme.onBackground,
+                          ),
+                          Text(domain.name.isNotEmpty ? domain.name : "Categories with no domain",
+                              style: Theme.of(context).textTheme.titleMedium),
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: catByDomain[domain]!.length,
+                            itemBuilder: (context, index2) {
+                              Category category = catByDomain[domain]![index2];
+
+                              return Card(
+                                child: ListTile(
+                                  title: Text(category.name),
+                                  trailing: IconButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => EditCategoryPage(category: category)));
+                                    },
+                                    icon: const Icon(Icons.edit_outlined),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          )
+                        ],
+                      ),
                     );
-                  }
-                },
-                icon: const Icon(Icons.add_outlined),
-              )
-            ],
-          ),
+                  }),
+            ),
+          ],
         ),
-        const SizedBox(
-          height: 10,
-        ),
-        Expanded(
-            child: SelectionArea(
-          child: ListView(
-            children: [
-              for (var name in categories.map((cat) => cat.name))
-                Card(
-                  child: ListTile(
-                    title: Text(name),
-                    trailing: IconButton(
-                      onPressed: () {
-                        if (canRemoveCategory(name, expenseState)) {
-                          categoryState.removeCategory(name);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Can\'t delete category. Delete expenses using it')),
-                          );
-                        }
-                      },
-                      icon: const Icon(Icons.delete_outline),
-                    ),
-                  ),
-                )
-            ],
-          ),
-        ))
-      ],
+      ),
     );
   }
 
@@ -114,9 +166,5 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
     categoryState.addCategory(currentText);
     _currentCategoryNameTextController.clear();
     myFocusNode.requestFocus();
-  }
-
-  bool canRemoveCategory(String catName, ExpenseState expenseState) {
-    return !expenseState.existsExpenseForCategory(catName);
   }
 }

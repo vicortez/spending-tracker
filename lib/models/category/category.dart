@@ -5,24 +5,18 @@ class Category {
   int id;
   String name;
   bool enabled;
+  int? domainId;
 
   static const PERSIST_NAME = "categories";
 
-  Category({required this.id, required this.name, required this.enabled});
+  Category({required this.id, required this.name, required this.enabled, this.domainId});
 
   factory Category.fromJson(Map<String, dynamic> jsonData) {
     return Category(
       id: jsonData['id'],
       name: jsonData['name'],
       enabled: jsonData['enabled'],
-    );
-  }
-
-  factory Category.fromOldJson(Map<String, dynamic> jsonData) {
-    return Category(
-      id: -1,
-      name: jsonData['name'],
-      enabled: jsonData['enabled'],
+      domainId: jsonData['domainId'],
     );
   }
 
@@ -30,6 +24,7 @@ class Category {
         'id': category.id,
         'name': category.name,
         'enabled': category.enabled,
+        'domainId': category.domainId,
       };
 
   static String encode(List<Category> categories) => json.encode(
@@ -38,7 +33,4 @@ class Category {
 
   static List<Category> decode(String categories) =>
       (json.decode(categories) as List<dynamic>).map<Category>((item) => Category.fromJson(item)).toList();
-
-  static List<Category> decodeOld(String categories) =>
-      (json.decode(categories) as List<dynamic>).map<Category>((item) => Category.fromOldJson(item)).toList();
 }

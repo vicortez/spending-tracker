@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/config/config_name.dart';
 import 'package:spending_tracker/models/category/category.dart';
+import 'package:spending_tracker/models/domain/domain.dart';
 import 'package:spending_tracker/models/expense/expense.dart';
 
 class ConfigState extends ChangeNotifier {
@@ -59,8 +60,10 @@ class ConfigState extends ChangeNotifier {
     Map<String, dynamic> jsonData = {};
     final String? categoriesStr = prefs?.getString(Category.PERSIST_NAME);
     final String? expensesStr = prefs?.getString(Expense.PERSIST_NAME);
+    final String? domainsStr = prefs?.getString(Domain.PERSIST_NAME);
     jsonData[Category.PERSIST_NAME] = categoriesStr;
     jsonData[Expense.PERSIST_NAME] = expensesStr;
+    jsonData[Domain.PERSIST_NAME] = domainsStr;
 
     return jsonData;
   }

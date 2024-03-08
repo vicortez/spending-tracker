@@ -8,6 +8,8 @@ import 'package:spending_tracker/config/config_name.dart';
 import 'package:spending_tracker/config/config_state.dart';
 import 'package:spending_tracker/models/category/category.dart';
 import 'package:spending_tracker/models/category/category_state.dart';
+import 'package:spending_tracker/models/domain/domain.dart';
+import 'package:spending_tracker/models/domain/domain_state.dart';
 import 'package:spending_tracker/models/expense/expense.dart';
 import 'package:spending_tracker/models/expense/expense_state.dart';
 
@@ -17,6 +19,7 @@ class ConfigPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var expenseState = context.watch<ExpenseState>();
+    var domainState = context.watch<DomainState>();
     var categoryState = context.watch<CategoryState>();
     var configState = context.watch<ConfigState>();
 
@@ -55,7 +58,8 @@ class ConfigPage extends StatelessWidget {
                           : () {
                               showConfirmDialog(
                                   context,
-                                  () => handleImportFile(context, configState, categoryState, expenseState),
+                                  () =>
+                                      handleImportFile(context, configState, categoryState, expenseState, domainState),
                                   () => {},
                                   "Confirm",
                                   "Importing app data will erase any current app data, and load the new one.");
@@ -149,12 +153,13 @@ class ConfigPage extends StatelessWidget {
     );
   }
 
-  void handleImportFile(
-      BuildContext context, ConfigState configState, CategoryState categoryState, ExpenseState expenseState) async {
+  void handleImportFile(BuildContext context, ConfigState configState, CategoryState categoryState,
+      ExpenseState expenseState, DomainState domainState) async {
     Map<String, dynamic>? jsonData = await configState.importJsonDataFile();
     if (jsonData != null) {
       categoryState.setDataFromImport(jsonData[Category.PERSIST_NAME]);
       expenseState.setDataFromImport(jsonData[Expense.PERSIST_NAME]);
+      domainState.setDataFromImport(jsonData[Domain.PERSIST_NAME]);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Data imported"), duration: Duration(seconds: 2)),
       );

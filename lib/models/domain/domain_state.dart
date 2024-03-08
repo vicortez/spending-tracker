@@ -20,7 +20,8 @@ class DomainState extends ChangeNotifier {
   }
 
   void setDataFromImport(dynamic data) {
-    updateLocalStorageFromRawData(data);
+    dynamic value = data ?? "[]";
+    updateLocalStorageFromRawData(value);
     loadFromLocalStorage(prefs!);
   }
 
@@ -88,9 +89,5 @@ class DomainState extends ChangeNotifier {
     } else {
       return domains.map((el) => el.id).reduce(max) + 1;
     }
-  }
-
-  bool existsCategoryWithDomain(int domainId) {
-    return domains.any((dom) => dom.id == domainId);
   }
 }
