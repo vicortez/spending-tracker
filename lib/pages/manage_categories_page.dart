@@ -29,17 +29,20 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
 
     var categories = categoryState.getEnabledCategories();
     List<Domain> domains = domainState.domains;
-    domains.sort(
-      (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
-    );
-    categories.sort(
-      (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
-    );
+    domains.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    categories.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     LinkedHashMap<Domain, List<Category>> catByDomain = LinkedHashMap();
-    for (var domain in domains) {
-      catByDomain[domain] = categories.where((cat) => cat.domainId == domain.id).toList();
+
+    for (Domain domain in domains) {
+      List<Category> foundCategories = categories.where((cat) => cat.domainId == domain.id).toList();
+      if (foundCategories.isNotEmpty) {
+        catByDomain[domain] = foundCategories;
+      }
     }
-    catByDomain[Domain(id: -1, name: "")] = categories.where((cat) => cat.domainId == null).toList();
+    List<Category> noDomainCategories = categories.where((cat) => cat.domainId == null).toList();
+    if (noDomainCategories.isNotEmpty) {
+      catByDomain[Domain(id: -1, name: "")] = noDomainCategories;
+    }
 
     return WillPopScope(
       onWillPop: () async {

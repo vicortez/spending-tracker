@@ -29,15 +29,11 @@ class _HomePageState extends State<HomePage> {
 
     List<Category> categories = categoryState.getEnabledCategories();
     List<Domain> domains = domainState.domains;
-    // TODO ordenação
+
     domains.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-    // categories.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    categories.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     LinkedHashMap<Domain?, List<Category>> catByDomain = LinkedHashMap();
-    for (Category cat in categories) {
-      Domain? domain = domains.firstWhereOrNull((element) => element.id == cat.domainId);
-      catByDomain.putIfAbsent(domain, () => []);
-      catByDomain[domain]!.add(cat);
-    }
+
     for (Domain domain in domains) {
       List<Category> foundCategories = categories.where((cat) => cat.domainId == domain.id).toList();
       if (foundCategories.isNotEmpty) {

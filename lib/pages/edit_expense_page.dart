@@ -42,7 +42,9 @@ class _EditExpensePageState extends State<EditExpensePage> {
   Widget build(BuildContext context) {
     var categoryState = context.watch<CategoryState>();
     var expenseState = context.watch<ExpenseState>();
+
     List<Category> categories = categoryState.getEnabledCategories();
+    categories.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
     var options = categories.map((cat) => cat.name);
     return Scaffold(
