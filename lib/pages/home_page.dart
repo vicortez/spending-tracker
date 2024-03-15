@@ -64,7 +64,7 @@ class _HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Divider(
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onBackground.withOpacity(0.6),
                       ),
                       Text(domainLabel, style: Theme.of(context).textTheme.titleMedium),
                       ListView.separated(

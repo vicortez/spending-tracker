@@ -119,7 +119,7 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Divider(
-                            color: Theme.of(context).colorScheme.onBackground,
+                            color: Theme.of(context).colorScheme.onBackground.withOpacity(0.6),
                           ),
                           Text(domain.name.isNotEmpty ? domain.name : "Categories with no domain",
                               style: Theme.of(context).textTheme.titleMedium),
