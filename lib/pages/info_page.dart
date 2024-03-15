@@ -16,6 +16,11 @@ class InfoPage extends StatelessWidget {
         ),
         Text("Developed by Victor Cortez using Flutter"),
         InkWell(onTap: _launchURL, child: Text(style: TextStyle(color: Colors.blue), "https://github.com/vicortez")),
+        Expanded(child: SizedBox.shrink()),
+        Text("Version 0.13.0"),
+        SizedBox(
+          height: 5,
+        )
       ],
     );
   }
