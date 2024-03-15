@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:spending_tracker/models/category/category_state.dart';
 import 'package:spending_tracker/models/domain/domain.dart';
 import 'package:spending_tracker/models/domain/domain_state.dart';
-import 'package:spending_tracker/models/expense/expense_state.dart';
 import 'package:spending_tracker/pages/edit_category_page.dart';
 
 import '../models/category/category.dart';
@@ -26,7 +25,6 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
   @override
   Widget build(BuildContext context) {
     var categoryState = context.watch<CategoryState>();
-    var expenseState = context.watch<ExpenseState>();
     var domainState = context.watch<DomainState>();
 
     var categories = categoryState.getEnabledCategories();
@@ -42,7 +40,6 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
       catByDomain[domain] = categories.where((cat) => cat.domainId == domain.id).toList();
     }
     catByDomain[Domain(id: -1, name: "")] = categories.where((cat) => cat.domainId == null).toList();
-    List<Category> noDomainCategories = categories.where((cat) => cat.domainId == null).toList();
 
     return WillPopScope(
       onWillPop: () async {

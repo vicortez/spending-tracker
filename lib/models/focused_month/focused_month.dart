@@ -7,15 +7,15 @@ class FocusedMonth {
 
   FocusedMonth({required this.month});
 
-  factory FocusedMonth.fromJson(Map<String, dynamic> jsonData) {
+  factory FocusedMonth.fromDate(int date) {
     return FocusedMonth(
-      month: DateTime.fromMillisecondsSinceEpoch(jsonData['month']),
+      month: DateTime.fromMillisecondsSinceEpoch(date),
     );
   }
 
-  static String encode(FocusedMonth focusedMonth) => json.encode(
-        json.encode(focusedMonth.month.millisecondsSinceEpoch),
-      );
+  static String encode(FocusedMonth focusedMonth) => json.encode(focusedMonth.month.millisecondsSinceEpoch);
 
-  static FocusedMonth decode(String focusedMonth) => FocusedMonth.fromJson(json.decode(focusedMonth));
+  static FocusedMonth decode(String focusedMonth) {
+    return FocusedMonth.fromDate(json.decode(focusedMonth));
+  }
 }
