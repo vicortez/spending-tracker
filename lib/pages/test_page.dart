@@ -53,12 +53,35 @@ class TestPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
-        title: Text("Tests"),
+        title: Text("Secret tests page"),
       ),
-      body: PieChart(PieChartData(
-        sections: _chartSections(expenses, categories, domains),
-        centerSpaceRadius: 48.0,
-      )),
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("Top 20 expenses"),
+            Container(
+              height: 300,
+              child: PieChart(
+                PieChartData(
+                  sections: _chartSections(expenses, categories, domains),
+                  centerSpaceRadius: 48.0,
+                ),
+              ),
+            ),
+            ..._chartSections(expenses, categories, domains).toList().map((section) {
+              return ListTile(
+                leading: Container(
+                  width: 10,
+                  height: 10,
+                  color: section.color,
+                ),
+                title: Text(section.title),
+              );
+            }).toList(),
+          ],
+        ),
+      ),
     );
   }
 
@@ -89,13 +112,16 @@ class TestPage extends StatelessWidget {
       var accCat = accCatList[i];
       const double radius = 40.0;
       final data = PieChartSectionData(
-        color: colors[i % colors.length],
-        value: accCat.acc,
-        radius: radius,
-        title:
-            "${categories.firstWhereOrNull((element) => accCatList[i].catId == element.id)?.name ?? "<noCat>"} \$${accCat.acc}",
-        titleStyle: TextStyle(fontSize: 18),
-      );
+          color: colors[i % colors.length],
+          value: accCat.acc,
+          radius: radius,
+          showTitle: false,
+          title:
+              "${categories.firstWhereOrNull((element) => accCatList[i].catId == element.id)?.name ?? "<noCat>"} \$${accCat.acc}",
+          titleStyle: TextStyle(
+            fontSize: 18,
+          ),
+          titlePositionPercentageOffset: 1.2);
       list.add(data);
     }
     return list;
