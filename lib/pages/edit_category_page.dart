@@ -69,9 +69,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                                       children: [
                                         Expanded(
                                           child: TextFormField(
-                                            enabled: false,
-                                            decoration: const InputDecoration(
-                                                labelText: "Name - feature not available temporarily"),
+                                            decoration: const InputDecoration(labelText: "Name"),
                                             controller: _categoryNameTextController,
                                             validator: (value) {
                                               if (value == null || value.isEmpty) {
