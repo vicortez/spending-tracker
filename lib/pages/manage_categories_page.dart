@@ -67,8 +67,9 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextFormField(
-                        textCapitalization: TextCapitalization.words,
+                        textCapitalization: TextCapitalization.sentences,
                         textInputAction: TextInputAction.done,
+                        focusNode: myFocusNode,
                         controller: _currentCategoryNameTextController,
                         decoration: const InputDecoration(hintText: 'New category'),
                         validator: (value) {
@@ -87,6 +88,7 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Category added')),
                             );
+                            myFocusNode.requestFocus();
                           }
                         },
                       ),
@@ -165,6 +167,5 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
     var categoryState = context.read<CategoryState>();
     categoryState.addCategory(currentText);
     _currentCategoryNameTextController.clear();
-    myFocusNode.requestFocus();
   }
 }
