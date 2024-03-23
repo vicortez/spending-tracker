@@ -24,7 +24,7 @@ class Expense {
 
   static Map<String, dynamic> toMap(Expense expense) => {
         'id': expense.id,
-        'categoryId': expense.id,
+        'categoryId': expense.categoryId,
         'categoryName': expense.categoryName,
         'amount': expense.amount,
         'date': expense.date.millisecondsSinceEpoch

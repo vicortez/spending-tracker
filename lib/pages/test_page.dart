@@ -53,7 +53,7 @@ class TestPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
-        title: Text("Secret tests page"),
+        title: const Text("Secret tests page"),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -71,12 +71,14 @@ class TestPage extends StatelessWidget {
             ),
             ..._chartSections(expenses, categories, domains).toList().map((section) {
               return ListTile(
+                visualDensity: const VisualDensity(vertical: -3),
                 leading: Container(
-                  width: 10,
-                  height: 10,
+                  width: 12,
+                  height: 12,
                   color: section.color,
                 ),
                 title: Text(section.title),
+                titleTextStyle: const TextStyle(fontSize: 18),
               );
             }).toList(),
           ],
@@ -118,7 +120,7 @@ class TestPage extends StatelessWidget {
           showTitle: false,
           title:
               "${categories.firstWhereOrNull((element) => accCatList[i].catId == element.id)?.name ?? "<noCat>"} \$${accCat.acc}",
-          titleStyle: TextStyle(
+          titleStyle: const TextStyle(
             fontSize: 18,
           ),
           titlePositionPercentageOffset: 1.2);
