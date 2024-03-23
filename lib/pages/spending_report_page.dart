@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/config/config_name.dart';
 import 'package:spending_tracker/config/config_state.dart';
+import 'package:spending_tracker/models/category/category.dart';
+import 'package:spending_tracker/models/category/category_state.dart';
 import 'package:spending_tracker/models/expense/expense.dart';
 import 'package:spending_tracker/models/expense/expense_state.dart';
 import 'package:spending_tracker/models/focused_month/focused_month_state.dart';
@@ -27,33 +29,37 @@ class SpendingReportPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var expenseState = context.watch<ExpenseState>();
+    var categoryState = context.watch<CategoryState>();
     var focusedMonthState = context.watch<FocusedMonthState>();
     var configState = context.watch<ConfigState>();
 
     bool seeAllMonths = configState.getConfig(ConfigName.seeAllMonths);
     DateTime month = focusedMonthState.getMonth();
     List<Expense> expenses = [...expenseState.expenses];
-    expenses.sort((a, b) => a.date.compareTo(b.date));
+    List<Category> categories = [...categoryState.categories];
+    expenses?.sort((a, b) => a.date.compareTo(b.date));
     if (!seeAllMonths) {
       expenses =
           expenses.where((expense) => expense.date.year == month.year && expense.date.month == month.month).toList();
     }
+
     // Quick and dirty way. Not scalable. Ideally we want a global object dictionary with theme name as keys.
     // or maybe there is a "fluttery" way to do it.
     bool isDarkMode = Theme.of(context).colorScheme.brightness == Brightness.dark;
     Color? tableBackground1 = Theme.of(context).colorScheme.background;
     Color? tableBackground2 = isDarkMode ? Colors.grey[850] : Colors.grey[300];
 
-    List<TableLineData> tableLinesData = getTableLinesData(
-        expenses, tableBackground1, tableBackground2, Theme.of(context).colorScheme.primary.withOpacity(0.5));
+    List<TableLineData> tableLinesData = getTableLinesData(expenses, tableBackground1, tableBackground2,
+        Theme.of(context).colorScheme.primary.withOpacity(0.5), categories);
     return Column(
       children: [
-        if (!seeAllMonths) Column(
-          children: [
-            Text("Showing report for ${monthNames[month.month]}"),
-            const SizedBox(height: 10),
-          ],
-        ),
+        if (!seeAllMonths)
+          Column(
+            children: [
+              Text("Showing report for ${monthNames[month.month]}"),
+              const SizedBox(height: 10),
+            ],
+          ),
         Expanded(
           child: ListView(
             children: [
@@ -138,12 +144,16 @@ class SpendingReportPage extends StatelessWidget {
     );
   }
 
-  List<TableLineData> getTableLinesData(
-      List<Expense> expenses, Color tableBackground1, Color? tableBackground2, Color aggBackgroundColor) {
+  List<TableLineData> getTableLinesData(List<Expense> expenses, Color tableBackground1, Color? tableBackground2,
+      Color aggBackgroundColor, List<Category> categories) {
     final SplayTreeMap<String, List<Expense>> orderedExpensesMap =
         SplayTreeMap<String, List<Expense>>((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
     for (var expense in expenses) {
-      orderedExpensesMap.putIfAbsent(expense.categoryName, () => <Expense>[]).add(expense);
+      String categoryName = categories
+          .firstWhere((element) => element.id == expense.categoryId,
+              orElse: () => Category(id: -1, name: "<category not found>", enabled: true))
+          .name;
+      orderedExpensesMap.putIfAbsent(categoryName, () => <Expense>[]).add(expense);
     }
 
     List<TableLineData> tableLinesData = [];

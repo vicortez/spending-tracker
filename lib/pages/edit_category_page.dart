@@ -131,7 +131,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                                         child: MyButton(
                                       text: "Delete",
                                       onPressed: () {
-                                        if (canRemoveCategory(widget.category.id, widget.category.name, expenseState)) {
+                                        if (canRemoveCategory(widget.category.id, expenseState)) {
                                           categoryState.removeCategory(widget.category.id);
                                           scaffoldMessenger.showSnackBar(
                                             const SnackBar(content: Text('Category removed')),
@@ -212,7 +212,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
         ));
   }
 
-  bool canRemoveCategory(int catId, String catName, ExpenseState expenseState) {
-    return !expenseState.existsExpenseForCategory(catId, catName);
+  bool canRemoveCategory(int catId, ExpenseState expenseState) {
+    return !expenseState.existsExpenseForCategory(catId);
   }
 }

@@ -30,7 +30,6 @@ class ExpenseState extends ChangeNotifier {
       return false;
     }
     expense.categoryId = categoryId;
-    expense.categoryName = categoryName;
     expense.amount = amount;
     expense.date = date;
     if (prefs != null) {
@@ -52,8 +51,7 @@ class ExpenseState extends ChangeNotifier {
   void addExpense(int categoryId, String categoryName, double amount) {
     DateTime date = DateTime.now();
     date = DateTime(date.year, date.month, date.day, date.hour, date.minute);
-    Expense expense =
-        Expense(id: getNextId(), categoryId: categoryId, categoryName: categoryName, amount: amount, date: date);
+    Expense expense = Expense(id: getNextId(), categoryId: categoryId, amount: amount, date: date);
     expenses.add(expense);
 
     if (prefs != null) {
@@ -91,9 +89,9 @@ class ExpenseState extends ChangeNotifier {
   }
 
   // TODO in the future, use cat id
-  bool existsExpenseForCategory(int catId, String catName) {
+  bool existsExpenseForCategory(int catId) {
     return expenses.any(
-      (exp) => (exp.categoryName == catName || exp.categoryId == catId),
+      (exp) => (exp.categoryId == catId),
     );
   }
 }

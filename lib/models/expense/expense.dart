@@ -4,19 +4,17 @@ import 'dart:convert';
 class Expense {
   int id;
   int? categoryId;
-  String categoryName;
   double amount;
   DateTime date;
 
   static const PERSIST_NAME = "expenses";
 
-  Expense({required this.id, this.categoryId, required this.categoryName, required this.amount, required this.date});
+  Expense({required this.id, this.categoryId, required this.amount, required this.date});
 
   factory Expense.fromJson(Map<String, dynamic> jsonData) {
     return Expense(
       id: jsonData['id'],
       categoryId: jsonData['categoryId'],
-      categoryName: jsonData['categoryName'],
       amount: jsonData['amount'],
       date: DateTime.fromMillisecondsSinceEpoch(jsonData['date']),
     );
@@ -25,7 +23,6 @@ class Expense {
   static Map<String, dynamic> toMap(Expense expense) => {
         'id': expense.id,
         'categoryId': expense.categoryId,
-        'categoryName': expense.categoryName,
         'amount': expense.amount,
         'date': expense.date.millisecondsSinceEpoch
       };

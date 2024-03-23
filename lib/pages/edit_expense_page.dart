@@ -30,7 +30,6 @@ class _EditExpensePageState extends State<EditExpensePage> {
   void initState() {
     super.initState();
 
-    categoryName = widget.expense.categoryName;
     categoryId = widget.expense.categoryId;
     RegExp trailingZeroesRegex = RegExp(r'([.]*0)(?!.*\d)');
     _expenseAmountTextController.text = widget.expense.amount.toString().replaceAll(trailingZeroesRegex, '');
