@@ -12,33 +12,38 @@ class InfoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text("Spending tracker"),
-        SizedBox(
+        const Text("Spending tracker"),
+        const SizedBox(
           height: 10,
         ),
-        Text("Developed by Victor Cortez using Flutter"),
-        InkWell(onTap: _launchURL, child: Text(style: TextStyle(color: Colors.blue), "https://github.com/vicortez")),
-        Expanded(child: SizedBox.shrink()),
+        const Text("Developed by Victor Cortez using Flutter"),
+        const InkWell(
+            onTap: _launchURL, child: Text(style: TextStyle(color: Colors.blue), "https://github.com/vicortez")),
+        const Expanded(child: SizedBox.shrink()),
         RichText(
           text: TextSpan(
             text: '',
             style: DefaultTextStyle.of(context).style,
             children: <TextSpan>[
               TextSpan(
-                text: 'Version 0.18.0',
+                text: 'Open experimental features page',
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
                     // Perform your action here
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => TestPage()),
+                      MaterialPageRoute(builder: (context) => const TestPage()),
                     );
                   },
               ),
             ],
           ),
         ),
-        SizedBox(
+        const SizedBox(
+          height: 10,
+        ),
+        const Text("Version 0.19.0"),
+        const SizedBox(
           height: 5,
         )
       ],
