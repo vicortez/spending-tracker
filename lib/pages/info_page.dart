@@ -25,7 +25,7 @@ class InfoPage extends StatelessWidget {
             style: DefaultTextStyle.of(context).style,
             children: <TextSpan>[
               TextSpan(
-                text: 'Version 0.14.0',
+                text: 'Version 0.18.0',
                 recognizer: TapGestureRecognizer()
                   ..onTap = () {
                     // Perform your action here
