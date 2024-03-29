@@ -110,7 +110,8 @@ class SpendingReportPage extends StatelessWidget {
     double columnSeparatorSize = 2;
     var style = rowData.isAggregate ? const TextStyle(fontWeight: FontWeight.w800) : null;
     String centerText = rowData.expense != null ? rowData.expense!.date.toString().substring(0, 10) : "Total: ";
-    String amountText = rowData.isAggregate ? rowData.total.toString() : (rowData.expense?.amount.toString() ?? "?");
+    double? amount = rowData.isAggregate ? rowData.total : rowData.expense?.amount;
+    String amountText = amount != null ? toMaxDecimalPlacesOmitTrailingZeroes(amount, 2) : "?";
 
     double minHeight = rowData.isAggregate ? 40 : 30;
     return Column(
@@ -179,6 +180,10 @@ class SpendingReportPage extends StatelessWidget {
                 );
               },
             )));
+  }
+
+  String toMaxDecimalPlacesOmitTrailingZeroes(double n, int places) {
+    return n.toStringAsFixed(n.truncateToDouble() == n ? 0 : places);
   }
 
   List<RowData> getRowsData(List<Expense> expenses, Color tableBackground1, Color? tableBackground2,
