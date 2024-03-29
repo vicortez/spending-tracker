@@ -24,7 +24,7 @@ class ExpenseState extends ChangeNotifier {
     loadFromLocalStorage(prefs!);
   }
 
-  bool updateExpense(int id, int? categoryId, String categoryName, double amount, DateTime date) {
+  bool updateExpense(int id, int categoryId, String categoryName, double amount, DateTime date) {
     Expense? expense = expenses.firstWhereOrNull((exp) => exp.id == id);
     if (expense == null) {
       return false;

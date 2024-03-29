@@ -170,9 +170,9 @@ class _EditExpensePageState extends State<EditExpensePage> {
                                             onPressed: () {
                                               var amount = double.tryParse(_expenseAmountTextController.text);
                                               bool success = false;
-                                              if (amount != null && selectedDate != null) {
-                                                success = expenseState.updateExpense(
-                                                    widget.expense.id, categoryId, categoryName, amount, selectedDate!);
+                                              if (amount != null && selectedDate != null && categoryId != null) {
+                                                success = expenseState.updateExpense(widget.expense.id, categoryId!,
+                                                    categoryName, amount, selectedDate!);
                                               }
                                               if (success) {
                                                 ScaffoldMessenger.of(context).showSnackBar(

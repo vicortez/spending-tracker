@@ -3,13 +3,13 @@ import 'dart:convert';
 // TODO extends persistable?
 class Expense {
   int id;
-  int? categoryId;
+  int categoryId;
   double amount;
   DateTime date;
 
   static const PERSIST_NAME = "expenses";
 
-  Expense({required this.id, this.categoryId, required this.amount, required this.date});
+  Expense({required this.id, required this.categoryId, required this.amount, required this.date});
 
   factory Expense.fromJson(Map<String, dynamic> jsonData) {
     return Expense(
