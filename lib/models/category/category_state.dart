@@ -7,10 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'category.dart';
 
 class CategoryState extends ChangeNotifier {
-  List<Category> _categories = [
-    // Category(name: "Sushi", enabled: true),
-    // Category(name: "Restaurants", enabled: true),
-  ];
+  List<Category> _categories = [];
 
   SharedPreferences? prefs;
 
@@ -101,5 +98,14 @@ class CategoryState extends ChangeNotifier {
 
   bool existsCategoryWithName(String name) {
     return _categories.any((cat) => cat.name == name);
+  }
+
+  List<Category> getExampleCategories() {
+    return [
+      Category(id: getNextId(), name: "Example Category 1", enabled: true),
+      Category(id: getNextId() + 1, name: "Example Category 2", enabled: true),
+      // Category(name: "Sushi", enabled: true),
+      // Category(name: "Restaurants", enabled: true),
+    ];
   }
 }
