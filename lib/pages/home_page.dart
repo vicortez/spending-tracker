@@ -27,7 +27,7 @@ class _HomePageState extends State<HomePage> {
     var categoryState = context.watch<CategoryState>();
     var domainState = context.watch<DomainState>();
 
-    List<Category> categories = categoryState.getEnabledCategories();
+    List<Category> categories = categoryState.getCategories();
     List<Domain> domains = domainState.domains;
 
     domains.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));

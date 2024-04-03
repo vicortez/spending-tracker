@@ -27,7 +27,7 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
     var categoryState = context.watch<CategoryState>();
     var domainState = context.watch<DomainState>();
 
-    var categories = categoryState.getEnabledCategories();
+    var categories = categoryState.getCategories();
     List<Domain> domains = domainState.domains;
     domains.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     categories.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));

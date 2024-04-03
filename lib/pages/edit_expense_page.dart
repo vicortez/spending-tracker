@@ -21,8 +21,8 @@ class _EditExpensePageState extends State<EditExpensePage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _expenseAmountTextController = TextEditingController();
   final TextEditingController dateTextController = TextEditingController();
-  String categoryName = "";
-  int? categoryId;
+  Category? relatedCategory;
+
   DateTime currentDate = DateTime.now();
   DateTime? selectedDate;
 
@@ -30,7 +30,10 @@ class _EditExpensePageState extends State<EditExpensePage> {
   void initState() {
     super.initState();
 
-    categoryId = widget.expense.categoryId;
+    int categoryId = widget.expense.categoryId;
+    var categoryState = context.read<CategoryState>();
+    relatedCategory = categoryState.getCategories().firstWhereOrNull((element) => element.id == categoryId);
+
     RegExp trailingZeroesRegex = RegExp(r'([.]*0)(?!.*\d)');
     _expenseAmountTextController.text = widget.expense.amount.toString().replaceAll(trailingZeroesRegex, '');
     selectedDate = widget.expense.date;
@@ -42,10 +45,9 @@ class _EditExpensePageState extends State<EditExpensePage> {
     var categoryState = context.watch<CategoryState>();
     var expenseState = context.watch<ExpenseState>();
 
-    List<Category> categories = categoryState.getEnabledCategories();
-    categories.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    List<Category> categoryOptions = categoryState.getCategories();
+    categoryOptions.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
-    var options = categories.map((cat) => cat.name);
     return Scaffold(
         appBar: AppBar(
           title: const Text("Edit expense"),
@@ -69,18 +71,16 @@ class _EditExpensePageState extends State<EditExpensePage> {
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
-                                    DropdownButtonFormField<String>(
-                                      value: options.contains(categoryName) ? categoryName : options.first,
-                                      onChanged: (String? selectedOption) {
-                                        categoryName = selectedOption!;
-                                        categoryId =
-                                            categories.firstWhereOrNull((cat) => cat.name == selectedOption)?.id;
+                                    DropdownButtonFormField<Category>(
+                                      value: categoryOptions != null ? relatedCategory : categoryOptions.first,
+                                      onChanged: (Category? selectedOption) {
+                                        relatedCategory = selectedOption;
                                       },
-                                      items: options.map<DropdownMenuItem<String>>((String value) {
-                                        return DropdownMenuItem<String>(
+                                      items: categoryOptions.map<DropdownMenuItem<Category>>((Category value) {
+                                        return DropdownMenuItem<Category>(
                                           value: value,
                                           child: Text(
-                                            value,
+                                            value.name,
                                           ),
                                         );
                                       }).toList(),
@@ -170,9 +170,9 @@ class _EditExpensePageState extends State<EditExpensePage> {
                                             onPressed: () {
                                               var amount = double.tryParse(_expenseAmountTextController.text);
                                               bool success = false;
-                                              if (amount != null && selectedDate != null && categoryId != null) {
-                                                success = expenseState.updateExpense(widget.expense.id, categoryId!,
-                                                    categoryName, amount, selectedDate!);
+                                              if (amount != null && selectedDate != null && relatedCategory != null) {
+                                                success = expenseState.updateExpense(
+                                                    widget.expense.id, relatedCategory!.id, amount, selectedDate!);
                                               }
                                               if (success) {
                                                 ScaffoldMessenger.of(context).showSnackBar(

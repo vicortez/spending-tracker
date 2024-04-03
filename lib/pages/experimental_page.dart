@@ -38,7 +38,7 @@ class TestPage extends StatelessWidget {
     var configState = context.watch<ConfigState>();
     var focusedMonthState = context.watch<FocusedMonthState>();
 
-    var categories = categoryState.getEnabledCategories();
+    var categories = categoryState.getCategories();
     List<Domain> domains = domainState.domains;
 
     bool seeAllMonths = configState.getConfig(ConfigName.seeAllMonths);

@@ -21,8 +21,11 @@ class CategoryState extends ChangeNotifier {
     }
   }
 
-  List<Category> getEnabledCategories() {
-    return _categories.where((element) => element.enabled).toList();
+  List<Category> getCategories({enabledOnly = true}) {
+    if (enabledOnly) {
+      return _categories.where((element) => element.enabled).toList();
+    }
+    return _categories;
   }
 
   void loadCategoriesFromLocalStorage(SharedPreferences prefs) {
