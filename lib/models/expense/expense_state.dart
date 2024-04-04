@@ -88,7 +88,6 @@ class ExpenseState extends ChangeNotifier {
     }
   }
 
-  // TODO in the future, use cat id
   bool existsExpenseForCategory(int catId) {
     return expenses.any(
       (exp) => (exp.categoryId == catId),

@@ -27,7 +27,7 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
     var categoryState = context.watch<CategoryState>();
     var domainState = context.watch<DomainState>();
 
-    var categories = categoryState.getCategories();
+    var categories = categoryState.getCategories(enabledOnly: false);
     List<Domain> domains = domainState.domains;
     domains.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     categories.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
@@ -131,10 +131,14 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
                             itemCount: catByDomain[domain]!.length,
                             itemBuilder: (context, index2) {
                               Category category = catByDomain[domain]![index2];
+                              var color = category.enabled ? Colors.white : Colors.grey;
 
                               return Card(
                                 child: ListTile(
-                                  title: Text(category.name),
+                                  title: Text(
+                                    category.name,
+                                    style: TextStyle(color: color),
+                                  ),
                                   trailing: IconButton(
                                     onPressed: () {
                                       Navigator.push(

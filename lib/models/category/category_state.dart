@@ -53,13 +53,16 @@ class CategoryState extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool updateCategory(int id, String newName, int? newDomainId) {
+  bool updateCategory(int id, String newName, int? newDomainId, bool? enabled) {
     Category? category = _categories.firstWhereOrNull((element) => element.id == id);
     if (category == null) {
       return false;
     }
     category.name = newName;
     category.domainId = newDomainId;
+    if (enabled != null) {
+      category.enabled = enabled;
+    }
     if (prefs != null) {
       updateLocalStorage();
     }
@@ -100,7 +103,7 @@ class CategoryState extends ChangeNotifier {
   }
 
   bool existsCategoryWithName(String name) {
-    return _categories.any((cat) => cat.name == name);
+    return _categories.any((cat) => cat.name.toLowerCase() == name.toLowerCase());
   }
 
   List<Category> getExampleCategories() {

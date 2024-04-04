@@ -21,6 +21,7 @@ class EditCategoryPage extends StatefulWidget {
 class _EditCategoryPageState extends State<EditCategoryPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _categoryNameTextController = TextEditingController();
+  bool? catIsEnabled;
 
   @override
   void initState() {
@@ -28,6 +29,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
 
     RegExp trailingZeroesRegex = RegExp(r'([.]*0)(?!.*\d)');
     _categoryNameTextController.text = widget.category.name;
+    catIsEnabled = widget.category.enabled;
   }
 
   @override
@@ -108,6 +110,15 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                                         );
                                       }).toList(),
                                     ),
+                                    CheckboxListTile(
+                                      title: const Text("Enabled"),
+                                      value: catIsEnabled,
+                                      onChanged: (newValue) {
+                                        setState(() {
+                                          catIsEnabled = newValue;
+                                        });
+                                      },
+                                    ),
                                   ],
                                 )),
                           ),
@@ -173,7 +184,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                                               String newCatName = _categoryNameTextController.text;
                                               int catId = widget.category.id;
                                               bool success = categoryState.updateCategory(
-                                                  catId, newCatName, domainFromCategory?.id);
+                                                  catId, newCatName, domainFromCategory?.id, catIsEnabled);
                                               if (success) {
                                                 ScaffoldMessenger.of(context).showSnackBar(
                                                   const SnackBar(

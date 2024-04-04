@@ -90,4 +90,8 @@ class DomainState extends ChangeNotifier {
       return domains.map((el) => el.id).reduce(max) + 1;
     }
   }
+
+  bool existsDomainWithName(String name) {
+    return domains.any((dom) => dom.name.toLowerCase() == name.toLowerCase());
+  }
 }

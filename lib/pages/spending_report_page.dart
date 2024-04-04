@@ -177,11 +177,11 @@ class SpendingReportPage extends StatelessWidget {
     final SplayTreeMap<String, List<Expense>> orderedExpensesMap =
         SplayTreeMap<String, List<Expense>>((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
     for (var expense in expenses) {
-      String categoryName = categories
-          .firstWhere((element) => element.id == expense.categoryId,
-              orElse: () => Category(id: -1, name: "<category not found>", enabled: true))
-          .name;
-      orderedExpensesMap.putIfAbsent(categoryName, () => <Expense>[]).add(expense);
+      Category category = categories.firstWhere((element) => element.id == expense.categoryId,
+          orElse: () => Category(id: -1, name: "<category not found>", enabled: true));
+      if (category.enabled) {
+        orderedExpensesMap.putIfAbsent(category.name, () => <Expense>[]).add(expense);
+      }
     }
 
     List<RowData> tableLinesData = [];

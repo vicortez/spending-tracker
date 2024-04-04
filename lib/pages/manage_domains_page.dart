@@ -56,7 +56,7 @@ class _ManageDomainsPageState extends State<ManageDomainsPage> {
                           if (value == null || value.isEmpty) {
                             return "Domain must have a name";
                           }
-                          bool isDuplicate = domains.any((dom) => dom.name == value);
+                          bool isDuplicate = domainState.existsDomainWithName(value);
                           if (isDuplicate) {
                             return "Domain already exists";
                           }
