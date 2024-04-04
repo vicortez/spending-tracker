@@ -82,22 +82,9 @@ class SpendingReportPage extends StatelessWidget {
           Expanded(
             child: Row(
               children: [
-                _buildExpandedCell(4, "Category", customStyle: textStyle),
-                SizedBox(
-                  width: columnSeparatorSize,
-                ),
-                _buildExpandedCell(3, "Date", customStyle: textStyle),
-                SizedBox(
-                  width: columnSeparatorSize,
-                ),
-                _buildExpandedCell(2, "Amount", customStyle: textStyle),
-                SizedBox(
-                  width: columnSeparatorSize,
-                ),
-                _buildExpandedCell(1, ""),
-                SizedBox(
-                  width: columnSeparatorSize,
-                ),
+                _buildExpandedCell(8, "Category", customStyle: textStyle),
+                _buildExpandedCell(6, "Date", customStyle: textStyle),
+                _buildExpandedCell(7, "Amount", customStyle: textStyle),
               ],
             ),
           ),
@@ -107,13 +94,22 @@ class SpendingReportPage extends StatelessWidget {
   }
 
   _buildRow(int index, BuildContext context, RowData rowData) {
-    double columnSeparatorSize = 2;
-    var style = rowData.isAggregate ? const TextStyle(fontWeight: FontWeight.w800) : null;
-    String centerText = rowData.expense != null ? rowData.expense!.date.toString().substring(0, 10) : "Total: ";
-    double? amount = rowData.isAggregate ? rowData.total : rowData.expense?.amount;
+    TextStyle? style;
+    String dateColText = rowData.expense != null ? rowData.expense!.date.toString().substring(0, 10) : "?";
+    double minHeight = 40;
+    int amountColFlex = 5;
+    double? amount = rowData.expense?.amount;
+
+    if (rowData.isAggregate) {
+      minHeight = 30;
+      amountColFlex = 7;
+      dateColText = "Total: ";
+      style = const TextStyle(fontWeight: FontWeight.w800);
+      amount = rowData.total;
+    }
+
     String amountText = amount != null ? toMaxDecimalPlacesOmitTrailingZeroes(amount, 2) : "?";
 
-    double minHeight = rowData.isAggregate ? 40 : 30;
     return Column(
       children: [
         ConstrainedBox(
@@ -122,22 +118,10 @@ class SpendingReportPage extends StatelessWidget {
             color: rowData.backgroundColor,
             child: Row(
               children: [
-                _buildExpandedCell(4, rowData.catName, customStyle: style),
-                SizedBox(
-                  width: columnSeparatorSize,
-                ),
-                _buildExpandedCell(3, centerText, customStyle: style),
-                SizedBox(
-                  width: columnSeparatorSize,
-                ),
-                _buildExpandedCell(2, amountText, customStyle: style),
-                SizedBox(
-                  width: columnSeparatorSize,
-                ),
-                rowData.isAggregate ? _buildExpandedCell(1, "") : _buildEditCell(1, rowData.expense, context),
-                SizedBox(
-                  width: columnSeparatorSize,
-                ),
+                _buildExpandedCell(8, rowData.catName, customStyle: style),
+                _buildExpandedCell(6, dateColText, customStyle: style),
+                _buildExpandedCell(amountColFlex, amountText, customStyle: style),
+                if (!rowData.isAggregate) _buildEditCell(2, rowData.expense, context),
               ],
             ),
           ),
@@ -146,13 +130,15 @@ class SpendingReportPage extends StatelessWidget {
     );
   }
 
-  _buildExpandedCell(int flex, String content, {TextStyle? customStyle, Widget? customWidget}) {
+  _buildExpandedCell(int flex, String content,
+      {TextStyle? customStyle, Widget? customWidget, TextAlign? textAlign = TextAlign.start}) {
     return Expanded(
       flex: flex,
       child: Container(
-        padding: const EdgeInsets.only(left: 5),
+        padding: const EdgeInsets.only(left: 4),
         child: customWidget ??
             Text(
+              textAlign: textAlign,
               content,
               style: customStyle,
             ),
