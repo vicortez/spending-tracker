@@ -42,7 +42,7 @@ class InfoPage extends StatelessWidget {
         const SizedBox(
           height: 10,
         ),
-        const Text("Version 0.20.0"),
+        const Text("Version 0.21.0"),
         const SizedBox(
           height: 5,
         )
