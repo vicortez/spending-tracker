@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:spending_tracker/models/month_names.dart';
 
-class MonthButton extends StatelessWidget {
+class MyMonthButton extends StatelessWidget {
   final int month;
   final bool allMonths;
   final VoidCallback onPressed;
 
-  const MonthButton({super.key, required this.month, required this.allMonths, required this.onPressed});
+  const MyMonthButton({super.key, required this.month, required this.allMonths, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {

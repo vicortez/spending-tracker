@@ -109,28 +109,47 @@ class _MainPageState extends State<MainPage> {
     Widget page;
     var configState = context.watch<ConfigState>();
     var focusedMonthState = context.watch<FocusedMonthState>();
+    List<Widget> orderedPageList = [
+      const HomePage(),
+      // const SharedExpensesPage(),
+      ChooseEntityToManagePage(
+        navigatorKey: nestedNavigatorKey,
+      ),
+      const SpendingReportPage(),
+      const ConfigPage(),
+      const InfoPage()
+    ];
 
-    switch (selectedIndex) {
-      case 0:
-        page = const HomePage();
-        break;
-      case 1:
-        page = ChooseEntityToManagePage(
-          navigatorKey: nestedNavigatorKey,
-        );
-        break;
-      case 2:
-        page = const SpendingReportPage();
-        break;
-      case 3:
-        page = const ConfigPage();
-        break;
-      case 4:
-        page = const InfoPage();
-        break;
-      default:
-        throw UnimplementedError('no widget for $selectedIndex index');
+    // switch (selectedIndex) {
+    //   case 0:
+    //     page = const HomePage();
+    //     break;
+    //   case 1:
+    //     page = const SharedExpensesPage();
+    //     break;
+    //   case 2:
+    //     page = ChooseEntityToManagePage(
+    //       navigatorKey: nestedNavigatorKey,
+    //     );
+    //     break;
+    //   case 3:
+    //     page = const SpendingReportPage();
+    //     break;
+    //   case 4:
+    //     page = const ConfigPage();
+    //     break;
+    //   case 5:
+    //     page = const InfoPage();
+    //     break;
+    //   default:
+    //     throw UnimplementedError('no widget for $selectedIndex index');
+    // }
+    if (selectedIndex >= 0 && selectedIndex < orderedPageList.length) {
+    } else {
+      page = const HomePage();
+      throw UnimplementedError('no widget for $selectedIndex index');
     }
+    page = orderedPageList[selectedIndex];
 
     return LayoutBuilder(builder: (context, constraints) {
       return WillPopScope(
@@ -146,7 +165,7 @@ class _MainPageState extends State<MainPage> {
             children: [
               SafeArea(
                 child: NavigationRail(
-                  leading: MonthButton(
+                  leading: MyMonthButton(
                     month: focusedMonthState.getMonth().month,
                     allMonths: configState.getConfig(ConfigName.seeAllMonths),
                     onPressed: () {
@@ -169,6 +188,12 @@ class _MainPageState extends State<MainPage> {
                       icon: Icon(Icons.home_outlined),
                       label: Text('Home'),
                     ),
+                    // NavigationRailDestination(
+                    //   icon: Icon(
+                    //     Icons.people_outline,
+                    //   ),
+                    //   label: Text('Shared expenses'), // TODO name
+                    // ),
                     NavigationRailDestination(
                       icon: Icon(Icons.label_outline),
                       label: Text('Manage categories'),

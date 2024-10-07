@@ -12,6 +12,7 @@ import 'package:spending_tracker/models/focused_month/focused_month_state.dart';
 import 'package:spending_tracker/models/month_names.dart';
 import 'package:spending_tracker/pages/edit_expense_page.dart';
 import 'package:spending_tracker/utils/color_utils.dart';
+import 'package:spending_tracker/utils/number_utils.dart';
 
 class RowData {
   Expense? expense;
@@ -166,10 +167,6 @@ class SpendingReportPage extends StatelessWidget {
                 );
               },
             )));
-  }
-
-  String toMaxDecimalPlacesOmitTrailingZeroes(double n, int places) {
-    return n.toStringAsFixed(n.truncateToDouble() == n ? 0 : places);
   }
 
   List<RowData> getRowsData(List<Expense> expenses, Color tableBackground1, Color? tableBackground2,

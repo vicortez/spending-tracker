@@ -13,6 +13,8 @@ import 'package:spending_tracker/models/domain/domain_state.dart';
 import 'package:spending_tracker/models/expense/expense.dart';
 import 'package:spending_tracker/models/expense/expense_state.dart';
 import 'package:spending_tracker/models/focused_month/focused_month_state.dart';
+import 'package:spending_tracker/models/month_names.dart';
+import 'package:spending_tracker/utils/number_utils.dart';
 
 import '../models/category/category.dart';
 
@@ -49,6 +51,7 @@ class TestPage extends StatelessWidget {
       expenses =
           expenses.where((expense) => expense.date.year == month.year && expense.date.month == month.month).toList();
     }
+    double totalSpentCurrentMonth = expenses.fold(0, (sum, expense) => sum + expense.amount);
 
     return Scaffold(
       appBar: AppBar(
@@ -59,6 +62,8 @@ class TestPage extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Text(
+                "Total spent in ${monthNames[month.month]!}: \$${toMaxDecimalPlacesOmitTrailingZeroes(totalSpentCurrentMonth, 2)}"),
             const Text("Top 20 expenses"),
             Container(
               height: 300,
@@ -119,7 +124,7 @@ class TestPage extends StatelessWidget {
           radius: radius,
           showTitle: false,
           title:
-              "${categories.firstWhereOrNull((element) => accCatList[i].catId == element.id)?.name ?? "<noCat>"} \$${accCat.acc}",
+              "${categories.firstWhereOrNull((element) => accCatList[i].catId == element.id)?.name ?? "<noCat>"} \$${toMaxDecimalPlacesOmitTrailingZeroes(accCat.acc, 2)}",
           titleStyle: const TextStyle(
             fontSize: 18,
           ),
