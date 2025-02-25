@@ -6,9 +6,9 @@ import 'package:flutter/foundation.dart' hide Category;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/config/config_name.dart';
-import 'package:spending_tracker/models/category/category.dart';
-import 'package:spending_tracker/models/domain/domain.dart';
-import 'package:spending_tracker/models/expense/expense.dart';
+import 'package:spending_tracker/repository/category/category.dart';
+import 'package:spending_tracker/repository/domain/domain.dart';
+import 'package:spending_tracker/repository/expense/expense.dart';
 
 class ConfigState extends ChangeNotifier {
   Map<ConfigName, dynamic> config = {ConfigName.theme: "dark", ConfigName.seeAllMonths: true};
@@ -18,7 +18,7 @@ class ConfigState extends ChangeNotifier {
 
   void loadFromLocalStorage(SharedPreferences prefs) {
     this.prefs = prefs;
-    final String? configStr = prefs?.getString(PERSIST_NAME);
+    final String? configStr = prefs.getString(PERSIST_NAME);
     if (configStr != null) {
       config = decode(configStr);
       notifyListeners();
@@ -58,12 +58,12 @@ class ConfigState extends ChangeNotifier {
 
   Map<String, dynamic> getAllAppPersistedData() {
     Map<String, dynamic> jsonData = {};
-    final String? categoriesStr = prefs?.getString(Category.PERSIST_NAME);
-    final String? expensesStr = prefs?.getString(Expense.PERSIST_NAME);
-    final String? domainsStr = prefs?.getString(Domain.PERSIST_NAME);
-    jsonData[Category.PERSIST_NAME] = categoriesStr;
-    jsonData[Expense.PERSIST_NAME] = expensesStr;
-    jsonData[Domain.PERSIST_NAME] = domainsStr;
+    final String? categoriesStr = prefs?.getString(CategoryEntity.PERSIST_NAME);
+    final String? expensesStr = prefs?.getString(ExpenseEntity.PERSIST_NAME);
+    final String? domainsStr = prefs?.getString(DomainEntity.PERSIST_NAME);
+    jsonData[CategoryEntity.PERSIST_NAME] = categoriesStr;
+    jsonData[ExpenseEntity.PERSIST_NAME] = expensesStr;
+    jsonData[DomainEntity.PERSIST_NAME] = domainsStr;
 
     return jsonData;
   }
@@ -127,8 +127,8 @@ class ConfigState extends ChangeNotifier {
   }
 
   void setAllDataFromJson(Map<String, dynamic> jsonData) {
-    prefs?.setString(Category.PERSIST_NAME, jsonData[Category.PERSIST_NAME]!);
-    prefs?.setString(Expense.PERSIST_NAME, jsonData[Expense.PERSIST_NAME]!);
+    prefs?.setString(CategoryEntity.PERSIST_NAME, jsonData[CategoryEntity.PERSIST_NAME]!);
+    prefs?.setString(ExpenseEntity.PERSIST_NAME, jsonData[ExpenseEntity.PERSIST_NAME]!);
     notifyListeners();
   }
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/examples.dart';
-import 'package:spending_tracker/models/category/category_state.dart';
+import 'package:spending_tracker/repository/category/category_state.dart';
 
 class OldHomePage extends StatelessWidget {
   const OldHomePage({super.key});

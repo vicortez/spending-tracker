@@ -6,12 +6,14 @@ import 'package:provider/provider.dart';
 import 'package:spending_tracker/common_widgets/my_button.dart';
 import 'package:spending_tracker/config/config_name.dart';
 import 'package:spending_tracker/config/config_state.dart';
-import 'package:spending_tracker/models/category/category.dart';
-import 'package:spending_tracker/models/category/category_state.dart';
-import 'package:spending_tracker/models/domain/domain.dart';
-import 'package:spending_tracker/models/domain/domain_state.dart';
-import 'package:spending_tracker/models/expense/expense.dart';
-import 'package:spending_tracker/models/expense/expense_state.dart';
+import 'package:spending_tracker/repository/category/category.dart';
+import 'package:spending_tracker/repository/category/category_state.dart';
+import 'package:spending_tracker/repository/domain/domain.dart';
+import 'package:spending_tracker/repository/domain/domain_state.dart';
+import 'package:spending_tracker/repository/expense/expense.dart';
+import 'package:spending_tracker/repository/expense/expense_state.dart';
+import 'package:spending_tracker/repository/focused_month/focused_month_state.dart';
+import 'package:spending_tracker/utils/sheet_exporter.dart';
 
 class ConfigPage extends StatelessWidget {
   const ConfigPage({super.key});
@@ -22,6 +24,7 @@ class ConfigPage extends StatelessWidget {
     var domainState = context.watch<DomainState>();
     var categoryState = context.watch<CategoryState>();
     var configState = context.watch<ConfigState>();
+    var focusedMonthState = context.watch<FocusedMonthState>();
 
     return Column(
       mainAxisSize: MainAxisSize.max,
@@ -39,6 +42,20 @@ class ConfigPage extends StatelessWidget {
                       value: configState.getConfig(ConfigName.seeAllMonths),
                       onChanged: (newValue) => configState.updateConfig(ConfigName.seeAllMonths, newValue),
                     ),
+                    const SizedBox(height: 15),
+                    MyButton(
+                      text: "Export to sheet (excel)",
+                      onPressed: kIsWeb
+                          ? null
+                          : () => onPressedExportToSheetAction(
+                              domainState, categoryState, expenseState, configState, focusedMonthState, context),
+                      type: ButtonType.normal,
+                    ),
+                    if (kIsWeb)
+                      const Text(
+                        "Exporting is currently unavailable for web",
+                        style: TextStyle(fontSize: 12),
+                      ),
                     const SizedBox(height: 15),
                     MyButton(
                       text: "Export all app data",
@@ -92,6 +109,36 @@ class ConfigPage extends StatelessWidget {
     );
   }
 
+  void onPressedExportToSheetAction(DomainState domainState, CategoryState categoryState, ExpenseState expenseState,
+      ConfigState configState, FocusedMonthState focusedMonthState, BuildContext context) async {
+    try {
+      List<DomainEntity> domains = [...domainState.domains];
+      List<CategoryEntity> categories = [...categoryState.categories];
+      List<ExpenseEntity> expenses = [...expenseState.expenses];
+
+      final SheetExporter sheetExporter = SheetExporter();
+
+      bool seeAllMonths = configState.getConfig(ConfigName.seeAllMonths);
+      DateTime month = focusedMonthState.getMonth();
+      if (!seeAllMonths) {
+        expenses =
+            expenses.where((expense) => expense.date.year == month.year && expense.date.month == month.month).toList();
+      }
+      final String filePath = await sheetExporter.exportToExcel(domains, categories, expenses);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Exercises exported to: $filePath'),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to export exercises'),
+        ),
+      );
+    }
+  }
+
   void onPressedExportAction(ConfigState configState, BuildContext context) {
     Map<String, dynamic> jsonAppData = configState.getAllAppPersistedData();
     String fileName = configState.getExportDataFilename();
@@ -125,7 +172,7 @@ class ConfigPage extends StatelessWidget {
     );
     Widget continueButton = TextButton(
       style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(Theme.of(context).colorScheme.secondary.withOpacity(0.05)),
+        backgroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.secondary.withOpacity(0.05)),
       ),
       child: const Text("Continue"),
       onPressed: () {
@@ -157,9 +204,9 @@ class ConfigPage extends StatelessWidget {
       ExpenseState expenseState, DomainState domainState) async {
     Map<String, dynamic>? jsonData = await configState.importJsonDataFile();
     if (jsonData != null) {
-      categoryState.setDataFromImport(jsonData[Category.PERSIST_NAME]);
-      expenseState.setDataFromImport(jsonData[Expense.PERSIST_NAME]);
-      domainState.setDataFromImport(jsonData[Domain.PERSIST_NAME]);
+      categoryState.setDataFromImport(jsonData[CategoryEntity.PERSIST_NAME]);
+      expenseState.setDataFromImport(jsonData[ExpenseEntity.PERSIST_NAME]);
+      domainState.setDataFromImport(jsonData[DomainEntity.PERSIST_NAME]);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Data imported"), duration: Duration(seconds: 2)),
       );

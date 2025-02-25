@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/common_widgets/my_button.dart';
-import 'package:spending_tracker/models/category/category.dart';
-import 'package:spending_tracker/models/category/category_state.dart';
-import 'package:spending_tracker/models/expense/expense.dart';
-import 'package:spending_tracker/models/expense/expense_state.dart';
+import 'package:spending_tracker/repository/category/category.dart';
+import 'package:spending_tracker/repository/category/category_state.dart';
+import 'package:spending_tracker/repository/expense/expense.dart';
+import 'package:spending_tracker/repository/expense/expense_state.dart';
 
 class EditExpensePage extends StatefulWidget {
   const EditExpensePage({super.key, required this.expense});
 
-  final Expense expense;
+  final ExpenseEntity expense;
 
   @override
   State<EditExpensePage> createState() => _EditExpensePageState();
@@ -21,7 +21,7 @@ class _EditExpensePageState extends State<EditExpensePage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _expenseAmountTextController = TextEditingController();
   final TextEditingController dateTextController = TextEditingController();
-  Category? relatedCategory;
+  CategoryEntity? relatedCategory;
 
   DateTime currentDate = DateTime.now();
   DateTime? selectedDate;
@@ -45,14 +45,14 @@ class _EditExpensePageState extends State<EditExpensePage> {
     var categoryState = context.watch<CategoryState>();
     var expenseState = context.watch<ExpenseState>();
 
-    List<Category> categoryOptions = categoryState.getCategories();
+    List<CategoryEntity> categoryOptions = categoryState.getCategories();
     categoryOptions.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
     return Scaffold(
         appBar: AppBar(
           title: const Text("Edit expense"),
         ),
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             return SingleChildScrollView(
@@ -71,13 +71,14 @@ class _EditExpensePageState extends State<EditExpensePage> {
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
-                                    DropdownButtonFormField<Category>(
+                                    DropdownButtonFormField<CategoryEntity>(
                                       value: categoryOptions != null ? relatedCategory : categoryOptions.first,
-                                      onChanged: (Category? selectedOption) {
+                                      onChanged: (CategoryEntity? selectedOption) {
                                         relatedCategory = selectedOption;
                                       },
-                                      items: categoryOptions.map<DropdownMenuItem<Category>>((Category value) {
-                                        return DropdownMenuItem<Category>(
+                                      items:
+                                          categoryOptions.map<DropdownMenuItem<CategoryEntity>>((CategoryEntity value) {
+                                        return DropdownMenuItem<CategoryEntity>(
                                           value: value,
                                           child: Text(
                                             value.name,

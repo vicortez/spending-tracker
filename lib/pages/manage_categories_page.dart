@@ -2,12 +2,12 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/models/category/category_state.dart';
-import 'package:spending_tracker/models/domain/domain.dart';
-import 'package:spending_tracker/models/domain/domain_state.dart';
 import 'package:spending_tracker/pages/edit_category_page.dart';
+import 'package:spending_tracker/repository/category/category_state.dart';
+import 'package:spending_tracker/repository/domain/domain.dart';
+import 'package:spending_tracker/repository/domain/domain_state.dart';
 
-import '../models/category/category.dart';
+import '../repository/category/category.dart';
 
 class ManageCategoriesPage extends StatefulWidget {
   const ManageCategoriesPage({super.key});
@@ -28,20 +28,20 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
     var domainState = context.watch<DomainState>();
 
     var categories = categoryState.getCategories(enabledOnly: false);
-    List<Domain> domains = domainState.domains;
+    List<DomainEntity> domains = domainState.domains;
     domains.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     categories.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-    LinkedHashMap<Domain, List<Category>> catByDomain = LinkedHashMap();
+    LinkedHashMap<DomainEntity, List<CategoryEntity>> catByDomain = LinkedHashMap();
 
-    for (Domain domain in domains) {
-      List<Category> foundCategories = categories.where((cat) => cat.domainId == domain.id).toList();
+    for (DomainEntity domain in domains) {
+      List<CategoryEntity> foundCategories = categories.where((cat) => cat.domainId == domain.id).toList();
       if (foundCategories.isNotEmpty) {
         catByDomain[domain] = foundCategories;
       }
     }
-    List<Category> noDomainCategories = categories.where((cat) => cat.domainId == null).toList();
+    List<CategoryEntity> noDomainCategories = categories.where((cat) => cat.domainId == null).toList();
     if (noDomainCategories.isNotEmpty) {
-      catByDomain[Domain(id: -1, name: "")] = noDomainCategories;
+      catByDomain[DomainEntity(id: -1, name: "")] = noDomainCategories;
     }
 
     return WillPopScope(
@@ -54,7 +54,7 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
           leading: const BackButton(),
           title: const Text("Manage categories"),
         ),
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -115,13 +115,13 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
               child: ListView.builder(
                   itemCount: catByDomain.keys.length,
                   itemBuilder: (context, index) {
-                    Domain domain = catByDomain.keys.elementAt(index);
+                    DomainEntity domain = catByDomain.keys.elementAt(index);
                     return SelectionArea(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Divider(
-                            color: Theme.of(context).colorScheme.onBackground.withOpacity(0.6),
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                           ),
                           Text(domain.name.isNotEmpty ? domain.name : "Categories with no domain",
                               style: Theme.of(context).textTheme.titleMedium),
@@ -130,7 +130,7 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: catByDomain[domain]!.length,
                             itemBuilder: (context, index2) {
-                              Category category = catByDomain[domain]![index2];
+                              CategoryEntity category = catByDomain[domain]![index2];
                               var color = category.enabled ? Colors.white : Colors.grey;
 
                               return Card(

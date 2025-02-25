@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:spending_tracker/models/month_names.dart';
+import 'package:spending_tracker/repository/month_names.dart';
 
 class MyMonthButton extends StatelessWidget {
   final int month;
   final bool allMonths;
   final VoidCallback onPressed;
 
-  const MyMonthButton({super.key, required this.month, required this.allMonths, required this.onPressed});
+  const MyMonthButton(
+      {super.key,
+      required this.month,
+      required this.allMonths,
+      required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +18,8 @@ class MyMonthButton extends StatelessWidget {
     return FloatingActionButton(
       onPressed: () => allMonths ? null : onPressed(),
       disabledElevation: 0,
-      backgroundColor: allMonths ? Colors.grey : Theme.of(context).colorScheme.primary,
+      backgroundColor:
+          allMonths ? Colors.grey : Theme.of(context).colorScheme.primary,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

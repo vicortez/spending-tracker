@@ -4,14 +4,14 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:spending_tracker/models/domain/domain.dart';
+import 'package:spending_tracker/repository/domain/domain.dart';
 
 class DomainState extends ChangeNotifier {
-  List<Domain> domains = [];
+  List<DomainEntity> domains = [];
   SharedPreferences? prefs;
-  String persistName = Domain.PERSIST_NAME;
+  String persistName = DomainEntity.PERSIST_NAME;
 
-  void setDomains(List<Domain> domains, {bool syncStorage = true}) {
+  void setDomains(List<DomainEntity> domains, {bool syncStorage = true}) {
     this.domains = domains;
     notifyListeners();
     if (syncStorage && prefs != null) {
@@ -30,7 +30,7 @@ class DomainState extends ChangeNotifier {
   }
 
   bool updateDomain(int id, String newName) {
-    Domain? domain = domains.firstWhereOrNull((dom) => dom.id == id);
+    DomainEntity? domain = domains.firstWhereOrNull((dom) => dom.id == id);
     if (domain == null) {
       return false;
     }
@@ -46,15 +46,15 @@ class DomainState extends ChangeNotifier {
 
   void loadFromLocalStorage(SharedPreferences prefs) {
     this.prefs = prefs;
-    final String? domainsStr = prefs?.getString(persistName);
+    final String? domainsStr = prefs.getString(persistName);
     if (domainsStr != null) {
-      domains = Domain.decodeMany(domainsStr);
+      domains = DomainEntity.decodeMany(domainsStr);
       notifyListeners();
     }
   }
 
   void addDomain(String name) {
-    Domain domain = Domain(id: getNextId(), name: name);
+    DomainEntity domain = DomainEntity(id: getNextId(), name: name);
     domains.add(domain);
 
     if (prefs != null) {
@@ -80,7 +80,7 @@ class DomainState extends ChangeNotifier {
   }
 
   void updateLocalStorage() {
-    prefs?.setString(persistName, Domain.encodeMany(domains));
+    prefs?.setString(persistName, DomainEntity.encodeMany(domains));
   }
 
   int getNextId() {

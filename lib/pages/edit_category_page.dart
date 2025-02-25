@@ -2,15 +2,15 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/common_widgets/my_button.dart';
-import 'package:spending_tracker/models/category/category.dart';
-import 'package:spending_tracker/models/category/category_state.dart';
-import 'package:spending_tracker/models/domain/domain.dart';
-import 'package:spending_tracker/models/domain/domain_state.dart';
+import 'package:spending_tracker/repository/category/category.dart';
+import 'package:spending_tracker/repository/category/category_state.dart';
+import 'package:spending_tracker/repository/domain/domain.dart';
+import 'package:spending_tracker/repository/domain/domain_state.dart';
 
-import '../models/expense/expense_state.dart';
+import '../repository/expense/expense_state.dart';
 
 class EditCategoryPage extends StatefulWidget {
-  final Category category;
+  final CategoryEntity category;
 
   const EditCategoryPage({super.key, required this.category});
 
@@ -40,15 +40,15 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
 
     var scaffoldMessenger = ScaffoldMessenger.of(context);
 
-    List<Domain> domains = domainState.domains;
-    List<Domain?> domainOptions = [null, ...domains];
-    Domain? domainFromCategory = domains.firstWhereOrNull((domain) => domain.id == widget.category.domainId);
+    List<DomainEntity> domains = domainState.domains;
+    List<DomainEntity?> domainOptions = [null, ...domains];
+    DomainEntity? domainFromCategory = domains.firstWhereOrNull((domain) => domain.id == widget.category.domainId);
 
     return Scaffold(
         appBar: AppBar(
           title: const Text("Edit category"),
         ),
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             return SingleChildScrollView(
@@ -88,7 +88,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                                         ),
                                       ],
                                     ),
-                                    DropdownButtonFormField<Domain?>(
+                                    DropdownButtonFormField<DomainEntity?>(
                                       disabledHint: const Text("No domains to choose from"),
                                       iconDisabledColor: Colors.grey.withOpacity(0.5),
                                       decoration: const InputDecoration(
@@ -97,12 +97,12 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                                           labelText: 'Domain'),
                                       value: domainOptions.firstWhereOrNull((element) => element == domainFromCategory),
                                       onChanged: domains.isNotEmpty
-                                          ? (Domain? selectedDomain) {
+                                          ? (DomainEntity? selectedDomain) {
                                               domainFromCategory = selectedDomain;
                                             }
                                           : null,
-                                      items: domainOptions.map<DropdownMenuItem<Domain?>>((Domain? value) {
-                                        return DropdownMenuItem<Domain?>(
+                                      items: domainOptions.map<DropdownMenuItem<DomainEntity?>>((DomainEntity? value) {
+                                        return DropdownMenuItem<DomainEntity?>(
                                           value: value,
                                           child: Text(
                                             value?.name ?? "<no domain>",

@@ -5,15 +5,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/common_widgets/month_button.dart';
 import 'package:spending_tracker/config/config_name.dart';
 import 'package:spending_tracker/config/config_state.dart';
-import 'package:spending_tracker/models/category/category_state.dart';
-import 'package:spending_tracker/models/domain/domain_state.dart';
-import 'package:spending_tracker/models/expense/expense_state.dart';
-import 'package:spending_tracker/models/focused_month/focused_month_state.dart';
 import 'package:spending_tracker/pages/choose_entity_to_manage_page.dart';
 import 'package:spending_tracker/pages/config_page.dart';
 import 'package:spending_tracker/pages/home_page.dart';
 import 'package:spending_tracker/pages/info_page.dart';
 import 'package:spending_tracker/pages/spending_report_page.dart';
+import 'package:spending_tracker/repository/category/category_state.dart';
+import 'package:spending_tracker/repository/domain/domain_state.dart';
+import 'package:spending_tracker/repository/expense/expense_state.dart';
+import 'package:spending_tracker/repository/focused_month/focused_month_state.dart';
 import 'package:spending_tracker/translations/translations.dart';
 
 void main() {
@@ -154,7 +154,8 @@ class _MainPageState extends State<MainPage> {
     return LayoutBuilder(builder: (context, constraints) {
       return WillPopScope(
         onWillPop: () async {
-          if (nestedNavigatorKey?.currentState != null && nestedNavigatorKey.currentState!.canPop()) {
+          if (nestedNavigatorKey.currentState != null &&
+              nestedNavigatorKey.currentState!.canPop()) {
             nestedNavigatorKey.currentState?.pop(context);
             return false;
           }
@@ -228,7 +229,7 @@ class _MainPageState extends State<MainPage> {
                     // anonymous colors. It is recommended to set colors in the theme object
                     // instead of using anonymous ones where possible.
                     // we can also use colors from the theme.
-                    color: Theme.of(context).colorScheme.background,
+                    color: Theme.of(context).colorScheme.surface,
                     child: Container(
                       margin: const EdgeInsets.all(10.0),
                       child: page,
@@ -243,7 +244,8 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
-  _checkAndRunWelcomeProcedure(BuildContext context, GlobalKey<NavigatorState> nestedNavigatorKey,
+  _checkAndRunWelcomeProcedure(
+      BuildContext context, GlobalKey<NavigatorState> nestedNavigatorKey,
       {required void Function() onNext}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool showDialog = (prefs.getBool('isFirstRun') ?? true);
@@ -256,7 +258,8 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
-  _showWelcomeDialog(BuildContext context, SharedPreferences prefs, {required void Function() onNext}) async {
+  _showWelcomeDialog(BuildContext context, SharedPreferences prefs,
+      {required void Function() onNext}) async {
     return await showDialog<void>(
       context: context,
       barrierDismissible: false,

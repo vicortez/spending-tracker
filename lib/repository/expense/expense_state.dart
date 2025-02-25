@@ -4,13 +4,13 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:spending_tracker/models/expense/expense.dart';
+import 'package:spending_tracker/repository/expense/expense.dart';
 
 class ExpenseState extends ChangeNotifier {
-  List<Expense> expenses = [];
+  List<ExpenseEntity> expenses = [];
   SharedPreferences? prefs;
 
-  void setExpenses(List<Expense> newExpenses, {bool syncStorage = true}) {
+  void setExpenses(List<ExpenseEntity> newExpenses, {bool syncStorage = true}) {
     expenses = newExpenses;
     notifyListeners();
     if (syncStorage && prefs != null) {
@@ -20,12 +20,12 @@ class ExpenseState extends ChangeNotifier {
 
   void setDataFromImport(dynamic data) {
     dynamic value = data ?? "[]";
-    prefs?.setString(Expense.PERSIST_NAME, value);
+    prefs?.setString(ExpenseEntity.PERSIST_NAME, value);
     loadFromLocalStorage(prefs!);
   }
 
   bool updateExpense(int id, int categoryId, double amount, DateTime date) {
-    Expense? expense = expenses.firstWhereOrNull((exp) => exp.id == id);
+    ExpenseEntity? expense = expenses.firstWhereOrNull((exp) => exp.id == id);
     if (expense == null) {
       return false;
     }
@@ -41,9 +41,9 @@ class ExpenseState extends ChangeNotifier {
 
   void loadFromLocalStorage(SharedPreferences prefs) {
     this.prefs = prefs;
-    final String? expensesStr = prefs?.getString(Expense.PERSIST_NAME);
+    final String? expensesStr = prefs.getString(ExpenseEntity.PERSIST_NAME);
     if (expensesStr != null) {
-      expenses = Expense.decode(expensesStr);
+      expenses = ExpenseEntity.decode(expensesStr);
       notifyListeners();
     }
   }
@@ -51,7 +51,7 @@ class ExpenseState extends ChangeNotifier {
   void addExpense(int categoryId, String categoryName, double amount) {
     DateTime date = DateTime.now();
     date = DateTime(date.year, date.month, date.day, date.hour, date.minute);
-    Expense expense = Expense(id: getNextId(), categoryId: categoryId, amount: amount, date: date);
+    ExpenseEntity expense = ExpenseEntity(id: getNextId(), categoryId: categoryId, amount: amount, date: date);
     expenses.add(expense);
 
     if (prefs != null) {
@@ -77,7 +77,7 @@ class ExpenseState extends ChangeNotifier {
   }
 
   void updateLocalStorage() {
-    prefs?.setString(Expense.PERSIST_NAME, Expense.encode(expenses));
+    prefs?.setString(ExpenseEntity.PERSIST_NAME, ExpenseEntity.encode(expenses));
   }
 
   int getNextId() {

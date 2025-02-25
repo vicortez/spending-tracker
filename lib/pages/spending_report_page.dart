@@ -4,18 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/config/config_name.dart';
 import 'package:spending_tracker/config/config_state.dart';
-import 'package:spending_tracker/models/category/category.dart';
-import 'package:spending_tracker/models/category/category_state.dart';
-import 'package:spending_tracker/models/expense/expense.dart';
-import 'package:spending_tracker/models/expense/expense_state.dart';
-import 'package:spending_tracker/models/focused_month/focused_month_state.dart';
-import 'package:spending_tracker/models/month_names.dart';
 import 'package:spending_tracker/pages/edit_expense_page.dart';
+import 'package:spending_tracker/repository/category/category.dart';
+import 'package:spending_tracker/repository/category/category_state.dart';
+import 'package:spending_tracker/repository/expense/expense.dart';
+import 'package:spending_tracker/repository/expense/expense_state.dart';
+import 'package:spending_tracker/repository/focused_month/focused_month_state.dart';
+import 'package:spending_tracker/repository/month_names.dart';
 import 'package:spending_tracker/utils/color_utils.dart';
 import 'package:spending_tracker/utils/number_utils.dart';
 
 class RowData {
-  Expense? expense;
+  ExpenseEntity? expense;
   Color backgroundColor;
   bool isAggregate;
   double? total;
@@ -36,8 +36,8 @@ class SpendingReportPage extends StatelessWidget {
 
     bool seeAllMonths = configState.getConfig(ConfigName.seeAllMonths);
     DateTime month = focusedMonthState.getMonth();
-    List<Expense> expenses = [...expenseState.expenses];
-    List<Category> categories = [...categoryState.categories];
+    List<ExpenseEntity> expenses = [...expenseState.expenses];
+    List<CategoryEntity> categories = [...categoryState.categories];
     expenses.sort((a, b) => a.date.compareTo(b.date));
     if (!seeAllMonths) {
       expenses =
@@ -47,7 +47,7 @@ class SpendingReportPage extends StatelessWidget {
     // Quick and dirty way. Not scalable. Ideally we want a global object dictionary with theme name as keys.
     // or maybe there is a "fluttery" way to do it.
     bool isDarkMode = Theme.of(context).colorScheme.brightness == Brightness.dark;
-    Color? tableBackground1 = Theme.of(context).colorScheme.background;
+    Color? tableBackground1 = Theme.of(context).colorScheme.surface;
     Color? tableBackground2 = isDarkMode ? Colors.grey[850] : Colors.grey[300];
 
     List<RowData> rowData = getRowsData(
@@ -169,22 +169,22 @@ class SpendingReportPage extends StatelessWidget {
             )));
   }
 
-  List<RowData> getRowsData(List<Expense> expenses, Color tableBackground1, Color? tableBackground2,
-      Color aggBackgroundColor, List<Category> categories) {
-    final SplayTreeMap<String, List<Expense>> orderedExpensesMap =
-        SplayTreeMap<String, List<Expense>>((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+  List<RowData> getRowsData(List<ExpenseEntity> expenses, Color tableBackground1, Color? tableBackground2,
+      Color aggBackgroundColor, List<CategoryEntity> categories) {
+    final SplayTreeMap<String, List<ExpenseEntity>> orderedExpensesMap =
+        SplayTreeMap<String, List<ExpenseEntity>>((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
     for (var expense in expenses) {
-      Category category = categories.firstWhere((element) => element.id == expense.categoryId,
-          orElse: () => Category(id: -1, name: "<category not found>", enabled: true));
+      CategoryEntity category = categories.firstWhere((element) => element.id == expense.categoryId,
+          orElse: () => CategoryEntity(id: -1, name: "<category not found>", enabled: true));
       if (category.enabled) {
-        orderedExpensesMap.putIfAbsent(category.name, () => <Expense>[]).add(expense);
+        orderedExpensesMap.putIfAbsent(category.name, () => <ExpenseEntity>[]).add(expense);
       }
     }
 
     List<RowData> tableLinesData = [];
     for (var expenseGroupEntry in orderedExpensesMap.entries) {
       String catName = expenseGroupEntry.key;
-      List<Expense> groupExpenses = expenseGroupEntry.value;
+      List<ExpenseEntity> groupExpenses = expenseGroupEntry.value;
       for (var expense in groupExpenses) {
         var backgroundColor = tableLinesData.length % 2 == 0 ? tableBackground1 : tableBackground2;
         tableLinesData.add(RowData(expense, backgroundColor!, false, null, catName));

@@ -7,13 +7,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'category.dart';
 
 class CategoryState extends ChangeNotifier {
-  List<Category> _categories = [];
+  List<CategoryEntity> _categories = [];
 
   SharedPreferences? prefs;
 
-  List<Category> get categories => List.from(_categories);
+  List<CategoryEntity> get categories => List.from(_categories);
 
-  void setCategories(List<Category> newCategories, {bool syncStorage = true}) {
+  void setCategories(List<CategoryEntity> newCategories, {bool syncStorage = true}) {
     _categories = newCategories;
     notifyListeners();
     if (syncStorage && prefs != null) {
@@ -21,7 +21,7 @@ class CategoryState extends ChangeNotifier {
     }
   }
 
-  List<Category> getCategories({enabledOnly = true}) {
+  List<CategoryEntity> getCategories({enabledOnly = true}) {
     if (enabledOnly) {
       return _categories.where((element) => element.enabled).toList();
     }
@@ -30,21 +30,21 @@ class CategoryState extends ChangeNotifier {
 
   void loadCategoriesFromLocalStorage(SharedPreferences prefs) {
     this.prefs = prefs;
-    final String? categoriesStr = prefs.getString(Category.PERSIST_NAME);
+    final String? categoriesStr = prefs.getString(CategoryEntity.PERSIST_NAME);
     if (categoriesStr != null) {
-      _categories = Category.decode(categoriesStr);
+      _categories = CategoryEntity.decode(categoriesStr);
       notifyListeners();
     }
   }
 
   void setDataFromImport(dynamic data) {
     dynamic value = data ?? "[]";
-    prefs?.setString(Category.PERSIST_NAME, value);
+    prefs?.setString(CategoryEntity.PERSIST_NAME, value);
     loadCategoriesFromLocalStorage(prefs!);
   }
 
   void addCategory(String name) {
-    Category category = Category(id: getNextId(), name: name, enabled: true);
+    CategoryEntity category = CategoryEntity(id: getNextId(), name: name, enabled: true);
     _categories.add(category);
 
     if (prefs != null) {
@@ -54,7 +54,7 @@ class CategoryState extends ChangeNotifier {
   }
 
   bool updateCategory(int id, String newName, int? newDomainId, bool? enabled) {
-    Category? category = _categories.firstWhereOrNull((element) => element.id == id);
+    CategoryEntity? category = _categories.firstWhereOrNull((element) => element.id == id);
     if (category == null) {
       return false;
     }
@@ -95,7 +95,7 @@ class CategoryState extends ChangeNotifier {
   }
 
   void updateLocalStorage() {
-    prefs?.setString(Category.PERSIST_NAME, Category.encode(_categories));
+    prefs?.setString(CategoryEntity.PERSIST_NAME, CategoryEntity.encode(_categories));
   }
 
   bool existsCategoryWithDomain(int domainId) {
@@ -106,10 +106,10 @@ class CategoryState extends ChangeNotifier {
     return _categories.any((cat) => cat.name.toLowerCase() == name.toLowerCase());
   }
 
-  List<Category> getExampleCategories() {
+  List<CategoryEntity> getExampleCategories() {
     return [
-      Category(id: getNextId(), name: "Example Category 1", enabled: true),
-      Category(id: getNextId() + 1, name: "Example Category 2", enabled: true),
+      CategoryEntity(id: getNextId(), name: "Example Category 1", enabled: true),
+      CategoryEntity(id: getNextId() + 1, name: "Example Category 2", enabled: true),
       // Category(name: "Sushi", enabled: true),
       // Category(name: "Restaurants", enabled: true),
     ];

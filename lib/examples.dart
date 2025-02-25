@@ -1,7 +1,7 @@
 // Example page
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/models/category/category_state.dart';
+import 'package:spending_tracker/repository/category/category_state.dart';
 
 class FavoritesPage extends StatelessWidget {
   const FavoritesPage({super.key});
@@ -41,7 +41,7 @@ class BigCard extends StatelessWidget {
     return ElevatedButton(
       onPressed: () {},
       style: ButtonStyle(
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          shape: WidgetStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))),
       child: Padding(
         padding: const EdgeInsets.all(10.0),

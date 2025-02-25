@@ -7,16 +7,16 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/config/config_name.dart';
 import 'package:spending_tracker/config/config_state.dart';
-import 'package:spending_tracker/models/category/category_state.dart';
-import 'package:spending_tracker/models/domain/domain.dart';
-import 'package:spending_tracker/models/domain/domain_state.dart';
-import 'package:spending_tracker/models/expense/expense.dart';
-import 'package:spending_tracker/models/expense/expense_state.dart';
-import 'package:spending_tracker/models/focused_month/focused_month_state.dart';
-import 'package:spending_tracker/models/month_names.dart';
+import 'package:spending_tracker/repository/category/category_state.dart';
+import 'package:spending_tracker/repository/domain/domain.dart';
+import 'package:spending_tracker/repository/domain/domain_state.dart';
+import 'package:spending_tracker/repository/expense/expense.dart';
+import 'package:spending_tracker/repository/expense/expense_state.dart';
+import 'package:spending_tracker/repository/focused_month/focused_month_state.dart';
+import 'package:spending_tracker/repository/month_names.dart';
 import 'package:spending_tracker/utils/number_utils.dart';
 
-import '../models/category/category.dart';
+import '../repository/category/category.dart';
 
 class AccCategory {
   const AccCategory(this.catId, this.acc);
@@ -41,11 +41,11 @@ class TestPage extends StatelessWidget {
     var focusedMonthState = context.watch<FocusedMonthState>();
 
     var categories = categoryState.getCategories();
-    List<Domain> domains = domainState.domains;
+    List<DomainEntity> domains = domainState.domains;
 
     bool seeAllMonths = configState.getConfig(ConfigName.seeAllMonths);
     DateTime month = focusedMonthState.getMonth();
-    List<Expense> expenses = [...expenseState.expenses];
+    List<ExpenseEntity> expenses = [...expenseState.expenses];
     expenses.sort((a, b) => a.date.compareTo(b.date));
     if (!seeAllMonths) {
       expenses =
@@ -65,7 +65,7 @@ class TestPage extends StatelessWidget {
             Text(
                 "Total spent in ${monthNames[month.month]!}: \$${toMaxDecimalPlacesOmitTrailingZeroes(totalSpentCurrentMonth, 2)}"),
             const Text("Top 20 expenses"),
-            Container(
+            SizedBox(
               height: 300,
               child: PieChart(
                 PieChartData(
@@ -92,7 +92,8 @@ class TestPage extends StatelessWidget {
     );
   }
 
-  List<PieChartSectionData> _chartSections(List<Expense> expenses, List<Category> categories, List<Domain> domains) {
+  List<PieChartSectionData> _chartSections(
+      List<ExpenseEntity> expenses, List<CategoryEntity> categories, List<DomainEntity> domains) {
     HashMap<int, double> accCats = HashMap();
     for (var expense in expenses) {
       int catId = expense.categoryId ?? 999;

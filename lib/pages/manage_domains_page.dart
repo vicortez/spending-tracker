@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/models/category/category_state.dart';
-import 'package:spending_tracker/models/domain/domain_state.dart';
+import 'package:spending_tracker/repository/category/category_state.dart';
+import 'package:spending_tracker/repository/domain/domain_state.dart';
 
 class ManageDomainsPage extends StatefulWidget {
   const ManageDomainsPage({super.key});
@@ -35,7 +35,7 @@ class _ManageDomainsPageState extends State<ManageDomainsPage> {
           leading: const BackButton(),
           title: const Text("Manage domains"),
         ),
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -51,12 +51,14 @@ class _ManageDomainsPageState extends State<ManageDomainsPage> {
                         textCapitalization: TextCapitalization.words,
                         textInputAction: TextInputAction.done,
                         controller: _currentDomainNameTextController,
-                        decoration: const InputDecoration(hintText: 'New domain'),
+                        decoration:
+                            const InputDecoration(hintText: 'New domain'),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return "Domain must have a name";
                           }
-                          bool isDuplicate = domainState.existsDomainWithName(value);
+                          bool isDuplicate =
+                              domainState.existsDomainWithName(value);
                           if (isDuplicate) {
                             return "Domain already exists";
                           }
@@ -104,7 +106,9 @@ class _ManageDomainsPageState extends State<ManageDomainsPage> {
                               domainState.removeDomain(domain.id);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Can\'t delete domain. Delete categories using it')),
+                                const SnackBar(
+                                    content: Text(
+                                        'Can\'t delete domain. Delete categories using it')),
                               );
                             }
                           },
