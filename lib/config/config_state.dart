@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/config/config_name.dart';
 import 'package:spending_tracker/repository/category/category.dart';
@@ -68,7 +69,7 @@ class ConfigState extends ChangeNotifier {
     return jsonData;
   }
 
-  Future<bool> saveJsonToFile(Map<String, dynamic> jsonMap, String fileName) async {
+  Future<bool> saveJsonToLocalFile(Map<String, dynamic> jsonMap, String fileName) async {
     try {
       Directory? directory = await getDirectoryToSaveFiles();
       if (directory == null) {
@@ -85,6 +86,26 @@ class ConfigState extends ChangeNotifier {
       return false;
     }
     return true;
+  }
+
+  Future<bool> exportJSONFile(Map<String, dynamic> jsonMap, String fileName) async {
+    try {
+      final tempDir = await getTemporaryDirectory();
+      final tempFilePath = '${tempDir.path}/$fileName.json';
+      // Save to temporary file
+      String jsonString = json.encode(jsonMap);
+      File tempFile = File(tempFilePath);
+      await tempFile.writeAsString(jsonString);
+      // Share the file
+      ShareResult res = await Share.shareXFiles(
+        [XFile(tempFilePath)],
+        subject: fileName,
+        text: 'Sharing JSON file: $fileName',
+      );
+      return res.status == ShareResultStatus.success;
+    } catch (e) {
+      return false;
+    }
   }
 
   String getExportDataFilename() => "spending-tracker-export-${DateTime.now().toString().substring(0, 10)}";

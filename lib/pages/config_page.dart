@@ -143,7 +143,7 @@ class ConfigPage extends StatelessWidget {
     Map<String, dynamic> jsonAppData = configState.getAllAppPersistedData();
     String fileName = configState.getExportDataFilename();
     configState
-        .saveJsonToFile(jsonAppData, fileName)
+        .exportJSONFile(jsonAppData, fileName)
         .then((res) => handleToastFileExportResult(res, context, fileName));
   }
 
@@ -151,7 +151,8 @@ class ConfigPage extends StatelessWidget {
     if (res) {
       String topLevelFolderName = Platform.isAndroid ? "Android/data" : "Download";
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("File exported to $topLevelFolderName folder as $fileName")),
+        SnackBar(content: Text("File exported $fileName exported")),
+        // SnackBar(content: Text("File exported to $topLevelFolderName folder as $fileName")),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
