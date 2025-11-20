@@ -127,7 +127,7 @@ class ConfigPage extends StatelessWidget {
       final String filePath = await sheetExporter.exportToExcel(domains, categories, expenses);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Exercises exported to: $filePath'),
+          content: Text('Expenses exported to: $filePath'),
         ),
       );
     } catch (e) {
