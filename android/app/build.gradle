@@ -1,3 +1,9 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -6,10 +12,7 @@ if (localPropertiesFile.exists()) {
     }
 }
 
-def flutterRoot = localProperties.getProperty('flutter.sdk')
-if (flutterRoot == null) {
-    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
-}
+// REMOVED: Manual flutterRoot check (handled by the plugin now)
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 if (flutterVersionCode == null) {
@@ -21,9 +24,9 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+// REMOVED: apply plugin: 'com.android.application'
+// REMOVED: apply plugin: 'kotlin-android'
+// REMOVED: apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
@@ -32,6 +35,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
+    namespace "top.cortez.spending_tracker"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -59,14 +63,6 @@ android {
         versionName flutterVersionName
     }
 
-    // If needed, sign with debug keys, so `flutter run --release` works.
-    //    buildTypes {
-    //        release {
-    //            // Signing with the debug keys for now, so `flutter run --release` works.
-    //            signingConfig signingConfigs.debug
-    //        }
-    //    }
-
     signingConfigs {
         release {
             keyAlias keystoreProperties['keyAlias']
@@ -87,5 +83,6 @@ flutter {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    // REMOVED: implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    // The new plugin handles the standard library dependency automatically.
 }
