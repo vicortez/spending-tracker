@@ -15,6 +15,7 @@ import 'package:spending_tracker/repository/category/category_state.dart';
 import 'package:spending_tracker/repository/domain/domain_state.dart';
 import 'package:spending_tracker/repository/expense/expense_state.dart';
 import 'package:spending_tracker/repository/focused_month/focused_month_state.dart';
+import 'package:spending_tracker/theme/app_theme.dart';
 import 'package:spending_tracker/translations/translations.dart';
 
 void main() {
@@ -43,11 +44,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       navigatorKey: mainNavigatorKey,
       title: 'Spending tracker',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: const ColorScheme.dark(primary: Colors.teal),
-        // colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-      ),
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: ThemeMode.system,
       home: const MainPage(),
       builder: (context, child) {
         return BaseScaffold(body: child!);
@@ -132,7 +131,8 @@ class _MainPageState extends State<MainPage> {
       builder: (context, constraints) {
         return WillPopScope(
           onWillPop: () async {
-            if (nestedNavigatorKey.currentState != null && nestedNavigatorKey.currentState!.canPop()) {
+            if (nestedNavigatorKey.currentState != null &&
+                nestedNavigatorKey.currentState!.canPop()) {
               nestedNavigatorKey.currentState?.pop(context);
               return false;
             }
@@ -162,20 +162,32 @@ class _MainPageState extends State<MainPage> {
                     backgroundColor: Theme.of(context).colorScheme.primary,
                     extended: constraints.maxWidth >= 600,
                     destinations: const [
-                      NavigationRailDestination(icon: Icon(Icons.home_outlined), label: Text('Home')),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.home_outlined),
+                        label: Text('Home'),
+                      ),
                       // NavigationRailDestination(
                       //   icon: Icon(
                       //     Icons.people_outline,
                       //   ),
                       //   label: Text('Shared expenses'), // TODO name
                       // ),
-                      NavigationRailDestination(icon: Icon(Icons.label_outline), label: Text('Manage categories')),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.label_outline),
+                        label: Text('Manage categories'),
+                      ),
                       NavigationRailDestination(
                         icon: Icon(Icons.receipt_long_outlined),
                         label: Text('Spending report'),
                       ),
-                      NavigationRailDestination(icon: Icon(Icons.settings_outlined), label: Text('Settings')),
-                      NavigationRailDestination(icon: Icon(Icons.info_outline), label: Text('About')),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.settings_outlined),
+                        label: Text('Settings'),
+                      ),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.info_outline),
+                        label: Text('About'),
+                      ),
                     ],
                     groupAlignment: -.5,
                     selectedIndex: selectedIndex,
