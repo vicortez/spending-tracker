@@ -1,6 +1,5 @@
 import 'dart:collection';
 
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -50,52 +49,46 @@ class _HomePageState extends State<HomePage> {
         children: [
           Expanded(
             child: ListView.separated(
-                itemCount: catByDomain.length,
-                separatorBuilder: (BuildContext ctx, int index) => const SizedBox(
-                      height: 15,
+              itemCount: catByDomain.length,
+              separatorBuilder: (BuildContext ctx, int index) => const SizedBox(height: 15),
+              itemBuilder: (context, index) {
+                DomainEntity? domain = catByDomain.keys.elementAtOrNull(index);
+                String domainLabel = 'Categories with no domain';
+                if (domain?.name != null && domain!.name.isNotEmpty) {
+                  domainLabel = domain.name;
+                }
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Divider(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+                    Text(domainLabel, style: Theme.of(context).textTheme.titleMedium),
+                    ListView.separated(
+                      itemBuilder: (context, index2) {
+                        var category = catByDomain[domain]![index2];
+                        return MyButton(
+                          text: category.name,
+                          onPressed: () {
+                            handleSubmitExpense(category.id, category.name, expenseAmountTextController.text);
+                          },
+                        );
+                      },
+                      separatorBuilder: (BuildContext ctx, int index) => const SizedBox(height: 10),
+                      itemCount: catByDomain[domain]!.length,
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
                     ),
-                itemBuilder: (context, index) {
-                  DomainEntity? domain = catByDomain.keys.elementAtOrNull(index);
-                  String domainLabel = 'Categories with no domain';
-                  if (domain?.name != null && domain!.name.isNotEmpty) {
-                    domainLabel = domain.name;
-                  }
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Divider(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                      ),
-                      Text(domainLabel, style: Theme.of(context).textTheme.titleMedium),
-                      ListView.separated(
-                        itemBuilder: (context, index2) {
-                          var category = catByDomain[domain]![index2];
-                          return MyButton(
-                            text: category.name,
-                            onPressed: () {
-                              handleSubmitExpense(category.id, category.name, expenseAmountTextController.text);
-                            },
-                          );
-                        },
-                        separatorBuilder: (BuildContext ctx, int index) => const SizedBox(
-                          height: 10,
-                        ),
-                        itemCount: catByDomain[domain]!.length,
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                      )
-                    ],
-                  );
-                }),
+                  ],
+                );
+              },
+            ),
           ),
           TextField(
-              autofocus: true,
-              decoration: const InputDecoration(hintText: '💸 Register expense'),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
-              controller: expenseAmountTextController,
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp('[0-9.-]+')),
-              ]),
+            autofocus: true,
+            decoration: const InputDecoration(hintText: '💸 Register expense'),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+            controller: expenseAmountTextController,
+            inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9.-]+'))],
+          ),
         ],
       ),
     );
@@ -104,11 +97,7 @@ class _HomePageState extends State<HomePage> {
   void handleSubmitExpense(int categoryId, String categoryName, String text) {
     double? amount = double.tryParse(text);
     if (amount == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Invalid expense'),
-        ),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Invalid expense')));
     } else {
       var expenseState = context.read<ExpenseState>();
       expenseState.addExpense(categoryId, categoryName, amount);
