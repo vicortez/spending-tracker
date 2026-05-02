@@ -2,7 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/components/ui/my_button.dart';
-import 'package:spending_tracker/components/ui/my_button.dart';
 import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/category/category_state.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
@@ -47,7 +46,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
 
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Edit category"),
+          title: const Text('Edit category'),
         ),
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: LayoutBuilder(
@@ -72,16 +71,16 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                                       children: [
                                         Expanded(
                                           child: TextFormField(
-                                            decoration: const InputDecoration(labelText: "Name"),
+                                            decoration: const InputDecoration(labelText: 'Name'),
                                             controller: _categoryNameTextController,
                                             validator: (value) {
                                               if (value == null || value.isEmpty) {
-                                                return "invalid name";
+                                                return 'invalid name';
                                               }
                                               var newNameClashesWithExisting = value != widget.category.name &&
                                                   categoryState.existsCategoryWithName(value);
                                               if (newNameClashesWithExisting) {
-                                                return "name already exists";
+                                                return 'name already exists';
                                               }
                                               return null;
                                             },
@@ -90,13 +89,13 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                                       ],
                                     ),
                                     DropdownButtonFormField<DomainEntity?>(
-                                      disabledHint: const Text("No domains to choose from"),
+                                      disabledHint: const Text('No domains to choose from'),
                                       iconDisabledColor: Colors.grey.withOpacity(0.5),
                                       decoration: const InputDecoration(
                                           contentPadding: EdgeInsets.fromLTRB(0, 5.5, 0, 0),
                                           labelStyle: TextStyle(),
                                           labelText: 'Domain'),
-                                      value: domainOptions.firstWhereOrNull((element) => element == domainFromCategory),
+                                      initialValue: domainOptions.firstWhereOrNull((element) => element == domainFromCategory),
                                       onChanged: domains.isNotEmpty
                                           ? (DomainEntity? selectedDomain) {
                                               domainFromCategory = selectedDomain;
@@ -106,13 +105,13 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                                         return DropdownMenuItem<DomainEntity?>(
                                           value: value,
                                           child: Text(
-                                            value?.name ?? "<no domain>",
+                                            value?.name ?? '<no domain>',
                                           ),
                                         );
                                       }).toList(),
                                     ),
                                     CheckboxListTile(
-                                      title: const Text("Enabled"),
+                                      title: const Text('Enabled'),
                                       value: catIsEnabled,
                                       onChanged: (newValue) {
                                         setState(() {
@@ -139,7 +138,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                                   children: [
                                     Expanded(
                                         child: MyButton(
-                                      text: "Delete",
+                                      text: 'Delete',
                                       onPressed: () {
                                         if (canRemoveCategory(widget.category.id, expenseState)) {
                                           categoryState.removeCategory(widget.category.id);
@@ -177,7 +176,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                                   children: [
                                     Expanded(
                                         child: MyButton(
-                                            text: "Save",
+                                            text: 'Save',
                                             onPressed: () {
                                               if (!_formKey.currentState!.validate()) {
                                                 return;
@@ -202,7 +201,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                                   children: [
                                     Expanded(
                                         child: MyButton(
-                                            text: "Back",
+                                            text: 'Back',
                                             onPressed: () {
                                               Navigator.pop(context);
                                             })),

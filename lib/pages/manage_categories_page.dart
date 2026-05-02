@@ -41,7 +41,7 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
     }
     List<CategoryEntity> noDomainCategories = categories.where((cat) => cat.domainId == null).toList();
     if (noDomainCategories.isNotEmpty) {
-      catByDomain[DomainEntity(id: -1, name: "")] = noDomainCategories;
+      catByDomain[DomainEntity(id: -1, name: '')] = noDomainCategories;
     }
 
     return WillPopScope(
@@ -52,7 +52,7 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
       child: Scaffold(
         appBar: AppBar(
           leading: const BackButton(),
-          title: const Text("Manage categories"),
+          title: const Text('Manage categories'),
         ),
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: Column(
@@ -74,11 +74,11 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
                         decoration: const InputDecoration(hintText: 'New category'),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Category must have a name";
+                            return 'Category must have a name';
                           }
                           bool isDuplicate = categoryState.existsCategoryWithName(value);
                           if (isDuplicate) {
-                            return "Category already exists";
+                            return 'Category already exists';
                           }
                           return null;
                         },
@@ -123,7 +123,7 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
                           Divider(
                             color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                           ),
-                          Text(domain.name.isNotEmpty ? domain.name : "Categories with no domain",
+                          Text(domain.name.isNotEmpty ? domain.name : 'Categories with no domain',
                               style: Theme.of(context).textTheme.titleMedium),
                           ListView.builder(
                             shrinkWrap: true,

@@ -9,7 +9,7 @@ class OldHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var catState = context.watch<CategoryState>();
-    var currentValue = "asdf";
+    var currentValue = 'asdf';
 
     IconData icon;
     if (true) {
@@ -22,7 +22,7 @@ class OldHomePage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text("Olás"),
+          const Text('Olás'),
           BigCard(text: currentValue),
           const SizedBox(
             height: 10,
@@ -50,7 +50,7 @@ class OldHomePage extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              catState.addCategory("name");
+              catState.addCategory('name');
             },
             child: const Text('add cat'),
           ),

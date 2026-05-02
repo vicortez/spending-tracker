@@ -56,7 +56,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                 itemBuilder: (context, index) {
                   DomainEntity? domain = catByDomain.keys.elementAtOrNull(index);
-                  String domainLabel = "Categories with no domain";
+                  String domainLabel = 'Categories with no domain';
                   if (domain?.name != null && domain!.name.isNotEmpty) {
                     domainLabel = domain.name;
                   }

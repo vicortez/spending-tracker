@@ -33,7 +33,7 @@ class _ManageDomainsPageState extends State<ManageDomainsPage> {
       child: Scaffold(
         appBar: AppBar(
           leading: const BackButton(),
-          title: const Text("Manage domains"),
+          title: const Text('Manage domains'),
         ),
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: Column(
@@ -55,12 +55,12 @@ class _ManageDomainsPageState extends State<ManageDomainsPage> {
                             const InputDecoration(hintText: 'New domain'),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Domain must have a name";
+                            return 'Domain must have a name';
                           }
                           bool isDuplicate =
                               domainState.existsDomainWithName(value);
                           if (isDuplicate) {
-                            return "Domain already exists";
+                            return 'Domain already exists';
                           }
                           return null;
                         },

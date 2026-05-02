@@ -73,7 +73,7 @@ class SpendingReportPage extends StatelessWidget {
     );
   }
 
-  _buildHeader(int index, context) {
+  SizedBox _buildHeader(int index, context) {
     double columnSeparatorSize = 3;
     var textStyle = const TextStyle(fontWeight: FontWeight.w800);
     return SizedBox(
@@ -83,9 +83,9 @@ class SpendingReportPage extends StatelessWidget {
           Expanded(
             child: Row(
               children: [
-                _buildExpandedCell(8, "Category", customStyle: textStyle),
-                _buildExpandedCell(6, "Date", customStyle: textStyle),
-                _buildExpandedCell(7, "Amount", customStyle: textStyle),
+                _buildExpandedCell(8, 'Category', customStyle: textStyle),
+                _buildExpandedCell(6, 'Date', customStyle: textStyle),
+                _buildExpandedCell(7, 'Amount', customStyle: textStyle),
               ],
             ),
           ),
@@ -94,9 +94,9 @@ class SpendingReportPage extends StatelessWidget {
     );
   }
 
-  _buildRow(int index, BuildContext context, RowData rowData) {
+  Column _buildRow(int index, BuildContext context, RowData rowData) {
     TextStyle? style;
-    String dateColText = rowData.expense != null ? rowData.expense!.date.toString().substring(0, 10) : "?";
+    String dateColText = rowData.expense != null ? rowData.expense!.date.toString().substring(0, 10) : '?';
     double minHeight = 40;
     int amountColFlex = 5;
     double? amount = rowData.expense?.amount;
@@ -104,12 +104,12 @@ class SpendingReportPage extends StatelessWidget {
     if (rowData.isAggregate) {
       minHeight = 30;
       amountColFlex = 7;
-      dateColText = "Total: ";
+      dateColText = 'Total: ';
       style = const TextStyle(fontWeight: FontWeight.w800);
       amount = rowData.total;
     }
 
-    String amountText = amount != null ? toMaxDecimalPlacesOmitTrailingZeroes(amount, 2) : "?";
+    String amountText = amount != null ? toMaxDecimalPlacesOmitTrailingZeroes(amount, 2) : '?';
 
     return Column(
       children: [
@@ -131,7 +131,7 @@ class SpendingReportPage extends StatelessWidget {
     );
   }
 
-  _buildExpandedCell(int flex, String content,
+  Expanded _buildExpandedCell(int flex, String content,
       {TextStyle? customStyle, Widget? customWidget, TextAlign? textAlign = TextAlign.start}) {
     return Expanded(
       flex: flex,
@@ -147,7 +147,7 @@ class SpendingReportPage extends StatelessWidget {
     );
   }
 
-  _buildEditCell(int flex, expense, context) {
+  Expanded _buildEditCell(int flex, expense, context) {
     return Expanded(
         flex: flex,
         child: ConstrainedBox(
@@ -175,7 +175,7 @@ class SpendingReportPage extends StatelessWidget {
         SplayTreeMap<String, List<ExpenseEntity>>((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
     for (var expense in expenses) {
       CategoryEntity category = categories.firstWhere((element) => element.id == expense.categoryId,
-          orElse: () => CategoryEntity(id: -1, name: "<category not found>", enabled: true));
+          orElse: () => CategoryEntity(id: -1, name: '<category not found>', enabled: true));
       if (category.enabled) {
         orderedExpensesMap.putIfAbsent(category.name, () => <ExpenseEntity>[]).add(expense);
       }

@@ -20,7 +20,7 @@ class DomainState extends ChangeNotifier {
   }
 
   void setDataFromImport(dynamic data) {
-    dynamic value = data ?? "[]";
+    dynamic value = data ?? '[]';
     updateLocalStorageFromRawData(value);
     loadFromLocalStorage(prefs!);
   }

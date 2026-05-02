@@ -12,7 +12,7 @@ import 'package:spending_tracker/repository/domain/domain.dart';
 import 'package:spending_tracker/repository/expense/expense.dart';
 
 class ConfigState extends ChangeNotifier {
-  Map<ConfigName, dynamic> config = {ConfigName.theme: "dark", ConfigName.seeAllMonths: true};
+  Map<ConfigName, dynamic> config = {ConfigName.theme: 'dark', ConfigName.seeAllMonths: true};
   String PERSIST_NAME = 'config';
 
   SharedPreferences? prefs;
@@ -108,7 +108,7 @@ class ConfigState extends ChangeNotifier {
     }
   }
 
-  String getExportDataFilename() => "spending-tracker-export-${DateTime.now().toString().substring(0, 10)}";
+  String getExportDataFilename() => 'spending-tracker-export-${DateTime.now().toString().substring(0, 10)}';
 
   Future<Directory?> getDirectoryToSaveFiles() async {
     final Directory? directory;

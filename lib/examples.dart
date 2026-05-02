@@ -30,9 +30,9 @@ class FavoritesPage extends StatelessWidget {
 
 class BigCard extends StatelessWidget {
   const BigCard({
-    Key? key,
+    super.key,
     required this.text,
-  }) : super(key: key);
+  });
 
   final String text;
 

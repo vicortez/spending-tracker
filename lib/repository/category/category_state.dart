@@ -38,7 +38,7 @@ class CategoryState extends ChangeNotifier {
   }
 
   void setDataFromImport(dynamic data) {
-    dynamic value = data ?? "[]";
+    dynamic value = data ?? '[]';
     prefs?.setString(CategoryEntity.PERSIST_NAME, value);
     loadCategoriesFromLocalStorage(prefs!);
   }
@@ -108,8 +108,8 @@ class CategoryState extends ChangeNotifier {
 
   List<CategoryEntity> getExampleCategories() {
     return [
-      CategoryEntity(id: getNextId(), name: "Example Category 1", enabled: true),
-      CategoryEntity(id: getNextId() + 1, name: "Example Category 2", enabled: true),
+      CategoryEntity(id: getNextId(), name: 'Example Category 1', enabled: true),
+      CategoryEntity(id: getNextId() + 1, name: 'Example Category 2', enabled: true),
       // Category(name: "Sushi", enabled: true),
       // Category(name: "Restaurants", enabled: true),
     ];

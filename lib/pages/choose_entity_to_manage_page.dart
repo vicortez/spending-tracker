@@ -32,16 +32,16 @@ class _ChooseEntityToManagePageState extends State<ChooseEntityToManagePage> {
         return MaterialPageRoute(
           builder: (context) => Scaffold(
             appBar: AppBar(
-              title: const Text("Select entity to manage"),
+              title: const Text('Select entity to manage'),
             ),
-            backgroundColor: Theme.of(context).colorScheme.background,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             body: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Row(
                   children: [
                     Expanded(
-                      child: Container(
+                      child: SizedBox(
                         height: buttonHeight,
                         child: MyButton(
                           text: 'Manage Categories',
@@ -61,7 +61,7 @@ class _ChooseEntityToManagePageState extends State<ChooseEntityToManagePage> {
                 Row(
                   children: [
                     Expanded(
-                      child: Container(
+                      child: SizedBox(
                         height: buttonHeight,
                         child: MyButton(
                           text: 'Manage Domains',
@@ -83,7 +83,7 @@ class _ChooseEntityToManagePageState extends State<ChooseEntityToManagePage> {
   }
 
   // if we're gonna start showing even more dialogs, refactor to not repeat so much code
-  _checkAndRunWelcomeProcedure(BuildContext context) async {
+  Future<void> _checkAndRunWelcomeProcedure(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool showDialog = (prefs.getBool('isFirstRun') ?? true);
 
@@ -95,7 +95,7 @@ class _ChooseEntityToManagePageState extends State<ChooseEntityToManagePage> {
     }
   }
 
-  _showWelcomeDialog(BuildContext context, SharedPreferences prefs) async {
+  Future<void> _showWelcomeDialog(BuildContext context, SharedPreferences prefs) async {
     return await showDialog<void>(
       context: context,
       barrierDismissible: false,

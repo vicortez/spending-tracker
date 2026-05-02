@@ -50,7 +50,7 @@ class _EditExpensePageState extends State<EditExpensePage> {
 
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Edit expense"),
+          title: const Text('Edit expense'),
         ),
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: LayoutBuilder(
@@ -72,7 +72,7 @@ class _EditExpensePageState extends State<EditExpensePage> {
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     DropdownButtonFormField<CategoryEntity>(
-                                      value: categoryOptions != null ? relatedCategory : categoryOptions.first,
+                                      initialValue: relatedCategory,
                                       onChanged: (CategoryEntity? selectedOption) {
                                         relatedCategory = selectedOption;
                                       },
@@ -90,7 +90,7 @@ class _EditExpensePageState extends State<EditExpensePage> {
                                       children: [
                                         Expanded(
                                           child: TextFormField(
-                                            decoration: const InputDecoration(labelText: "Amount"),
+                                            decoration: const InputDecoration(labelText: 'Amount'),
                                             controller: _expenseAmountTextController,
                                             keyboardType:
                                                 const TextInputType.numberWithOptions(decimal: true, signed: true),
@@ -100,7 +100,7 @@ class _EditExpensePageState extends State<EditExpensePage> {
                                             validator: (value) {
                                               double? amount = double.tryParse(_expenseAmountTextController.text);
                                               if (amount == null) {
-                                                return "Invalid amount";
+                                                return 'Invalid amount';
                                               }
                                               return null;
                                             },
@@ -150,7 +150,7 @@ class _EditExpensePageState extends State<EditExpensePage> {
                                   children: [
                                     Expanded(
                                         child: MyButton(
-                                      text: "Delete",
+                                      text: 'Delete',
                                       onPressed: () {
                                         expenseState.removeExpense(widget.expense.id);
                                         ScaffoldMessenger.of(context).showSnackBar(
@@ -167,7 +167,7 @@ class _EditExpensePageState extends State<EditExpensePage> {
                                   children: [
                                     Expanded(
                                         child: MyButton(
-                                            text: "Save",
+                                            text: 'Save',
                                             onPressed: () {
                                               var amount = double.tryParse(_expenseAmountTextController.text);
                                               bool success = false;
@@ -198,7 +198,7 @@ class _EditExpensePageState extends State<EditExpensePage> {
                                   children: [
                                     Expanded(
                                         child: MyButton(
-                                            text: "Back",
+                                            text: 'Back',
                                             onPressed: () {
                                               Navigator.pop(context);
                                             })),

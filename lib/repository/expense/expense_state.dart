@@ -19,7 +19,7 @@ class ExpenseState extends ChangeNotifier {
   }
 
   void setDataFromImport(dynamic data) {
-    dynamic value = data ?? "[]";
+    dynamic value = data ?? '[]';
     prefs?.setString(ExpenseEntity.PERSIST_NAME, value);
     loadFromLocalStorage(prefs!);
   }

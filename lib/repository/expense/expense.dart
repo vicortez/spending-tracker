@@ -7,7 +7,7 @@ class ExpenseEntity {
   double amount;
   DateTime date;
 
-  static const PERSIST_NAME = "expenses";
+  static const PERSIST_NAME = 'expenses';
 
   ExpenseEntity({required this.id, required this.categoryId, required this.amount, required this.date});
 

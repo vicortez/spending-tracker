@@ -15,7 +15,7 @@ class MyButton extends StatelessWidget {
     Color fontColor;
     switch (type) {
       case ButtonType.normal:
-        backgroundColor = Theme.of(context).colorScheme.background;
+        backgroundColor = Theme.of(context).colorScheme.surface;
         fontColor = Theme.of(context).colorScheme.primary;
         break;
       case ButtonType.danger:
@@ -23,17 +23,17 @@ class MyButton extends StatelessWidget {
         fontColor = getTextColorForBackground(backgroundColor);
         break;
       default:
-        backgroundColor = Theme.of(context).colorScheme.background;
+        backgroundColor = Theme.of(context).colorScheme.surface;
         fontColor = Theme.of(context).colorScheme.primary;
         break;
     }
     return ElevatedButton(
       onPressed: onPressed != null ? () => onPressed!() : null,
       style: ButtonStyle(
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          shape: WidgetStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-          backgroundColor: MaterialStateProperty.all(backgroundColor),
-          foregroundColor: MaterialStateProperty.all(fontColor)),
+          backgroundColor: WidgetStateProperty.all(backgroundColor),
+          foregroundColor: WidgetStateProperty.all(fontColor)),
       child: Text(
         text,
       ),

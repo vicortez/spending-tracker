@@ -56,15 +56,15 @@ class TestPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
-        title: const Text("Secret tests page"),
+        title: const Text('Secret tests page'),
       ),
       body: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-                "Total spent in ${monthNames[month.month]!}: \$${toMaxDecimalPlacesOmitTrailingZeroes(totalSpentCurrentMonth, 2)}"),
-            const Text("Top 20 expenses"),
+                'Total spent in ${monthNames[month.month]!}: \$${toMaxDecimalPlacesOmitTrailingZeroes(totalSpentCurrentMonth, 2)}'),
+            const Text('Top 20 expenses'),
             SizedBox(
               height: 300,
               child: PieChart(
@@ -85,7 +85,7 @@ class TestPage extends StatelessWidget {
                 title: Text(section.title),
                 titleTextStyle: const TextStyle(fontSize: 18),
               );
-            }).toList(),
+            }),
           ],
         ),
       ),

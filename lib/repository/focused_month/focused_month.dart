@@ -3,7 +3,7 @@ import 'dart:convert';
 class FocusedMonth {
   DateTime month;
 
-  static const PERSIST_NAME = "focused_month";
+  static const PERSIST_NAME = 'focused_month';
 
   FocusedMonth({required this.month});
 

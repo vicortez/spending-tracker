@@ -9,13 +9,7 @@ class BaseScaffold extends StatelessWidget {
   final Widget? bottomNavigationBar;
   final Color? backgroundColor;
 
-  const BaseScaffold({
-    super.key,
-    required this.body,
-    this.appBar,
-    this.bottomNavigationBar,
-    this.backgroundColor,
-  });
+  const BaseScaffold({super.key, required this.body, this.appBar, this.bottomNavigationBar, this.backgroundColor});
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +20,7 @@ class BaseScaffold extends StatelessWidget {
       // If no color is passed, it uses the default Scaffold background color
       backgroundColor: bgColor,
       bottomNavigationBar: bottomNavigationBar,
-      body: SafeArea(
-        child: body,
-      ),
+      body: SafeArea(child: body),
     );
   }
 }

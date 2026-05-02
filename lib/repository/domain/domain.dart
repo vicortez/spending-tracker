@@ -5,7 +5,7 @@ class DomainEntity {
   int id;
   String name;
 
-  static const PERSIST_NAME = "domains";
+  static const PERSIST_NAME = 'domains';
 
   DomainEntity({required this.id, required this.name});
 

@@ -12,13 +12,13 @@ class InfoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Text("Spending tracker"),
+        const Text('Spending tracker'),
         const SizedBox(
           height: 10,
         ),
-        const Text("Developed by Victor Cortez using Flutter"),
+        const Text('Developed by Victor Cortez using Flutter'),
         const InkWell(
-            onTap: _launchURL, child: Text(style: TextStyle(color: Colors.blue), "https://github.com/vicortez")),
+            onTap: _launchURL, child: Text(style: TextStyle(color: Colors.blue), 'https://github.com/vicortez')),
         const Expanded(child: SizedBox.shrink()),
         RichText(
           text: TextSpan(
@@ -42,7 +42,7 @@ class InfoPage extends StatelessWidget {
         const SizedBox(
           height: 10,
         ),
-        const Text("Version 0.24.0"),
+        const Text('Version 0.24.0'),
         const SizedBox(
           height: 5,
         )
@@ -51,7 +51,7 @@ class InfoPage extends StatelessWidget {
   }
 }
 
-_launchURL() async {
+Future<void> _launchURL() async {
   const url = 'https://github.com/vicortez';
   final uri = Uri.parse(url);
   if (await canLaunchUrl(uri)) {

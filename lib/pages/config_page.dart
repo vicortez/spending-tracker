@@ -38,13 +38,13 @@ class ConfigPage extends StatelessWidget {
                 child: Column(
                   children: [
                     CheckboxListTile(
-                      title: const Text("See all months"),
+                      title: const Text('See all months'),
                       value: configState.getConfig(ConfigName.seeAllMonths),
                       onChanged: (newValue) => configState.updateConfig(ConfigName.seeAllMonths, newValue),
                     ),
                     const SizedBox(height: 15),
                     MyButton(
-                      text: "Export to sheet (excel)",
+                      text: 'Export to sheet (excel)',
                       onPressed: kIsWeb
                           ? null
                           : () => onPressedExportToSheetAction(
@@ -53,23 +53,23 @@ class ConfigPage extends StatelessWidget {
                     ),
                     if (kIsWeb)
                       const Text(
-                        "Exporting is currently unavailable for web",
+                        'Exporting is currently unavailable for web',
                         style: TextStyle(fontSize: 12),
                       ),
                     const SizedBox(height: 15),
                     MyButton(
-                      text: "Export all app data",
+                      text: 'Export all app data',
                       onPressed: kIsWeb ? null : () => onPressedExportAction(configState, context),
                       type: ButtonType.normal,
                     ),
                     if (kIsWeb)
                       const Text(
-                        "Exporting is currently unavailable for web",
+                        'Exporting is currently unavailable for web',
                         style: TextStyle(fontSize: 12),
                       ),
                     const SizedBox(height: 15),
                     MyButton(
-                      text: "Import app data",
+                      text: 'Import app data',
                       onPressed: kIsWeb
                           ? null
                           : () {
@@ -78,19 +78,19 @@ class ConfigPage extends StatelessWidget {
                                   () =>
                                       handleImportFile(context, configState, categoryState, expenseState, domainState),
                                   () => {},
-                                  "Confirm",
-                                  "Importing app data will erase any current app data, and load the new one.");
+                                  'Confirm',
+                                  'Importing app data will erase any current app data, and load the new one.');
                             },
                       type: ButtonType.normal,
                     ),
                     if (kIsWeb)
                       const Text(
-                        "Importing is currently unavailable for web",
+                        'Importing is currently unavailable for web',
                         style: TextStyle(fontSize: 12),
                       ),
                     const SizedBox(height: 30),
                     MyButton(
-                      text: "Delete all expenses".toUpperCase(),
+                      text: 'Delete all expenses'.toUpperCase(),
                       onPressed: () {
                         expenseState.removeALl();
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -149,9 +149,9 @@ class ConfigPage extends StatelessWidget {
 
   void handleToastFileExportResult(bool res, BuildContext context, String fileName) {
     if (res) {
-      String topLevelFolderName = Platform.isAndroid ? "Android/data" : "Download";
+      String topLevelFolderName = Platform.isAndroid ? 'Android/data' : 'Download';
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("File exported $fileName exported")),
+        SnackBar(content: Text('File exported $fileName exported')),
         // SnackBar(content: Text("File exported to $topLevelFolderName folder as $fileName")),
       );
     } else {
@@ -165,7 +165,7 @@ class ConfigPage extends StatelessWidget {
       BuildContext context, VoidCallback onConfirm, VoidCallback onCancel, String title, String body) {
     // set up the buttons
     Widget cancelButton = TextButton(
-      child: const Text("Cancel"),
+      child: const Text('Cancel'),
       onPressed: () {
         Navigator.of(context).pop();
         onCancel();
@@ -175,7 +175,7 @@ class ConfigPage extends StatelessWidget {
       style: ButtonStyle(
         backgroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.secondary.withOpacity(0.05)),
       ),
-      child: const Text("Continue"),
+      child: const Text('Continue'),
       onPressed: () {
         Navigator.of(context).pop();
         onConfirm();
@@ -209,7 +209,7 @@ class ConfigPage extends StatelessWidget {
       expenseState.setDataFromImport(jsonData[ExpenseEntity.PERSIST_NAME]);
       domainState.setDataFromImport(jsonData[DomainEntity.PERSIST_NAME]);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Data imported"), duration: Duration(seconds: 2)),
+        const SnackBar(content: Text('Data imported'), duration: Duration(seconds: 2)),
       );
     }
     return;

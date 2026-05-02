@@ -7,7 +7,7 @@ class CategoryEntity {
   bool enabled;
   int? domainId;
 
-  static const PERSIST_NAME = "categories";
+  static const PERSIST_NAME = 'categories';
 
   CategoryEntity({required this.id, required this.name, required this.enabled, this.domainId});
 
