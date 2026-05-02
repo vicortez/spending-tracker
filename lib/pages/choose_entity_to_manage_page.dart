@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:spending_tracker/common_widgets/my_button.dart';
+import 'package:spending_tracker/components/ui/my_button.dart';
 import 'package:spending_tracker/pages/manage_categories_page.dart';
 import 'package:spending_tracker/pages/manage_domains_page.dart';
 import 'package:spending_tracker/translations/translations.dart';

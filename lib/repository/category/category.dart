@@ -11,7 +11,7 @@ class CategoryEntity {
 
   CategoryEntity({required this.id, required this.name, required this.enabled, this.domainId});
 
-  factory CategoryEntity.fromJson(Map<String, dynamic> jsonData) {
+  factory CategoryEntity.fromMap(Map<String, dynamic> jsonData) {
     return CategoryEntity(
       id: jsonData['id'],
       name: jsonData['name'],
@@ -32,5 +32,5 @@ class CategoryEntity {
       );
 
   static List<CategoryEntity> decode(String categories) =>
-      (json.decode(categories) as List<dynamic>).map<CategoryEntity>((item) => CategoryEntity.fromJson(item)).toList();
+      (json.decode(categories) as List<dynamic>).map<CategoryEntity>((item) => CategoryEntity.fromMap(item)).toList();
 }

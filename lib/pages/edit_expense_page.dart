@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/common_widgets/my_button.dart';
+import 'package:spending_tracker/components/ui/my_button.dart';
 import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/category/category_state.dart';
 import 'package:spending_tracker/repository/expense/expense.dart';

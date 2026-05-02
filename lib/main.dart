@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:spending_tracker/common_widgets/month_button.dart';
+import 'package:spending_tracker/components/BaseScaffold.dart';
+import 'package:spending_tracker/components/ui/month_button.dart';
 import 'package:spending_tracker/config/config_name.dart';
 import 'package:spending_tracker/config/config_state.dart';
 import 'package:spending_tracker/pages/choose_entity_to_manage_page.dart';
@@ -48,6 +49,11 @@ class MyApp extends StatelessWidget {
                   // colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
                 ),
                 home: const MainPage(),
+                builder: (context, child) {
+                  return BaseScaffold(
+                    body: child!,
+                  );
+                },
               ),
             ),
           ),
@@ -120,30 +126,6 @@ class _MainPageState extends State<MainPage> {
       const InfoPage()
     ];
 
-    // switch (selectedIndex) {
-    //   case 0:
-    //     page = const HomePage();
-    //     break;
-    //   case 1:
-    //     page = const SharedExpensesPage();
-    //     break;
-    //   case 2:
-    //     page = ChooseEntityToManagePage(
-    //       navigatorKey: nestedNavigatorKey,
-    //     );
-    //     break;
-    //   case 3:
-    //     page = const SpendingReportPage();
-    //     break;
-    //   case 4:
-    //     page = const ConfigPage();
-    //     break;
-    //   case 5:
-    //     page = const InfoPage();
-    //     break;
-    //   default:
-    //     throw UnimplementedError('no widget for $selectedIndex index');
-    // }
     if (selectedIndex >= 0 && selectedIndex < orderedPageList.length) {
     } else {
       page = const HomePage();
@@ -154,8 +136,7 @@ class _MainPageState extends State<MainPage> {
     return LayoutBuilder(builder: (context, constraints) {
       return WillPopScope(
         onWillPop: () async {
-          if (nestedNavigatorKey.currentState != null &&
-              nestedNavigatorKey.currentState!.canPop()) {
+          if (nestedNavigatorKey.currentState != null && nestedNavigatorKey.currentState!.canPop()) {
             nestedNavigatorKey.currentState?.pop(context);
             return false;
           }
@@ -244,8 +225,7 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
-  _checkAndRunWelcomeProcedure(
-      BuildContext context, GlobalKey<NavigatorState> nestedNavigatorKey,
+  _checkAndRunWelcomeProcedure(BuildContext context, GlobalKey<NavigatorState> nestedNavigatorKey,
       {required void Function() onNext}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool showDialog = (prefs.getBool('isFirstRun') ?? true);
@@ -258,8 +238,7 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
-  _showWelcomeDialog(BuildContext context, SharedPreferences prefs,
-      {required void Function() onNext}) async {
+  _showWelcomeDialog(BuildContext context, SharedPreferences prefs, {required void Function() onNext}) async {
     return await showDialog<void>(
       context: context,
       barrierDismissible: false,

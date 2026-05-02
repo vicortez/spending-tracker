@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/common_widgets/my_button.dart';
+import 'package:spending_tracker/components/ui/my_button.dart';
 import 'package:spending_tracker/config/config_name.dart';
 import 'package:spending_tracker/config/config_state.dart';
 import 'package:spending_tracker/repository/category/category.dart';
