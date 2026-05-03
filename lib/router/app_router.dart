@@ -1,0 +1,44 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:spending_tracker/components/navigation_shell.dart';
+import 'package:spending_tracker/pages/choose_entity_to_manage_page.dart';
+import 'package:spending_tracker/pages/home_page.dart';
+import 'package:spending_tracker/pages/info_page.dart';
+import 'package:spending_tracker/pages/settings_page.dart';
+import 'package:spending_tracker/pages/spending_report_page.dart';
+import 'package:spending_tracker/router/route_utils.dart';
+
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> shellNavigatorKey = GlobalKey<NavigatorState>();
+
+final GoRouter appRouter = GoRouter(
+  initialLocation: AppRouteConstants.homePath,
+  navigatorKey: rootNavigatorKey,
+  routes: [
+    ShellRoute(
+      navigatorKey: shellNavigatorKey,
+      builder: (context, state, child) {
+        return MainNavigationShell(child: child);
+      },
+      routes: [
+        GoRoute(path: AppRouteConstants.homePath, builder: (context, state) => const HomePage()),
+        GoRoute(
+          path: AppRouteConstants.categoriesPath,
+          builder: (context, state) => ChooseEntityToManagePage(
+            navigatorKey: GlobalKey<NavigatorState>(), // Individual key for internal nav if needed
+          ),
+        ),
+        GoRoute(
+          path: AppRouteConstants.reportsPath,
+          builder: (context, state) => const SpendingReportPage(),
+          // Edit expense could be a sub-route or a modal
+        ),
+        GoRoute(
+          path: AppRouteConstants.settingsPath,
+          builder: (context, state) => const SettingsPage(),
+        ),
+        GoRoute(path: AppRouteConstants.aboutPath, builder: (context, state) => const InfoPage()),
+      ],
+    ),
+  ],
+);

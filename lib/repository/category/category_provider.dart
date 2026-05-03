@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'category.dart';
 
-class CategoryState extends ChangeNotifier {
+class CategoryProvider with ChangeNotifier {
   List<CategoryEntity> _categories = [];
 
   SharedPreferences? prefs;

@@ -4,27 +4,27 @@ import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/components/ui/my_button.dart';
-import 'package:spending_tracker/config/config_name.dart';
-import 'package:spending_tracker/config/config_state.dart';
 import 'package:spending_tracker/repository/category/category.dart';
-import 'package:spending_tracker/repository/category/category_state.dart';
+import 'package:spending_tracker/repository/category/category_provider.dart';
+import 'package:spending_tracker/repository/config/config_name.dart';
+import 'package:spending_tracker/repository/config/config_provider.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
-import 'package:spending_tracker/repository/domain/domain_state.dart';
+import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense.dart';
-import 'package:spending_tracker/repository/expense/expense_state.dart';
-import 'package:spending_tracker/repository/focused_month/focused_month_state.dart';
+import 'package:spending_tracker/repository/expense/expense_provider.dart';
+import 'package:spending_tracker/repository/focused_month/focused_month_provider.dart';
 import 'package:spending_tracker/utils/sheet_exporter.dart';
 
-class ConfigPage extends StatelessWidget {
-  const ConfigPage({super.key});
+class SettingsPage extends StatelessWidget {
+  const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var expenseState = context.watch<ExpenseState>();
-    var domainState = context.watch<DomainState>();
-    var categoryState = context.watch<CategoryState>();
-    var configState = context.watch<ConfigState>();
-    var focusedMonthState = context.watch<FocusedMonthState>();
+    var expenseProvider = context.watch<ExpenseProvider>();
+    var domainProvider = context.watch<DomainProvider>();
+    var categoryProvider = context.watch<CategoryProvider>();
+    var configProvider = context.watch<ConfigProvider>();
+    var focusedMonthProvider = context.watch<FocusedMonthProvider>();
 
     return Column(
       mainAxisSize: MainAxisSize.max,
@@ -39,8 +39,9 @@ class ConfigPage extends StatelessWidget {
                   children: [
                     CheckboxListTile(
                       title: const Text('See all months'),
-                      value: configState.getConfig(ConfigName.seeAllMonths),
-                      onChanged: (newValue) => configState.updateConfig(ConfigName.seeAllMonths, newValue),
+                      value: configProvider.getConfig(ConfigName.seeAllMonths),
+                      onChanged: (newValue) =>
+                          configProvider.updateConfig(ConfigName.seeAllMonths, newValue),
                     ),
                     const SizedBox(height: 15),
                     MyButton(
@@ -48,7 +49,13 @@ class ConfigPage extends StatelessWidget {
                       onPressed: kIsWeb
                           ? null
                           : () => onPressedExportToSheetAction(
-                              domainState, categoryState, expenseState, configState, focusedMonthState, context),
+                              domainProvider,
+                              categoryProvider,
+                              expenseProvider,
+                              configProvider,
+                              focusedMonthProvider,
+                              context,
+                            ),
                       type: ButtonType.normal,
                     ),
                     if (kIsWeb)
@@ -59,7 +66,9 @@ class ConfigPage extends StatelessWidget {
                     const SizedBox(height: 15),
                     MyButton(
                       text: 'Export all app data',
-                      onPressed: kIsWeb ? null : () => onPressedExportAction(configState, context),
+                      onPressed: kIsWeb
+                          ? null
+                          : () => onPressedExportAction(configProvider, context),
                       type: ButtonType.normal,
                     ),
                     if (kIsWeb)
@@ -74,12 +83,18 @@ class ConfigPage extends StatelessWidget {
                           ? null
                           : () {
                               showConfirmDialog(
+                                context,
+                                () => handleImportFile(
                                   context,
-                                  () =>
-                                      handleImportFile(context, configState, categoryState, expenseState, domainState),
-                                  () => {},
-                                  'Confirm',
-                                  'Importing app data will erase any current app data, and load the new one.');
+                                  configProvider,
+                                  categoryProvider,
+                                  expenseProvider,
+                                  domainProvider,
+                                ),
+                                () => {},
+                                'Confirm',
+                                'Importing app data will erase any current app data, and load the new one.',
+                              );
                             },
                       type: ButtonType.normal,
                     ),
@@ -92,10 +107,10 @@ class ConfigPage extends StatelessWidget {
                     MyButton(
                       text: 'Delete all expenses'.toUpperCase(),
                       onPressed: () {
-                        expenseState.removeALl();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Expenses deleted')),
-                        );
+                        expenseProvider.removeALl();
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(const SnackBar(content: Text('Expenses deleted')));
                       },
                       type: ButtonType.danger,
                     ),
@@ -104,45 +119,50 @@ class ConfigPage extends StatelessWidget {
               ),
             ),
           ],
-        )
+        ),
       ],
     );
   }
 
-  void onPressedExportToSheetAction(DomainState domainState, CategoryState categoryState, ExpenseState expenseState,
-      ConfigState configState, FocusedMonthState focusedMonthState, BuildContext context) async {
+  void onPressedExportToSheetAction(
+    DomainProvider domainProvider,
+    CategoryProvider categoryProvider,
+    ExpenseProvider expenseProvider,
+    ConfigProvider configProvider,
+    FocusedMonthProvider focusedMonthProvider,
+    BuildContext context,
+  ) async {
     try {
-      List<DomainEntity> domains = [...domainState.domains];
-      List<CategoryEntity> categories = [...categoryState.categories];
-      List<ExpenseEntity> expenses = [...expenseState.expenses];
+      List<DomainEntity> domains = [...domainProvider.domains];
+      List<CategoryEntity> categories = [...categoryProvider.categories];
+      List<ExpenseEntity> expenses = [...expenseProvider.expenses];
 
       final SheetExporter sheetExporter = SheetExporter();
 
-      bool seeAllMonths = configState.getConfig(ConfigName.seeAllMonths);
-      DateTime month = focusedMonthState.getMonth();
+      bool seeAllMonths = configProvider.getConfig(ConfigName.seeAllMonths);
+      DateTime month = focusedMonthProvider.getMonth();
       if (!seeAllMonths) {
-        expenses =
-            expenses.where((expense) => expense.date.year == month.year && expense.date.month == month.month).toList();
+        expenses = expenses
+            .where(
+              (expense) => expense.date.year == month.year && expense.date.month == month.month,
+            )
+            .toList();
       }
       final String filePath = await sheetExporter.exportToExcel(domains, categories, expenses);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Expenses exported to: $filePath'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Expenses exported to: $filePath')));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to export exercises'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to export exercises')));
     }
   }
 
-  void onPressedExportAction(ConfigState configState, BuildContext context) {
-    Map<String, dynamic> jsonAppData = configState.getAllAppPersistedData();
-    String fileName = configState.getExportDataFilename();
-    configState
+  void onPressedExportAction(ConfigProvider configProvider, BuildContext context) {
+    Map<String, dynamic> jsonAppData = configProvider.getAllAppPersistedData();
+    String fileName = configProvider.getExportDataFilename();
+    configProvider
         .exportJSONFile(jsonAppData, fileName)
         .then((res) => handleToastFileExportResult(res, context, fileName));
   }
@@ -155,14 +175,19 @@ class ConfigPage extends StatelessWidget {
         // SnackBar(content: Text("File exported to $topLevelFolderName folder as $fileName")),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error exporting file :(')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Error exporting file :(')));
     }
   }
 
   void showConfirmDialog(
-      BuildContext context, VoidCallback onConfirm, VoidCallback onCancel, String title, String body) {
+    BuildContext context,
+    VoidCallback onConfirm,
+    VoidCallback onCancel,
+    String title,
+    String body,
+  ) {
     // set up the buttons
     Widget cancelButton = TextButton(
       child: const Text('Cancel'),
@@ -173,7 +198,9 @@ class ConfigPage extends StatelessWidget {
     );
     Widget continueButton = TextButton(
       style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.secondary.withOpacity(0.05)),
+        backgroundColor: WidgetStateProperty.all(
+          Theme.of(context).colorScheme.secondary.withOpacity(0.05),
+        ),
       ),
       child: const Text('Continue'),
       onPressed: () {
@@ -186,10 +213,7 @@ class ConfigPage extends StatelessWidget {
     AlertDialog alert = AlertDialog(
       title: Text(title),
       content: Text(body),
-      actions: [
-        cancelButton,
-        continueButton,
-      ],
+      actions: [cancelButton, continueButton],
     );
 
     // show the dialog
@@ -201,13 +225,18 @@ class ConfigPage extends StatelessWidget {
     );
   }
 
-  void handleImportFile(BuildContext context, ConfigState configState, CategoryState categoryState,
-      ExpenseState expenseState, DomainState domainState) async {
-    Map<String, dynamic>? jsonData = await configState.importJsonDataFile();
+  void handleImportFile(
+    BuildContext context,
+    ConfigProvider configProvider,
+    CategoryProvider categoryProvider,
+    ExpenseProvider expenseProvider,
+    DomainProvider domainProvider,
+  ) async {
+    Map<String, dynamic>? jsonData = await configProvider.importJsonDataFile();
     if (jsonData != null) {
-      categoryState.setDataFromImport(jsonData[CategoryEntity.PERSIST_NAME]);
-      expenseState.setDataFromImport(jsonData[ExpenseEntity.PERSIST_NAME]);
-      domainState.setDataFromImport(jsonData[DomainEntity.PERSIST_NAME]);
+      categoryProvider.setDataFromImport(jsonData[CategoryEntity.PERSIST_NAME]);
+      expenseProvider.setDataFromImport(jsonData[ExpenseEntity.PERSIST_NAME]);
+      domainProvider.setDataFromImport(jsonData[DomainEntity.PERSIST_NAME]);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Data imported'), duration: Duration(seconds: 2)),
       );

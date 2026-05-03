@@ -6,12 +6,12 @@ import 'package:flutter/foundation.dart' hide Category;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:spending_tracker/config/config_name.dart';
 import 'package:spending_tracker/repository/category/category.dart';
+import 'package:spending_tracker/repository/config/config_name.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
 import 'package:spending_tracker/repository/expense/expense.dart';
 
-class ConfigState extends ChangeNotifier {
+class ConfigProvider with ChangeNotifier {
   Map<ConfigName, dynamic> config = {ConfigName.theme: 'dark', ConfigName.seeAllMonths: true};
   String PERSIST_NAME = 'config';
 
@@ -108,7 +108,8 @@ class ConfigState extends ChangeNotifier {
     }
   }
 
-  String getExportDataFilename() => 'spending-tracker-export-${DateTime.now().toString().substring(0, 10)}';
+  String getExportDataFilename() =>
+      'spending-tracker-export-${DateTime.now().toString().substring(0, 10)}';
 
   Future<Directory?> getDirectoryToSaveFiles() async {
     final Directory? directory;
@@ -153,12 +154,12 @@ class ConfigState extends ChangeNotifier {
     notifyListeners();
   }
 
-// void toggleTheme() {
-//   if (config['theme'] == "dark") {
-//     config['theme'] = "light";
-//   } else {
-//     config['theme'] = "dark";
-//   }
-//   notifyListeners();
-// }
+  // void toggleTheme() {
+  //   if (config['theme'] == "dark") {
+  //     config['theme'] = "light";
+  //   } else {
+  //     config['theme'] = "dark";
+  //   }
+  //   notifyListeners();
+  // }
 }

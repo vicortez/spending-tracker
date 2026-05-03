@@ -2,14 +2,14 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/config/config_name.dart';
-import 'package:spending_tracker/config/config_state.dart';
 import 'package:spending_tracker/pages/edit_expense_page.dart';
 import 'package:spending_tracker/repository/category/category.dart';
-import 'package:spending_tracker/repository/category/category_state.dart';
+import 'package:spending_tracker/repository/category/category_provider.dart';
+import 'package:spending_tracker/repository/config/config_name.dart';
+import 'package:spending_tracker/repository/config/config_provider.dart';
 import 'package:spending_tracker/repository/expense/expense.dart';
-import 'package:spending_tracker/repository/expense/expense_state.dart';
-import 'package:spending_tracker/repository/focused_month/focused_month_state.dart';
+import 'package:spending_tracker/repository/expense/expense_provider.dart';
+import 'package:spending_tracker/repository/focused_month/focused_month_provider.dart';
 import 'package:spending_tracker/repository/month_names.dart';
 import 'package:spending_tracker/utils/color_utils.dart';
 import 'package:spending_tracker/utils/number_utils.dart';
@@ -29,19 +29,20 @@ class SpendingReportPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var expenseState = context.watch<ExpenseState>();
-    var categoryState = context.watch<CategoryState>();
-    var focusedMonthState = context.watch<FocusedMonthState>();
-    var configState = context.watch<ConfigState>();
+    var expenseProvider = context.watch<ExpenseProvider>();
+    var categoryProvider = context.watch<CategoryProvider>();
+    var focusedMonthProvider = context.watch<FocusedMonthProvider>();
+    var configProvider = context.watch<ConfigProvider>();
 
-    bool seeAllMonths = configState.getConfig(ConfigName.seeAllMonths);
-    DateTime month = focusedMonthState.getMonth();
-    List<ExpenseEntity> expenses = [...expenseState.expenses];
-    List<CategoryEntity> categories = [...categoryState.categories];
+    bool seeAllMonths = configProvider.getConfig(ConfigName.seeAllMonths);
+    DateTime month = focusedMonthProvider.getMonth();
+    List<ExpenseEntity> expenses = [...expenseProvider.expenses];
+    List<CategoryEntity> categories = [...categoryProvider.categories];
     expenses.sort((a, b) => a.date.compareTo(b.date));
     if (!seeAllMonths) {
-      expenses =
-          expenses.where((expense) => expense.date.year == month.year && expense.date.month == month.month).toList();
+      expenses = expenses
+          .where((expense) => expense.date.year == month.year && expense.date.month == month.month)
+          .toList();
     }
 
     // Quick and dirty way. Not scalable. Ideally we want a global object dictionary with theme name as keys.
@@ -51,7 +52,12 @@ class SpendingReportPage extends StatelessWidget {
     Color? tableBackground2 = isDarkMode ? Colors.grey[850] : Colors.grey[300];
 
     List<RowData> rowData = getRowsData(
-        expenses, tableBackground1, tableBackground2, darken(Theme.of(context).colorScheme.primary, 30), categories);
+      expenses,
+      tableBackground1,
+      tableBackground2,
+      darken(Theme.of(context).colorScheme.primary, 30),
+      categories,
+    );
     return SelectionArea(
       child: Column(
         children: [
@@ -67,7 +73,7 @@ class SpendingReportPage extends StatelessWidget {
                 return _buildRow(index, context, rowData[index - 1]);
               },
             ),
-          )
+          ),
         ],
       ),
     );
@@ -96,7 +102,9 @@ class SpendingReportPage extends StatelessWidget {
 
   Column _buildRow(int index, BuildContext context, RowData rowData) {
     TextStyle? style;
-    String dateColText = rowData.expense != null ? rowData.expense!.date.toString().substring(0, 10) : '?';
+    String dateColText = rowData.expense != null
+        ? rowData.expense!.date.toString().substring(0, 10)
+        : '?';
     double minHeight = 40;
     int amountColFlex = 5;
     double? amount = rowData.expense?.amount;
@@ -131,51 +139,57 @@ class SpendingReportPage extends StatelessWidget {
     );
   }
 
-  Expanded _buildExpandedCell(int flex, String content,
-      {TextStyle? customStyle, Widget? customWidget, TextAlign? textAlign = TextAlign.start}) {
+  Expanded _buildExpandedCell(
+    int flex,
+    String content, {
+    TextStyle? customStyle,
+    Widget? customWidget,
+    TextAlign? textAlign = TextAlign.start,
+  }) {
     return Expanded(
       flex: flex,
       child: Container(
         padding: const EdgeInsets.only(left: 4),
-        child: customWidget ??
-            Text(
-              textAlign: textAlign,
-              content,
-              style: customStyle,
-            ),
+        child: customWidget ?? Text(textAlign: textAlign, content, style: customStyle),
       ),
     );
   }
 
   Expanded _buildEditCell(int flex, expense, context) {
     return Expanded(
-        flex: flex,
-        child: ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 30),
-            child: IconButton(
-              iconSize: 16,
-              icon: const Icon(
-                Icons.edit_outlined,
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => EditExpensePage(
-                            expense: expense,
-                          )),
-                );
-              },
-            )));
+      flex: flex,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxHeight: 30),
+        child: IconButton(
+          iconSize: 16,
+          icon: const Icon(Icons.edit_outlined),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => EditExpensePage(expense: expense)),
+            );
+          },
+        ),
+      ),
+    );
   }
 
-  List<RowData> getRowsData(List<ExpenseEntity> expenses, Color tableBackground1, Color? tableBackground2,
-      Color aggBackgroundColor, List<CategoryEntity> categories) {
+  List<RowData> getRowsData(
+    List<ExpenseEntity> expenses,
+    Color tableBackground1,
+    Color? tableBackground2,
+    Color aggBackgroundColor,
+    List<CategoryEntity> categories,
+  ) {
     final SplayTreeMap<String, List<ExpenseEntity>> orderedExpensesMap =
-        SplayTreeMap<String, List<ExpenseEntity>>((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+        SplayTreeMap<String, List<ExpenseEntity>>(
+          (a, b) => a.toLowerCase().compareTo(b.toLowerCase()),
+        );
     for (var expense in expenses) {
-      CategoryEntity category = categories.firstWhere((element) => element.id == expense.categoryId,
-          orElse: () => CategoryEntity(id: -1, name: '<category not found>', enabled: true));
+      CategoryEntity category = categories.firstWhere(
+        (element) => element.id == expense.categoryId,
+        orElse: () => CategoryEntity(id: -1, name: '<category not found>', enabled: true),
+      );
       if (category.enabled) {
         orderedExpensesMap.putIfAbsent(category.name, () => <ExpenseEntity>[]).add(expense);
       }

@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/components/ui/my_button.dart';
-import 'package:spending_tracker/repository/category/category_state.dart';
+import 'package:spending_tracker/repository/category/category.dart';
+import 'package:spending_tracker/repository/category/category_provider.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
-import 'package:spending_tracker/repository/expense/expense_state.dart';
-
-import '../repository/category/category.dart';
-import '../repository/domain/domain_state.dart';
+import 'package:spending_tracker/repository/domain/domain_provider.dart';
+import 'package:spending_tracker/repository/expense/expense.dart';
+import 'package:spending_tracker/repository/expense/expense_provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -23,23 +23,27 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    var categoryState = context.watch<CategoryState>();
-    var domainState = context.watch<DomainState>();
+    var categoryProvider = context.watch<CategoryProvider>();
+    var domainProvider = context.watch<DomainProvider>();
 
-    List<CategoryEntity> categories = categoryState.getCategories();
-    List<DomainEntity> domains = domainState.domains;
+    List<CategoryEntity> categories = categoryProvider.getCategories();
+    List<DomainEntity> domains = domainProvider.domains;
 
     domains.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     categories.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     LinkedHashMap<DomainEntity?, List<CategoryEntity>> catByDomain = LinkedHashMap();
 
     for (DomainEntity domain in domains) {
-      List<CategoryEntity> foundCategories = categories.where((cat) => cat.domainId == domain.id).toList();
+      List<CategoryEntity> foundCategories = categories
+          .where((cat) => cat.domainId == domain.id)
+          .toList();
       if (foundCategories.isNotEmpty) {
         catByDomain[domain] = foundCategories;
       }
     }
-    List<CategoryEntity> noDomainCategories = categories.where((cat) => cat.domainId == null).toList();
+    List<CategoryEntity> noDomainCategories = categories
+        .where((cat) => cat.domainId == null)
+        .toList();
     if (noDomainCategories.isNotEmpty) {
       catByDomain[null] = noDomainCategories;
     }
@@ -68,7 +72,11 @@ class _HomePageState extends State<HomePage> {
                         return MyButton(
                           text: category.name,
                           onPressed: () {
-                            handleSubmitExpense(category.id, category.name, expenseAmountTextController.text);
+                            handleSubmitExpense(
+                              category.id,
+                              category.name,
+                              expenseAmountTextController.text,
+                            );
                           },
                         );
                       },
@@ -99,8 +107,8 @@ class _HomePageState extends State<HomePage> {
     if (amount == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Invalid expense')));
     } else {
-      var expenseState = context.read<ExpenseState>();
-      expenseState.addExpense(categoryId, categoryName, amount);
+      var expenseProvider = context.read<ExpenseProvider>();
+      expenseProvider.addExpense(categoryId, categoryName, amount);
       expenseAmountTextController.clear();
     }
   }

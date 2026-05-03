@@ -1,264 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:spending_tracker/components/base_scaffold.dart';
-import 'package:spending_tracker/components/ui/month_button.dart';
-import 'package:spending_tracker/config/config_name.dart';
-import 'package:spending_tracker/config/config_state.dart';
-import 'package:spending_tracker/pages/choose_entity_to_manage_page.dart';
-import 'package:spending_tracker/pages/config_page.dart';
-import 'package:spending_tracker/pages/home_page.dart';
-import 'package:spending_tracker/pages/info_page.dart';
-import 'package:spending_tracker/pages/spending_report_page.dart';
-import 'package:spending_tracker/repository/category/category_state.dart';
-import 'package:spending_tracker/repository/domain/domain_state.dart';
-import 'package:spending_tracker/repository/expense/expense_state.dart';
-import 'package:spending_tracker/repository/focused_month/focused_month_state.dart';
+import 'package:spending_tracker/repository/category/category_provider.dart';
+import 'package:spending_tracker/repository/config/config_provider.dart';
+import 'package:spending_tracker/repository/domain/domain_provider.dart';
+import 'package:spending_tracker/repository/expense/expense_provider.dart';
+import 'package:spending_tracker/repository/focused_month/focused_month_provider.dart';
+import 'package:spending_tracker/repository/onboarding/onboarding_provider.dart';
+import 'package:spending_tracker/router/app_router.dart';
 import 'package:spending_tracker/theme/app_theme.dart';
-import 'package:spending_tracker/translations/translations.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (ctx) => ExpenseState()),
-        ChangeNotifierProvider(create: (ctx) => CategoryState()),
-        ChangeNotifierProvider(create: (ctx) => ConfigState()),
-        ChangeNotifierProvider(create: (ctx) => FocusedMonthState()),
-        ChangeNotifierProvider(create: (ctx) => DomainState()),
+        ChangeNotifierProvider(create: (ctx) => ExpenseProvider()..loadFromLocalStorage(prefs)),
+        ChangeNotifierProvider(
+          create: (ctx) => CategoryProvider()..loadCategoriesFromLocalStorage(prefs),
+        ),
+        ChangeNotifierProvider(create: (ctx) => ConfigProvider()..loadFromLocalStorage(prefs)),
+        ChangeNotifierProvider(
+          create: (ctx) => FocusedMonthProvider()..loadFromLocalStorage(prefs),
+        ),
+        ChangeNotifierProvider(create: (ctx) => DomainProvider()..loadFromLocalStorage(prefs)),
+        ChangeNotifierProvider(create: (ctx) => OnboardingProvider()..init(prefs)),
       ],
       child: const MyApp(),
     ),
   );
 }
 
-final GlobalKey<NavigatorState> mainNavigatorKey = GlobalKey();
-final GlobalKey<NavigatorState> nestedNavigatorKey = GlobalKey();
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      navigatorKey: mainNavigatorKey,
-      title: 'Spending tracker',
+    return MaterialApp.router(
+      routerConfig: appRouter,
+      title: 'Spending Tracker',
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: ThemeMode.system,
-      home: const MainPage(),
-      builder: (context, child) {
-        return BaseScaffold(body: child!);
-      },
-    );
-  }
-}
-
-class MainPage extends StatefulWidget {
-  const MainPage({super.key});
-
-  @override
-  State<MainPage> createState() => _MainPageState();
-}
-
-class _MainPageState extends State<MainPage> {
-  var selectedIndex = 0;
-  bool firstLoad = true;
-
-  void loadState() async {
-    var categoryState = context.watch<CategoryState>();
-    var expenseState = context.watch<ExpenseState>();
-    var configState = context.watch<ConfigState>();
-    var focusedMonthState = context.watch<FocusedMonthState>();
-    var domainState = context.watch<DomainState>();
-
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    categoryState.loadCategoriesFromLocalStorage(prefs);
-    expenseState.loadFromLocalStorage(prefs);
-    configState.loadFromLocalStorage(prefs);
-    focusedMonthState.loadFromLocalStorage(prefs);
-    domainState.loadFromLocalStorage(prefs);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (firstLoad) {
-      loadState();
-      firstLoad = false;
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkAndRunWelcomeProcedure(
-        context,
-        nestedNavigatorKey,
-        onNext: () {
-          setState(() {
-            selectedIndex = 1;
-          });
-        },
-      );
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Widget page;
-    var configState = context.watch<ConfigState>();
-    var focusedMonthState = context.watch<FocusedMonthState>();
-    List<Widget> orderedPageList = [
-      const HomePage(),
-      // const SharedExpensesPage(),
-      ChooseEntityToManagePage(navigatorKey: nestedNavigatorKey),
-      const SpendingReportPage(),
-      const ConfigPage(),
-      const InfoPage(),
-    ];
-
-    if (selectedIndex >= 0 && selectedIndex < orderedPageList.length) {
-    } else {
-      page = const HomePage();
-      throw UnimplementedError('no widget for $selectedIndex index');
-    }
-    page = orderedPageList[selectedIndex];
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return WillPopScope(
-          onWillPop: () async {
-            if (nestedNavigatorKey.currentState != null &&
-                nestedNavigatorKey.currentState!.canPop()) {
-              nestedNavigatorKey.currentState?.pop(context);
-              return false;
-            }
-            return true;
-          },
-          child: Scaffold(
-            body: Row(
-              children: [
-                SafeArea(
-                  child: NavigationRail(
-                    leading: MyMonthButton(
-                      month: focusedMonthState.getMonth().month,
-                      allMonths: configState.getConfig(ConfigName.seeAllMonths),
-                      onPressed: () {
-                        showMonthPicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(1990),
-                          lastDate: DateTime(DateTime.now().year + 50),
-                        ).then((DateTime? monthDate) {
-                          if (monthDate != null) {
-                            focusedMonthState.setFocusedMonth(monthDate);
-                          }
-                        });
-                      },
-                    ),
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    extended: constraints.maxWidth >= 600,
-                    destinations: const [
-                      NavigationRailDestination(
-                        icon: Icon(Icons.home_outlined),
-                        label: Text('Home'),
-                      ),
-                      // NavigationRailDestination(
-                      //   icon: Icon(
-                      //     Icons.people_outline,
-                      //   ),
-                      //   label: Text('Shared expenses'), // TODO name
-                      // ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.label_outline),
-                        label: Text('Manage categories'),
-                      ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.receipt_long_outlined),
-                        label: Text('Spending report'),
-                      ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.settings_outlined),
-                        label: Text('Settings'),
-                      ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.info_outline),
-                        label: Text('About'),
-                      ),
-                    ],
-                    groupAlignment: -.5,
-                    selectedIndex: selectedIndex,
-                    onDestinationSelected: (int value) {
-                      setState(() {
-                        selectedIndex = value;
-                      });
-                    },
-                  ),
-                ),
-                Expanded(
-                  child: SafeArea(
-                    child: Container(
-                      // we can use Colors.nameofcolor for predefined colors
-                      // or we can use Color.fromRGBO(0, 255, 0, 1.0), or Color(0xFF00FF00) for
-                      // anonymous colors. It is recommended to set colors in the theme object
-                      // instead of using anonymous ones where possible.
-                      // we can also use colors from the theme.
-                      color: Theme.of(context).colorScheme.surface,
-                      child: Container(margin: const EdgeInsets.all(10.0), child: page),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> _checkAndRunWelcomeProcedure(
-    BuildContext context,
-    GlobalKey<NavigatorState> nestedNavigatorKey, {
-    required void Function() onNext,
-  }) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool showDialog = (prefs.getBool('isFirstRun') ?? true);
-
-    // if (true) {
-    if (showDialog) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _showWelcomeDialog(context, prefs, onNext: onNext);
-      });
-    }
-  }
-
-  Future<void> _showWelcomeDialog(
-    BuildContext context,
-    SharedPreferences prefs, {
-    required void Function() onNext,
-  }) async {
-    return await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Welcome!'),
-          content: const Text(welcome1),
-          actions: <Widget>[
-            const Text('1/2'),
-            TextButton(
-              child: const Text('Next'),
-              onPressed: () async {
-                Navigator.of(context).pop();
-                onNext();
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 }

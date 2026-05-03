@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
 
-class DomainState extends ChangeNotifier {
+class DomainProvider with ChangeNotifier {
   List<DomainEntity> domains = [];
   SharedPreferences? prefs;
   String persistName = DomainEntity.PERSIST_NAME;

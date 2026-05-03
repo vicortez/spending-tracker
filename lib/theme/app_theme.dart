@@ -23,7 +23,9 @@ class AppTheme {
         seedColor: tiffanyBlue,
         primary: tiffanyBlue,
         brightness: Brightness.dark,
+        surface: Colors.black,
       ),
+      scaffoldBackgroundColor: Colors.black,
       appBarTheme: const AppBarTheme(backgroundColor: Colors.black87, foregroundColor: tiffanyBlue),
     );
   }

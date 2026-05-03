@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/repository/focused_month/focused_month.dart';
 
-class FocusedMonthState extends ChangeNotifier {
+class FocusedMonthProvider with ChangeNotifier {
   FocusedMonth focusedMonth = FocusedMonth(month: DateTime.now());
 
   SharedPreferences? prefs;
@@ -28,7 +28,6 @@ class FocusedMonthState extends ChangeNotifier {
   }
 
   void updateLocalStorage() {
-    prefs?.setString(
-        FocusedMonth.PERSIST_NAME, FocusedMonth.encode(focusedMonth));
+    prefs?.setString(FocusedMonth.PERSIST_NAME, FocusedMonth.encode(focusedMonth));
   }
 }

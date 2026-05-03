@@ -1,14 +1,14 @@
 // Example page
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/repository/category/category_state.dart';
+import 'package:spending_tracker/repository/category/category_provider.dart';
 
 class FavoritesPage extends StatelessWidget {
   const FavoritesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<CategoryState>();
+    var appState = context.watch<CategoryProvider>();
 
     return const Center(child: Text('No favorites yet'));
 
@@ -29,10 +29,7 @@ class FavoritesPage extends StatelessWidget {
 }
 
 class BigCard extends StatelessWidget {
-  const BigCard({
-    super.key,
-    required this.text,
-  });
+  const BigCard({super.key, required this.text});
 
   final String text;
 
@@ -41,14 +38,11 @@ class BigCard extends StatelessWidget {
     return ElevatedButton(
       onPressed: () {},
       style: ButtonStyle(
-          shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))),
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Text(
-          text,
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       ),
+      child: Padding(padding: const EdgeInsets.all(10.0), child: Text(text)),
     );
   }
 }

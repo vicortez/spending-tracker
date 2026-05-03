@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/examples.dart';
-import 'package:spending_tracker/repository/category/category_state.dart';
+import 'package:spending_tracker/repository/category/category_provider.dart';
 
 class OldHomePage extends StatelessWidget {
   const OldHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var catState = context.watch<CategoryState>();
+    var catState = context.watch<CategoryProvider>();
     var currentValue = 'asdf';
 
     IconData icon;
@@ -24,9 +24,7 @@ class OldHomePage extends StatelessWidget {
         children: [
           const Text('Olás'),
           BigCard(text: currentValue),
-          const SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 10),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -37,9 +35,7 @@ class OldHomePage extends StatelessWidget {
                 icon: Icon(icon),
                 label: const Text('Like'),
               ),
-              const SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () {
                   // appState.genNext();

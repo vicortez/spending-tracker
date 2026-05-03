@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/repository/expense/expense.dart';
 
-class ExpenseState extends ChangeNotifier {
+class ExpenseProvider with ChangeNotifier {
   List<ExpenseEntity> expenses = [];
   SharedPreferences? prefs;
 
@@ -51,7 +51,12 @@ class ExpenseState extends ChangeNotifier {
   void addExpense(int categoryId, String categoryName, double amount) {
     DateTime date = DateTime.now();
     date = DateTime(date.year, date.month, date.day, date.hour, date.minute);
-    ExpenseEntity expense = ExpenseEntity(id: getNextId(), categoryId: categoryId, amount: amount, date: date);
+    ExpenseEntity expense = ExpenseEntity(
+      id: getNextId(),
+      categoryId: categoryId,
+      amount: amount,
+      date: date,
+    );
     expenses.add(expense);
 
     if (prefs != null) {
@@ -89,8 +94,6 @@ class ExpenseState extends ChangeNotifier {
   }
 
   bool existsExpenseForCategory(int catId) {
-    return expenses.any(
-      (exp) => (exp.categoryId == catId),
-    );
+    return expenses.any((exp) => (exp.categoryId == catId));
   }
 }

@@ -6,7 +6,12 @@ class MyMonthButton extends StatelessWidget {
   final bool allMonths;
   final VoidCallback onPressed;
 
-  const MyMonthButton({super.key, required this.month, required this.allMonths, required this.onPressed});
+  const MyMonthButton({
+    super.key,
+    required this.month,
+    required this.allMonths,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +20,7 @@ class MyMonthButton extends StatelessWidget {
       onPressed: () => allMonths ? null : onPressed(),
       disabledElevation: 0,
       backgroundColor: allMonths ? Colors.grey : Theme.of(context).colorScheme.primary,
+      foregroundColor: Colors.black,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/repository/category/category_state.dart';
-import 'package:spending_tracker/repository/domain/domain_state.dart';
+import 'package:spending_tracker/repository/category/category_provider.dart';
+import 'package:spending_tracker/repository/domain/domain_provider.dart';
 
 class ManageDomainsPage extends StatefulWidget {
   const ManageDomainsPage({super.key});
@@ -17,13 +17,11 @@ class _ManageDomainsPageState extends State<ManageDomainsPage> {
 
   @override
   Widget build(BuildContext context) {
-    var domainState = context.watch<DomainState>();
-    var categoryState = context.watch<CategoryState>();
+    var domainProvider = context.watch<DomainProvider>();
+    var categoryProvider = context.watch<CategoryProvider>();
 
-    var domains = domainState.domains;
-    domains.sort(
-      (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
-    );
+    var domains = domainProvider.domains;
+    domains.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
     return WillPopScope(
       onWillPop: () async {
@@ -31,10 +29,7 @@ class _ManageDomainsPageState extends State<ManageDomainsPage> {
         return false; // Prevents the automatic pop of the current
       },
       child: Scaffold(
-        appBar: AppBar(
-          leading: const BackButton(),
-          title: const Text('Manage domains'),
-        ),
+        appBar: AppBar(leading: const BackButton(), title: const Text('Manage domains')),
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -51,14 +46,12 @@ class _ManageDomainsPageState extends State<ManageDomainsPage> {
                         textCapitalization: TextCapitalization.words,
                         textInputAction: TextInputAction.done,
                         controller: _currentDomainNameTextController,
-                        decoration:
-                            const InputDecoration(hintText: 'New domain'),
+                        decoration: const InputDecoration(hintText: 'New domain'),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Domain must have a name';
                           }
-                          bool isDuplicate =
-                              domainState.existsDomainWithName(value);
+                          bool isDuplicate = domainProvider.existsDomainWithName(value);
                           if (isDuplicate) {
                             return 'Domain already exists';
                           }
@@ -67,9 +60,9 @@ class _ManageDomainsPageState extends State<ManageDomainsPage> {
                         onFieldSubmitted: (value) {
                           if (_formKey.currentState!.validate()) {
                             submitDomain();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Domain added')),
-                            );
+                            ScaffoldMessenger.of(
+                              context,
+                            ).showSnackBar(const SnackBar(content: Text('Domain added')));
                           }
                         },
                       ),
@@ -79,46 +72,47 @@ class _ManageDomainsPageState extends State<ManageDomainsPage> {
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         submitDomain();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Domain added')),
-                        );
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(const SnackBar(content: Text('Domain added')));
                       }
                     },
                     icon: const Icon(Icons.add_outlined),
-                  )
+                  ),
                 ],
               ),
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             Expanded(
-                child: SelectionArea(
-              child: ListView(
-                children: [
-                  for (var domain in domains)
-                    Card(
-                      child: ListTile(
-                        title: Text(domain.name),
-                        trailing: IconButton(
-                          onPressed: () {
-                            if (canRemoveDomain(domain.id, categoryState)) {
-                              domainState.removeDomain(domain.id);
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
+              child: SelectionArea(
+                child: ListView(
+                  children: [
+                    for (var domain in domains)
+                      Card(
+                        child: ListTile(
+                          title: Text(domain.name),
+                          trailing: IconButton(
+                            onPressed: () {
+                              if (canRemoveDomain(domain.id, categoryProvider)) {
+                                domainProvider.removeDomain(domain.id);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
                                     content: Text(
-                                        'Can\'t delete domain. Delete categories using it')),
-                              );
-                            }
-                          },
-                          icon: const Icon(Icons.delete_outline),
+                                      'Can\'t delete domain. Delete categories using it',
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                            icon: const Icon(Icons.delete_outline),
+                          ),
                         ),
                       ),
-                    )
-                ],
+                  ],
+                ),
               ),
-            ))
+            ),
           ],
         ),
       ),
@@ -127,13 +121,13 @@ class _ManageDomainsPageState extends State<ManageDomainsPage> {
 
   void submitDomain() {
     String currentText = _currentDomainNameTextController.text;
-    var domainState = context.read<DomainState>();
-    domainState.addDomain(currentText);
+    var domainProvider = context.read<DomainProvider>();
+    domainProvider.addDomain(currentText);
     _currentDomainNameTextController.clear();
     myFocusNode.requestFocus();
   }
 
-  bool canRemoveDomain(int domId, CategoryState categoryState) {
-    return !categoryState.existsCategoryWithDomain(domId);
+  bool canRemoveDomain(int domId, CategoryProvider categoryProvider) {
+    return !categoryProvider.existsCategoryWithDomain(domId);
   }
 }
