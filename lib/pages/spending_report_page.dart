@@ -1,8 +1,8 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/pages/edit_expense_page.dart';
 import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
 import 'package:spending_tracker/repository/config/config_name.dart';
@@ -155,7 +155,7 @@ class SpendingReportPage extends StatelessWidget {
     );
   }
 
-  Expanded _buildEditCell(int flex, expense, context) {
+  Expanded _buildEditCell(int flex, expense, BuildContext context) {
     return Expanded(
       flex: flex,
       child: ConstrainedBox(
@@ -164,10 +164,7 @@ class SpendingReportPage extends StatelessWidget {
           iconSize: 16,
           icon: const Icon(Icons.edit_outlined),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => EditExpensePage(expense: expense)),
-            );
+            context.push('/reports/edit/${expense.id}');
           },
         ),
       ),

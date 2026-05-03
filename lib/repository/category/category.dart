@@ -1,7 +1,7 @@
-import 'dart:convert';
+import 'package:spending_tracker/repository/interfaces/mappable.dart';
+import 'package:spending_tracker/repository/interfaces/persistable.dart';
 
-// TODO extends persistable?
-class CategoryEntity {
+class CategoryEntity implements Mappable, Persistable {
   int id;
   String name;
   bool enabled;
@@ -20,17 +20,14 @@ class CategoryEntity {
     );
   }
 
-  static Map<String, dynamic> toMap(CategoryEntity category) => {
-        'id': category.id,
-        'name': category.name,
-        'enabled': category.enabled,
-        'domainId': category.domainId,
+  @override
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'name': name,
+        'enabled': enabled,
+        'domainId': domainId,
       };
 
-  static String encode(List<CategoryEntity> categories) => json.encode(
-        categories.map<Map<String, dynamic>>((category) => CategoryEntity.toMap(category)).toList(),
-      );
-
-  static List<CategoryEntity> decode(String categories) =>
-      (json.decode(categories) as List<dynamic>).map<CategoryEntity>((item) => CategoryEntity.fromMap(item)).toList();
+  @override
+  String getPersistenceKey() => PERSIST_NAME;
 }

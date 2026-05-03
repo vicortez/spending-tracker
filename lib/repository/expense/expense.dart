@@ -1,7 +1,7 @@
-import 'dart:convert';
+import 'package:spending_tracker/repository/interfaces/mappable.dart';
+import 'package:spending_tracker/repository/interfaces/persistable.dart';
 
-// TODO extends persistable?
-class ExpenseEntity {
+class ExpenseEntity implements Mappable, Persistable {
   int id;
   int categoryId;
   double amount;
@@ -11,7 +11,7 @@ class ExpenseEntity {
 
   ExpenseEntity({required this.id, required this.categoryId, required this.amount, required this.date});
 
-  factory ExpenseEntity.fromJson(Map<String, dynamic> jsonData) {
+  factory ExpenseEntity.fromMap(Map<String, dynamic> jsonData) {
     return ExpenseEntity(
       id: jsonData['id'],
       categoryId: jsonData['categoryId'],
@@ -20,17 +20,14 @@ class ExpenseEntity {
     );
   }
 
-  static Map<String, dynamic> toMap(ExpenseEntity expense) => {
-        'id': expense.id,
-        'categoryId': expense.categoryId,
-        'amount': expense.amount,
-        'date': expense.date.millisecondsSinceEpoch
+  @override
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'categoryId': categoryId,
+        'amount': amount,
+        'date': date.millisecondsSinceEpoch,
       };
 
-  static String encode(List<ExpenseEntity> expenses) => json.encode(
-        expenses.map<Map<String, dynamic>>((expense) => ExpenseEntity.toMap(expense)).toList(),
-      );
-
-  static List<ExpenseEntity> decode(String expenses) =>
-      (json.decode(expenses) as List<dynamic>).map<ExpenseEntity>((item) => ExpenseEntity.fromJson(item)).toList();
+  @override
+  String getPersistenceKey() => PERSIST_NAME;
 }

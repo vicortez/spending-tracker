@@ -1,27 +1,33 @@
-// Global state
 import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/repository/expense/expense.dart';
+import 'package:spending_tracker/repository/services/persistence_service.dart';
 
 class ExpenseProvider with ChangeNotifier {
   List<ExpenseEntity> expenses = [];
-  SharedPreferences? prefs;
+  PersistenceService? _persistenceService;
 
   void setExpenses(List<ExpenseEntity> newExpenses, {bool syncStorage = true}) {
     expenses = newExpenses;
     notifyListeners();
-    if (syncStorage && prefs != null) {
-      updateLocalStorage();
+    if (syncStorage) {
+      _persistChanges();
     }
   }
 
-  void setDataFromImport(dynamic data) {
+  Future<void> setDataFromImport(dynamic data) async {
+    if (_persistenceService == null) return;
+
     dynamic value = data ?? '[]';
-    prefs?.setString(ExpenseEntity.PERSIST_NAME, value);
-    loadFromLocalStorage(prefs!);
+    await _persistenceService!.saveRawData(value, ExpenseEntity.PERSIST_NAME);
+    expenses = await _persistenceService!.loadRecords(
+      ExpenseEntity.fromMap,
+      ExpenseEntity.PERSIST_NAME,
+    );
+    notifyListeners();
   }
 
   bool updateExpense(int id, int categoryId, double amount, DateTime date) {
@@ -32,20 +38,18 @@ class ExpenseProvider with ChangeNotifier {
     expense.categoryId = categoryId;
     expense.amount = amount;
     expense.date = date;
-    if (prefs != null) {
-      updateLocalStorage();
-    }
+    _persistChanges();
     notifyListeners();
     return true;
   }
 
-  void loadFromLocalStorage(SharedPreferences prefs) {
-    this.prefs = prefs;
-    final String? expensesStr = prefs.getString(ExpenseEntity.PERSIST_NAME);
-    if (expensesStr != null) {
-      expenses = ExpenseEntity.decode(expensesStr);
-      notifyListeners();
-    }
+  Future<void> loadFromLocalStorage(SharedPreferences prefs) async {
+    _persistenceService = PersistenceService(prefs);
+    expenses = await _persistenceService!.loadRecords(
+      ExpenseEntity.fromMap,
+      ExpenseEntity.PERSIST_NAME,
+    );
+    notifyListeners();
   }
 
   void addExpense(int categoryId, String categoryName, double amount) {
@@ -58,31 +62,29 @@ class ExpenseProvider with ChangeNotifier {
       date: date,
     );
     expenses.add(expense);
-
-    if (prefs != null) {
-      updateLocalStorage();
-    }
+    _persistChanges();
     notifyListeners();
   }
 
   void removeExpense(int id) {
     expenses.removeWhere((exp) => exp.id == id);
-    if (prefs != null) {
-      updateLocalStorage();
-    }
+    _persistChanges();
     notifyListeners();
   }
 
   void removeALl() {
     expenses.clear();
-    if (prefs != null) {
-      updateLocalStorage();
-    }
+    _persistChanges();
     notifyListeners();
   }
 
-  void updateLocalStorage() {
-    prefs?.setString(ExpenseEntity.PERSIST_NAME, ExpenseEntity.encode(expenses));
+  Future<void> _persistChanges() async {
+    if (_persistenceService != null) {
+      await _persistenceService!.saveRecords(
+        expenses,
+        ExpenseEntity.PERSIST_NAME,
+      );
+    }
   }
 
   int getNextId() {
@@ -95,5 +97,9 @@ class ExpenseProvider with ChangeNotifier {
 
   bool existsExpenseForCategory(int catId) {
     return expenses.any((exp) => (exp.categoryId == catId));
+  }
+
+  ExpenseEntity? getById(int id) {
+    return expenses.firstWhereOrNull((exp) => exp.id == id);
   }
 }

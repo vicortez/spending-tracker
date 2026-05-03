@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> {
                           },
                         );
                       },
-                      separatorBuilder: (BuildContext ctx, int index) => const SizedBox(height: 10),
+                      separatorBuilder: (BuildContext ctx, int index) => const SizedBox(height: 6),
                       itemCount: catByDomain[domain]!.length,
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,

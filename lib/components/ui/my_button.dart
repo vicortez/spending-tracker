@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:spending_tracker/utils/color_utils.dart';
 
 enum ButtonType { normal, danger }
 
@@ -15,7 +16,7 @@ class MyButton extends StatelessWidget {
     Color fontColor;
     switch (type) {
       case ButtonType.normal:
-        backgroundColor = Theme.of(context).colorScheme.surface;
+        backgroundColor = lighten(Theme.of(context).colorScheme.surface, 8);
         fontColor = Theme.of(context).colorScheme.primary;
         break;
       case ButtonType.danger:
@@ -30,13 +31,13 @@ class MyButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed != null ? () => onPressed!() : null,
       style: ButtonStyle(
-          shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-          backgroundColor: WidgetStateProperty.all(backgroundColor),
-          foregroundColor: WidgetStateProperty.all(fontColor)),
-      child: Text(
-        text,
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+        backgroundColor: WidgetStateProperty.all(backgroundColor),
+        foregroundColor: WidgetStateProperty.all(fontColor),
       ),
+      child: Text(text),
     );
   }
 

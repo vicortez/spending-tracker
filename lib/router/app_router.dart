@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:spending_tracker/components/navigation_shell.dart';
 import 'package:spending_tracker/pages/choose_entity_to_manage_page.dart';
+import 'package:spending_tracker/pages/edit_expense_page.dart';
 import 'package:spending_tracker/pages/home_page.dart';
 import 'package:spending_tracker/pages/info_page.dart';
 import 'package:spending_tracker/pages/settings_page.dart';
@@ -31,7 +32,15 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: AppRouteConstants.reportsPath,
           builder: (context, state) => const SpendingReportPage(),
-          // Edit expense could be a sub-route or a modal
+          routes: [
+            GoRoute(
+              path: AppRouteConstants.editExpensePath,
+              builder: (context, state) {
+                final id = state.pathParameters['id']!;
+                return EditExpensePage(expenseId: id);
+              },
+            ),
+          ],
         ),
         GoRoute(
           path: AppRouteConstants.settingsPath,
