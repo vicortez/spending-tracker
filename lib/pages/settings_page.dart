@@ -188,39 +188,37 @@ class SettingsPage extends StatelessWidget {
     String title,
     String body,
   ) {
-    // set up the buttons
-    Widget cancelButton = TextButton(
-      child: const Text('Cancel'),
-      onPressed: () {
-        Navigator.of(context).pop();
-        onCancel();
-      },
-    );
-    Widget continueButton = TextButton(
-      style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.all(
-          Theme.of(context).colorScheme.secondary.withOpacity(0.05),
-        ),
-      ),
-      child: const Text('Continue'),
-      onPressed: () {
-        Navigator.of(context).pop();
-        onConfirm();
-      },
-    );
-
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: Text(title),
-      content: Text(body),
-      actions: [cancelButton, continueButton],
-    );
-
     // show the dialog
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return alert;
+      builder: (BuildContext dialogContext) {
+        // set up the buttons using the dialog context
+        Widget cancelButton = TextButton(
+          child: const Text('Cancel'),
+          onPressed: () {
+            Navigator.of(dialogContext).pop();
+            onCancel();
+          },
+        );
+        Widget continueButton = TextButton(
+          style: ButtonStyle(
+            backgroundColor: WidgetStateProperty.all(
+              Theme.of(dialogContext).colorScheme.secondary.withOpacity(0.05),
+            ),
+          ),
+          child: const Text('Continue'),
+          onPressed: () {
+            Navigator.of(dialogContext).pop();
+            onConfirm();
+          },
+        );
+
+        // set up the AlertDialog
+        return AlertDialog(
+          title: Text(title),
+          content: Text(body),
+          actions: [cancelButton, continueButton],
+        );
       },
     );
   }
