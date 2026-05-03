@@ -8,7 +8,6 @@ import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
-import 'package:spending_tracker/repository/expense/expense.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
 
 class HomePage extends StatefulWidget {
