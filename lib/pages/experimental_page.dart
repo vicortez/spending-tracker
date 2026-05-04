@@ -5,6 +5,8 @@ import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:spending_tracker/components/ui/cool_button.dart';
+import 'package:spending_tracker/pages/button_showcase_page.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
 import 'package:spending_tracker/repository/config/config_name.dart';
 import 'package:spending_tracker/repository/config/config_provider.dart';
@@ -26,8 +28,6 @@ class AccCategory {
 }
 
 class TestPage extends StatelessWidget {
-  // final List<Sector> sectors;
-
   const TestPage({super.key});
 
   @override
@@ -58,6 +58,18 @@ class TestPage extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: CoolButton(
+                text: 'View Button Showcase',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ButtonShowcasePage()),
+                  );
+                },
+              ),
+            ),
             Text(
               'Total spent in ${monthNames[month.month]!}: \$${toMaxDecimalPlacesOmitTrailingZeroes(totalSpentCurrentMonth, 2)}',
             ),

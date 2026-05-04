@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/components/ui/my_button.dart';
+import 'package:spending_tracker/components/ui/cool_button.dart';
 import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
@@ -144,7 +144,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: MyButton(
+                                      child: CoolButton(
                                         text: 'Delete',
                                         onPressed: () {
                                           if (canRemoveCategory(
@@ -194,7 +194,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: MyButton(
+                                      child: CoolButton(
                                         text: 'Save',
                                         onPressed: () {
                                           if (!_formKey.currentState!.validate()) {
@@ -223,7 +223,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: MyButton(
+                                      child: CoolButton(
                                         text: 'Back',
                                         onPressed: () {
                                           Navigator.pop(context);

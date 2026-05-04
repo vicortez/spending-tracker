@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:spending_tracker/components/ui/my_button.dart';
+import 'package:spending_tracker/components/ui/cool_button.dart';
 import 'package:spending_tracker/pages/manage_categories_page.dart';
 import 'package:spending_tracker/pages/manage_domains_page.dart';
 
@@ -26,7 +26,7 @@ class ChooseEntityToManagePage extends StatelessWidget {
                     Expanded(
                       child: SizedBox(
                         height: buttonHeight,
-                        child: MyButton(
+                        child: CoolButton(
                           text: 'Manage Categories',
                           type: ButtonType.normal,
                           onPressed: () {
@@ -46,7 +46,7 @@ class ChooseEntityToManagePage extends StatelessWidget {
                     Expanded(
                       child: SizedBox(
                         height: buttonHeight,
-                        child: MyButton(
+                        child: CoolButton(
                           text: 'Manage Domains',
                           type: ButtonType.normal,
                           onPressed: () {

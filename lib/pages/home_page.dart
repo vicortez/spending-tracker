@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/components/ui/my_button.dart';
+import 'package:spending_tracker/components/ui/cool_button.dart';
 import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
@@ -68,7 +68,7 @@ class _HomePageState extends State<HomePage> {
                     ListView.separated(
                       itemBuilder: (context, index2) {
                         var category = catByDomain[domain]![index2];
-                        return MyButton(
+                        return CoolButton(
                           text: category.name,
                           onPressed: () {
                             handleSubmitExpense(

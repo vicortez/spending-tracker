@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/components/ui/my_button.dart';
+import 'package:spending_tracker/components/ui/cool_button.dart';
 import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
 import 'package:spending_tracker/repository/config/config_name.dart';
@@ -44,7 +44,7 @@ class SettingsPage extends StatelessWidget {
                           configProvider.updateConfig(ConfigName.seeAllMonths, newValue),
                     ),
                     const SizedBox(height: 15),
-                    MyButton(
+                    CoolButton(
                       text: 'Export to sheet (excel)',
                       onPressed: kIsWeb
                           ? null
@@ -64,7 +64,7 @@ class SettingsPage extends StatelessWidget {
                         style: TextStyle(fontSize: 12),
                       ),
                     const SizedBox(height: 15),
-                    MyButton(
+                    CoolButton(
                       text: 'Export all app data',
                       onPressed: kIsWeb
                           ? null
@@ -77,7 +77,7 @@ class SettingsPage extends StatelessWidget {
                         style: TextStyle(fontSize: 12),
                       ),
                     const SizedBox(height: 15),
-                    MyButton(
+                    CoolButton(
                       text: 'Import app data',
                       onPressed: kIsWeb
                           ? null
@@ -104,7 +104,7 @@ class SettingsPage extends StatelessWidget {
                         style: TextStyle(fontSize: 12),
                       ),
                     const SizedBox(height: 30),
-                    MyButton(
+                    CoolButton(
                       text: 'Delete all expenses'.toUpperCase(),
                       onPressed: () {
                         expenseProvider.removeALl();

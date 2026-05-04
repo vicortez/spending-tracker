@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:spending_tracker/components/ui/my_button.dart';
+import 'package:spending_tracker/components/ui/cool_button.dart';
 import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
 import 'package:spending_tracker/repository/expense/expense.dart';
@@ -132,7 +132,7 @@ class _EditExpenseFormState extends State<EditExpenseForm> {
               ),
             ),
             const Spacer(),
-            MyButton(
+            CoolButton(
               text: 'Delete',
               onPressed: () {
                 expenseProvider.removeExpense(widget.expense.id);
@@ -144,7 +144,7 @@ class _EditExpenseFormState extends State<EditExpenseForm> {
               type: ButtonType.danger,
             ),
             const SizedBox(height: 24),
-            MyButton(
+            CoolButton(
               text: 'Save',
               onPressed: () {
                 var amount = double.tryParse(_expenseAmountTextController.text);
@@ -173,7 +173,7 @@ class _EditExpenseFormState extends State<EditExpenseForm> {
               },
             ),
             const SizedBox(height: 8),
-            MyButton(
+            CoolButton(
               text: 'Back',
               onPressed: () {
                 context.pop();
