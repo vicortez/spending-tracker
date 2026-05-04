@@ -14,34 +14,63 @@ class ButtonShowcasePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _sectionTitle(context, 'Theme Defaults'),
-            _buttonRow('Normal', const CoolButton(text: 'Normal')),
-            _buttonRow('Normal Outline', const CoolButton(text: 'Normal Outline', isOutline: true)),
-            _buttonRow('Danger', const CoolButton(text: 'Danger', type: ButtonType.danger)),
+            _buttonRow('Normal', CoolButton(text: 'Normal', onPressed: () {})),
             _buttonRow(
-              'Danger Outline',
-              const CoolButton(text: 'Danger Outline', type: ButtonType.danger, isOutline: true),
+              'Normal with Outline',
+              CoolButton(text: 'Normal Outline', outline: true, onPressed: () {}),
+            ),
+            _buttonRow(
+              'Danger',
+              CoolButton(text: 'Danger', type: ButtonType.danger, onPressed: () {}),
+            ),
+            _buttonRow(
+              'Danger with Outline',
+              CoolButton(
+                text: 'Danger Outline',
+                type: ButtonType.danger,
+                outline: true,
+                onPressed: () {},
+              ),
             ),
 
             _sectionTitle(context, 'Custom Colors'),
-            _buttonRow('Purple', const CoolButton(text: 'Purple', bgColor: Colors.purple)),
             _buttonRow(
-              'Purple Outline',
-              const CoolButton(text: 'Purple Outline', bgColor: Colors.purple, isOutline: true),
+              'Purple',
+              CoolButton(text: 'Purple', bgColor: Colors.purple, onPressed: () {}),
+            ),
+            _buttonRow(
+              'Purple with Outline',
+              CoolButton(
+                text: 'Purple Outline',
+                bgColor: Colors.purple,
+                outline: true,
+                onPressed: () {},
+              ),
             ),
             _buttonRow(
               'Amber',
-              const CoolButton(text: 'Amber', bgColor: Colors.amber, textColor: Colors.black),
+              CoolButton(
+                text: 'Amber',
+                bgColor: Colors.amber,
+                textColor: Colors.black,
+                onPressed: () {},
+              ),
             ),
             _buttonRow(
-              'Amber Outline',
-              const CoolButton(text: 'Amber Outline', bgColor: Colors.amber, isOutline: true),
+              'Custom Base Color',
+              CoolButton(
+                text: 'Teal Face, Blue Base',
+                bgColor: Colors.teal,
+                baseColor: Colors.blue[900],
+                onPressed: () {},
+              ),
             ),
 
             _sectionTitle(context, 'Disabled States'),
             _buttonRow('Disabled', const CoolButton(text: 'Disabled', onPressed: null)),
             _buttonRow(
-              'Disabled Outline',
-              const CoolButton(text: 'Disabled Outline', isOutline: true, onPressed: null),
+              'Disabled with Outline',
+              const CoolButton(text: 'Disabled Outline', outline: true, onPressed: null),
             ),
 
             const SizedBox(height: 40),
