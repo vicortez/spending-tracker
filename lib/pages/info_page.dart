@@ -4,21 +4,19 @@ import 'package:spending_tracker/pages/experimental_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class InfoPage extends StatelessWidget {
-  const InfoPage({
-    super.key,
-  });
+  const InfoPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         const Text('Spending tracker'),
-        const SizedBox(
-          height: 10,
-        ),
+        const SizedBox(height: 10),
         const Text('Developed by Victor Cortez using Flutter'),
         const InkWell(
-            onTap: _launchURL, child: Text(style: TextStyle(color: Colors.blue), 'https://github.com/vicortez')),
+          onTap: _launchURL,
+          child: Text(style: TextStyle(color: Colors.blue), 'https://github.com/vicortez'),
+        ),
         const Expanded(child: SizedBox.shrink()),
         RichText(
           text: TextSpan(
@@ -39,13 +37,9 @@ class InfoPage extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(
-          height: 10,
-        ),
-        const Text('Version 0.24.0'),
-        const SizedBox(
-          height: 5,
-        )
+        const SizedBox(height: 10),
+        const Text('Version 0.27.0'),
+        const SizedBox(height: 5),
       ],
     );
   }
