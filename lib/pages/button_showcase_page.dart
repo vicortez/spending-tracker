@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:spending_tracker/components/ui/cool_button.dart';
+import 'package:spending_tracker/utils/color_utils.dart';
 
 class ButtonShowcasePage extends StatelessWidget {
   const ButtonShowcasePage({super.key});
@@ -16,43 +17,87 @@ class ButtonShowcasePage extends StatelessWidget {
             _sectionTitle(context, 'Theme Defaults'),
             _buttonRow('Normal', CoolButton(text: 'Normal', onPressed: () {})),
             _buttonRow(
-              'Normal with Outline',
-              CoolButton(text: 'Normal Outline', outline: true, onPressed: () {}),
+              'Secondary',
+              CoolButton(text: 'Secondary', type: ButtonType.secondary, onPressed: () {}),
             ),
             _buttonRow(
               'Danger',
               CoolButton(text: 'Danger', type: ButtonType.danger, onPressed: () {}),
             ),
+
+            _sectionTitle(context, 'Outlined Variants'),
             _buttonRow(
-              'Danger with Outline',
+              'Normal Outline',
+              CoolButton(text: 'Normal Outline', outline: true, onPressed: () {}),
+            ),
+            _buttonRow(
+              'Secondary Outline',
               CoolButton(
-                text: 'Danger Outline',
-                type: ButtonType.danger,
+                text: 'Secondary Outline',
+                type: ButtonType.secondary,
                 outline: true,
                 onPressed: () {},
               ),
             ),
 
-            _sectionTitle(context, 'Custom Colors'),
+            _sectionTitle(context, 'Neutral Shades'),
+            _buttonRow('Black', CoolButton(text: 'Black', bgColor: Colors.black, onPressed: () {})),
             _buttonRow(
-              'Purple',
-              CoolButton(text: 'Purple', bgColor: Colors.purple, onPressed: () {}),
+              'Black2',
+              CoolButton(
+                text: 'Black2',
+                bgColor: Colors.black,
+                onPressed: () {},
+                textColor: Colors.teal,
+                outline: true,
+                baseColor: Colors.grey[900],
+              ),
             ),
             _buttonRow(
-              'Purple with Outline',
+              'Grey 900',
+              CoolButton(text: 'Grey 900', bgColor: Colors.grey[900], onPressed: () {}),
+            ),
+            _buttonRow(
+              'Grey 850',
+              CoolButton(text: 'Grey 850', bgColor: Colors.grey[850], onPressed: () {}),
+            ),
+            _buttonRow(
+              'Grey 800',
+              CoolButton(text: 'Grey 800', bgColor: Colors.grey[800], onPressed: () {}),
+            ),
+            _buttonRow(
+              'White',
               CoolButton(
-                text: 'Purple Outline',
-                bgColor: Colors.purple,
-                outline: true,
+                text: 'White',
+                bgColor: Colors.white,
+                textColor: Colors.black,
+                onPressed: () {},
+              ),
+            ),
+
+            _sectionTitle(context, 'Special Overrides'),
+            _buttonRow(
+              'Almost Black Teal',
+              CoolButton(text: 'Dark Teal', bgColor: const Color(0xFF001A1A), onPressed: () {}),
+            ),
+
+            _buttonRow(
+              'Almost Black Teal2',
+              CoolButton(
+                text: 'Dark Teal2',
+                bgColor: const Color(0xFF001A1A),
+                baseColor: darken(const Color(0xFF001A1A), 25),
+                textColor: Colors.teal,
                 onPressed: () {},
               ),
             ),
             _buttonRow(
-              'Amber',
+              'Almost Black Teal3',
               CoolButton(
-                text: 'Amber',
-                bgColor: Colors.amber,
-                textColor: Colors.black,
+                text: 'Dark Teal3',
+                bgColor: const Color(0xFF0D4343),
+                baseColor: darken(const Color(0xFF0D4343)),
+                textColor: Colors.teal,
                 onPressed: () {},
               ),
             ),
@@ -68,10 +113,6 @@ class ButtonShowcasePage extends StatelessWidget {
 
             _sectionTitle(context, 'Disabled States'),
             _buttonRow('Disabled', const CoolButton(text: 'Disabled', onPressed: null)),
-            _buttonRow(
-              'Disabled with Outline',
-              const CoolButton(text: 'Disabled Outline', outline: true, onPressed: null),
-            ),
 
             const SizedBox(height: 40),
           ],

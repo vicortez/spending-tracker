@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:spending_tracker/utils/color_utils.dart';
 
-enum ButtonType { normal, danger }
+enum ButtonType { normal, secondary, danger }
 
 class CoolButton extends StatefulWidget {
   final String text;
@@ -33,28 +33,12 @@ class _CoolButtonState extends State<CoolButton> {
   @override
   Widget build(BuildContext context) {
     final bool isEnabled = widget.onPressed != null;
-    final colorScheme = Theme.of(context).colorScheme;
 
-    Color themeColor = widget.type == ButtonType.danger ? Colors.red : colorScheme.primary;
-    Color effectiveFaceColor = widget.bgColor ?? themeColor;
-    Color effectiveBaseColor = widget.baseColor ?? darken(effectiveFaceColor, 20);
+    final style = _getStyle(context, isEnabled);
 
-    Color faceColor;
-    Color baseColor;
-    Color textColor;
-
-    if (isEnabled) {
-      faceColor = effectiveFaceColor;
-      baseColor = effectiveBaseColor;
-      textColor =
-          widget.textColor ??
-          (widget.type == ButtonType.danger ? Colors.white : colorScheme.onPrimary);
-    } else {
-      // Solid colors for disabled state
-      faceColor = widget.type == ButtonType.danger ? darken(Colors.red, 40) : Colors.grey[800]!;
-      baseColor = widget.type == ButtonType.danger ? darken(Colors.red, 60) : Colors.grey[900]!;
-      textColor = Colors.grey[600]!;
-    }
+    final Color faceColor = widget.bgColor ?? style.faceColor;
+    final Color baseColor = widget.baseColor ?? style.baseColor;
+    final Color textColor = widget.textColor ?? style.textColor;
 
     const double borderRadius = 12.0;
     const double depth = 4.0;
@@ -122,4 +106,51 @@ class _CoolButtonState extends State<CoolButton> {
       ),
     );
   }
+
+  _CoolButtonStyle _getStyle(BuildContext context, bool isEnabled) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    if (!isEnabled) {
+      final Color face = widget.type == ButtonType.danger
+          ? darken(Colors.red, 40)
+          : Colors.grey[800]!;
+      final Color base = widget.type == ButtonType.danger
+          ? darken(Colors.red, 60)
+          : Colors.grey[900]!;
+      return _CoolButtonStyle(faceColor: face, baseColor: base, textColor: Colors.grey[600]!);
+    }
+
+    switch (widget.type) {
+      case ButtonType.normal:
+        return _CoolButtonStyle(
+          faceColor: colorScheme.primary,
+          baseColor: darken(colorScheme.primary, 20),
+          textColor: colorScheme.onPrimary,
+        );
+      case ButtonType.secondary:
+        return _CoolButtonStyle(
+          faceColor: colorScheme.secondary,
+          baseColor: darken(colorScheme.secondary, 20),
+          textColor: colorScheme.onSecondary,
+        );
+      case ButtonType.danger:
+        return _CoolButtonStyle(
+          faceColor: Colors.red,
+          baseColor: darken(Colors.red, 20),
+          textColor: Colors.white,
+        );
+    }
+  }
+}
+
+class _CoolButtonStyle {
+  final Color faceColor;
+  final Color baseColor;
+  final Color textColor;
+
+  const _CoolButtonStyle({
+    required this.faceColor,
+    required this.baseColor,
+    required this.textColor,
+  });
 }
