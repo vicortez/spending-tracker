@@ -3,8 +3,6 @@ import 'package:spending_tracker/utils/color_utils.dart';
 
 enum ButtonType { normal, secondary, danger, theme }
 
-const baseAnimationDurationMs = 80;
-
 class CoolButton extends StatefulWidget {
   final String text;
   final VoidCallback? onPressed;
@@ -34,6 +32,11 @@ class CoolButton extends StatefulWidget {
 class _CoolButtonState extends State<CoolButton> {
   bool _isPressed = false;
   DateTime? _pressStartTime;
+
+  static const int baseAnimationDurationMs = 40;
+  static const double borderRadius = 10.0;
+  static const double depth = 4.0;
+  static const double buttonHeight = 50.0;
 
   void _handleTapDown() {
     setState(() {
@@ -79,10 +82,7 @@ class _CoolButtonState extends State<CoolButton> {
             : style.baseColor);
     final Color textColor = widget.textColor ?? style.textColor;
 
-    const double borderRadius = 12.0;
-    const double depth = 4.0;
     final double currentOutlineWidth = widget.outline ? 2.0 : 0.0;
-    const double buttonHeight = 50.0;
 
     final bool isActuallyPressed = isEnabled && _isPressed;
 
