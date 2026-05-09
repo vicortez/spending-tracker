@@ -46,6 +46,9 @@ class _CoolButtonState extends State<CoolButton> {
   }
 
   void _handleTapUp() async {
+    // Call onPressed immediately for instant responsiveness
+    widget.onPressed?.call();
+
     final pressedDuration = DateTime.now().difference(_pressStartTime ?? DateTime.now());
     final minAnimationDuration = Duration(milliseconds: baseAnimationDurationMs);
 
@@ -57,8 +60,6 @@ class _CoolButtonState extends State<CoolButton> {
     if (mounted) {
       setState(() => _isPressed = false);
     }
-
-    widget.onPressed?.call();
   }
 
   void _handleTapCancel() {
