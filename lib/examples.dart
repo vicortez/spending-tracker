@@ -1,14 +1,12 @@
 // Example page
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:spending_tracker/repository/category/category_provider.dart';
 
 class FavoritesPage extends StatelessWidget {
   const FavoritesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<CategoryProvider>();
+    // var appState = context.watch<CategoryProvider>();
 
     return const Center(child: Text('No favorites yet'));
 

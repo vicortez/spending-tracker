@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nested/nested.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
@@ -15,23 +16,7 @@ void main() async {
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (ctx) => ExpenseProvider()..loadFromLocalStorage(prefs)),
-        ChangeNotifierProvider(
-          create: (ctx) => CategoryProvider()..loadCategoriesFromLocalStorage(prefs),
-        ),
-        ChangeNotifierProvider(create: (ctx) => ConfigProvider()..loadFromLocalStorage(prefs)),
-        ChangeNotifierProvider(
-          create: (ctx) => FocusedMonthProvider()..loadFromLocalStorage(prefs),
-        ),
-        ChangeNotifierProvider(create: (ctx) => DomainProvider()..loadFromLocalStorage(prefs)),
-        ChangeNotifierProvider(create: (ctx) => OnboardingProvider()..init(prefs)),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  runApp(MultiProvider(providers: initializeGlobalProviders(prefs), child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -47,4 +32,17 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.system,
     );
   }
+}
+
+List<SingleChildWidget> initializeGlobalProviders(SharedPreferences prefs) {
+  return [
+    ChangeNotifierProvider(create: (ctx) => ExpenseProvider()..loadFromLocalStorage(prefs)),
+    ChangeNotifierProvider(
+      create: (ctx) => CategoryProvider()..loadCategoriesFromLocalStorage(prefs),
+    ),
+    ChangeNotifierProvider(create: (ctx) => ConfigProvider()..loadFromLocalStorage(prefs)),
+    ChangeNotifierProvider(create: (ctx) => FocusedMonthProvider()..loadFromLocalStorage(prefs)),
+    ChangeNotifierProvider(create: (ctx) => DomainProvider()..loadFromLocalStorage(prefs)),
+    ChangeNotifierProvider(create: (ctx) => OnboardingProvider()..init(prefs)),
+  ];
 }

@@ -41,14 +41,23 @@ class ButtonShowcasePage extends StatelessWidget {
             ),
 
             _sectionTitle(context, 'Neutral Shades'),
-            _buttonRow('Black', CoolButton(text: 'Black', bgColor: Colors.black, onPressed: () {})),
+            _buttonRow(
+              'Black',
+              CoolButton(
+                text: 'Black',
+
+                textColor: Colors.teal,
+                bgColor: Colors.black,
+                onPressed: () {},
+              ),
+            ),
             _buttonRow(
               'Black2',
               CoolButton(
                 text: 'Black2',
                 bgColor: Colors.black,
                 onPressed: () {},
-                textColor: Colors.teal,
+                textColor: Colors.tealAccent,
                 outline: true,
                 baseColor: Colors.grey[900],
               ),
@@ -78,7 +87,12 @@ class ButtonShowcasePage extends StatelessWidget {
             _sectionTitle(context, 'Special Overrides'),
             _buttonRow(
               'Almost Black Teal',
-              CoolButton(text: 'Dark Teal', bgColor: const Color(0xFF001A1A), onPressed: () {}),
+              CoolButton(
+                text: 'Dark Teal',
+                textColor: Colors.teal,
+                bgColor: const Color(0xFF001A1A),
+                onPressed: () {},
+              ),
             ),
 
             _buttonRow(
@@ -87,7 +101,7 @@ class ButtonShowcasePage extends StatelessWidget {
                 text: 'Dark Teal2',
                 bgColor: const Color(0xFF001A1A),
                 baseColor: darken(const Color(0xFF001A1A), 25),
-                textColor: Colors.teal,
+                textColor: Colors.tealAccent,
                 onPressed: () {},
               ),
             ),

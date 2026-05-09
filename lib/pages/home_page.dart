@@ -77,6 +77,11 @@ class _HomePageState extends State<HomePage> {
                               expenseAmountTextController.text,
                             );
                           },
+                          type: ButtonType.theme,
+                          outline: true,
+                          baseColor: Colors.grey[900],
+                          // baseColor: Colors.teal[900],
+                          textColor: Colors.teal,
                         );
                       },
                       separatorBuilder: (BuildContext ctx, int index) => const SizedBox(height: 6),

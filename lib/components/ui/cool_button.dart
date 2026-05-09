@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:spending_tracker/utils/color_utils.dart';
 
-enum ButtonType { normal, secondary, danger }
+enum ButtonType { normal, secondary, danger, theme }
+
+const baseAnimationDurationMs = 80;
 
 class CoolButton extends StatefulWidget {
   final String text;
@@ -11,6 +13,7 @@ class CoolButton extends StatefulWidget {
   final Color? bgColor;
   final Color? textColor;
   final Color? baseColor;
+  final bool autoBaseColor;
 
   const CoolButton({
     super.key,
@@ -21,6 +24,7 @@ class CoolButton extends StatefulWidget {
     this.bgColor,
     this.textColor,
     this.baseColor,
+    this.autoBaseColor = true,
   });
 
   @override
@@ -29,6 +33,37 @@ class CoolButton extends StatefulWidget {
 
 class _CoolButtonState extends State<CoolButton> {
   bool _isPressed = false;
+  DateTime? _pressStartTime;
+
+  void _handleTapDown() {
+    setState(() {
+      _isPressed = true;
+      _pressStartTime = DateTime.now();
+    });
+  }
+
+  void _handleTapUp() async {
+    final pressedDuration = DateTime.now().difference(_pressStartTime ?? DateTime.now());
+    final minAnimationDuration = Duration(milliseconds: baseAnimationDurationMs);
+
+    // Ensure animation is visible for at least minAnimationDuration
+    if (pressedDuration < minAnimationDuration) {
+      await Future.delayed(minAnimationDuration - pressedDuration);
+    }
+
+    if (mounted) {
+      setState(() => _isPressed = false);
+    }
+
+    widget.onPressed?.call();
+  }
+
+  void _handleTapCancel() {
+    setState(() {
+      _isPressed = false;
+      _pressStartTime = null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +72,11 @@ class _CoolButtonState extends State<CoolButton> {
     final style = _getStyle(context, isEnabled);
 
     final Color faceColor = widget.bgColor ?? style.faceColor;
-    final Color baseColor = widget.baseColor ?? style.baseColor;
+    final Color baseColor =
+        widget.baseColor ??
+        (widget.autoBaseColor && widget.bgColor != null
+            ? darken(widget.bgColor!, 20)
+            : style.baseColor);
     final Color textColor = widget.textColor ?? style.textColor;
 
     const double borderRadius = 12.0;
@@ -48,14 +87,9 @@ class _CoolButtonState extends State<CoolButton> {
     final bool isActuallyPressed = isEnabled && _isPressed;
 
     return GestureDetector(
-      onTapDown: isEnabled ? (_) => setState(() => _isPressed = true) : null,
-      onTapUp: isEnabled
-          ? (_) {
-              setState(() => _isPressed = false);
-              widget.onPressed?.call();
-            }
-          : null,
-      onTapCancel: isEnabled ? () => setState(() => _isPressed = false) : null,
+      onTapDown: isEnabled ? (_) => _handleTapDown() : null,
+      onTapUp: isEnabled ? (_) => _handleTapUp() : null,
+      onTapCancel: isEnabled ? () => _handleTapCancel() : null,
       child: SizedBox(
         width: double.infinity,
         height: buttonHeight,
@@ -63,7 +97,7 @@ class _CoolButtonState extends State<CoolButton> {
           children: [
             // Base layer (Shadow/Depth + Outline container)
             AnimatedPositioned(
-              duration: const Duration(milliseconds: 70),
+              duration: const Duration(milliseconds: baseAnimationDurationMs),
               top: isActuallyPressed ? depth : 0,
               left: 0,
               right: 0,
@@ -77,7 +111,7 @@ class _CoolButtonState extends State<CoolButton> {
             ),
             // Face layer
             AnimatedPositioned(
-              duration: const Duration(milliseconds: 70),
+              duration: const Duration(milliseconds: baseAnimationDurationMs),
               top: currentOutlineWidth + (isActuallyPressed ? depth : 0),
               left: currentOutlineWidth,
               right: currentOutlineWidth,
@@ -138,6 +172,13 @@ class _CoolButtonState extends State<CoolButton> {
           faceColor: Colors.red,
           baseColor: darken(Colors.red, 20),
           textColor: Colors.white,
+        );
+      case ButtonType.theme:
+        final isDark = colorScheme.brightness == Brightness.dark;
+        return _CoolButtonStyle(
+          faceColor: colorScheme.surface,
+          baseColor: isDark ? lighten(colorScheme.surface, 20) : darken(colorScheme.surface, 20),
+          textColor: colorScheme.onSurface,
         );
     }
   }
