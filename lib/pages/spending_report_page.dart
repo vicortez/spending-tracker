@@ -11,6 +11,7 @@ import 'package:spending_tracker/repository/expense/expense.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
 import 'package:spending_tracker/repository/focused_month/focused_month_provider.dart';
 import 'package:spending_tracker/repository/month_names.dart';
+import 'package:spending_tracker/router/navigation_extensions.dart';
 import 'package:spending_tracker/utils/color_utils.dart';
 import 'package:spending_tracker/utils/number_utils.dart';
 
@@ -164,7 +165,7 @@ class SpendingReportPage extends StatelessWidget {
           iconSize: 16,
           icon: const Icon(Icons.edit_outlined),
           onPressed: () {
-            context.push('/reports/edit/${expense.id}');
+            context.pushWithHistory('/reports/edit/${expense.id}');
           },
         ),
       ),

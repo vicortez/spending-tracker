@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:spending_tracker/components/ui/cool_button.dart';
 import 'package:spending_tracker/components/ui/my_bottom_sheet.dart';
+import 'package:spending_tracker/router/navigation_extensions.dart';
 
 /// Shows a bottom sheet with options for adding an expense
 void showAddExpenseBottomSheet({
@@ -28,7 +28,7 @@ void showAddExpenseBottomSheet({
           final todayString =
               '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
 
-          context.push(
+          context.pushWithHistory(
             '/add-expense',
             extra: {
               'categoryId': categoryId,

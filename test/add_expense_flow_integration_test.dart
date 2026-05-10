@@ -12,6 +12,7 @@ import 'package:spending_tracker/repository/expense/expense_provider.dart';
 import 'package:spending_tracker/repository/focused_month/focused_month_provider.dart';
 import 'package:spending_tracker/repository/onboarding/onboarding_provider.dart';
 import 'package:spending_tracker/router/app_router.dart';
+import 'package:spending_tracker/services/navigation_history_service.dart';
 
 void main() {
   group('Add Expense Flow Integration Tests', () {
@@ -21,6 +22,7 @@ void main() {
     late ConfigProvider configProvider;
     late FocusedMonthProvider focusedMonthProvider;
     late OnboardingProvider onboardingProvider;
+    late NavigationHistoryService navigationHistoryService;
 
     setUp(() async {
       SharedPreferences.setMockInitialValues({});
@@ -32,6 +34,7 @@ void main() {
       configProvider = ConfigProvider();
       focusedMonthProvider = FocusedMonthProvider();
       onboardingProvider = OnboardingProvider();
+      navigationHistoryService = NavigationHistoryService();
 
       await categoryProvider.loadCategoriesFromLocalStorage(prefs);
       domainProvider.loadFromLocalStorage(prefs);
@@ -65,6 +68,7 @@ void main() {
             ChangeNotifierProvider.value(value: configProvider),
             ChangeNotifierProvider.value(value: focusedMonthProvider),
             ChangeNotifierProvider.value(value: onboardingProvider),
+            ChangeNotifierProvider.value(value: navigationHistoryService),
           ],
           child: MaterialApp.router(
             routerConfig: appRouter,
@@ -130,6 +134,7 @@ void main() {
             ChangeNotifierProvider.value(value: configProvider),
             ChangeNotifierProvider.value(value: focusedMonthProvider),
             ChangeNotifierProvider.value(value: onboardingProvider),
+            ChangeNotifierProvider.value(value: navigationHistoryService),
           ],
           child: MaterialApp.router(
             routerConfig: appRouter,
@@ -181,6 +186,7 @@ void main() {
             ChangeNotifierProvider.value(value: configProvider),
             ChangeNotifierProvider.value(value: focusedMonthProvider),
             ChangeNotifierProvider.value(value: onboardingProvider),
+            ChangeNotifierProvider.value(value: navigationHistoryService),
           ],
           child: MaterialApp.router(
             routerConfig: appRouter,
@@ -232,6 +238,7 @@ void main() {
             ChangeNotifierProvider.value(value: configProvider),
             ChangeNotifierProvider.value(value: focusedMonthProvider),
             ChangeNotifierProvider.value(value: onboardingProvider),
+            ChangeNotifierProvider.value(value: navigationHistoryService),
           ],
           child: MaterialApp.router(
             routerConfig: appRouter,

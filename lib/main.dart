@@ -9,6 +9,7 @@ import 'package:spending_tracker/repository/expense/expense_provider.dart';
 import 'package:spending_tracker/repository/focused_month/focused_month_provider.dart';
 import 'package:spending_tracker/repository/onboarding/onboarding_provider.dart';
 import 'package:spending_tracker/router/app_router.dart';
+import 'package:spending_tracker/services/navigation_history_service.dart';
 import 'package:spending_tracker/theme/app_theme.dart';
 
 void main() async {
@@ -44,5 +45,6 @@ List<SingleChildWidget> initializeGlobalProviders(SharedPreferences prefs) {
     ChangeNotifierProvider(create: (ctx) => FocusedMonthProvider()..loadFromLocalStorage(prefs)),
     ChangeNotifierProvider(create: (ctx) => DomainProvider()..loadFromLocalStorage(prefs)),
     ChangeNotifierProvider(create: (ctx) => OnboardingProvider()..init(prefs)),
+    ChangeNotifierProvider(create: (ctx) => NavigationHistoryService()),
   ];
 }

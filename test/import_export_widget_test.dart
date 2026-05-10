@@ -9,6 +9,7 @@ import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
 import 'package:spending_tracker/repository/focused_month/focused_month_provider.dart';
 import 'package:spending_tracker/repository/onboarding/onboarding_provider.dart';
+import 'package:spending_tracker/services/navigation_history_service.dart';
 
 void main() {
   group('Import/Export Widget Integration Tests', () {
@@ -26,6 +27,7 @@ void main() {
       final focusedMonthProvider = FocusedMonthProvider();
       final domainProvider = DomainProvider();
       final onboardingProvider = OnboardingProvider();
+      final navigationHistoryService = NavigationHistoryService();
 
       final prefs = await SharedPreferences.getInstance();
       await categoryProvider.loadCategoriesFromLocalStorage(prefs);
@@ -49,6 +51,7 @@ void main() {
             ChangeNotifierProvider<FocusedMonthProvider>.value(value: focusedMonthProvider),
             ChangeNotifierProvider<DomainProvider>.value(value: domainProvider),
             ChangeNotifierProvider<OnboardingProvider>.value(value: onboardingProvider),
+            ChangeNotifierProvider<NavigationHistoryService>.value(value: navigationHistoryService),
           ],
           child: const MyApp(),
         ),
@@ -82,6 +85,7 @@ void main() {
       final focusedMonthProvider = FocusedMonthProvider();
       final domainProvider = DomainProvider();
       final onboardingProvider = OnboardingProvider();
+      final navigationHistoryService = NavigationHistoryService();
 
       final prefs = await SharedPreferences.getInstance();
       await categoryProvider.loadCategoriesFromLocalStorage(prefs);
@@ -105,6 +109,7 @@ void main() {
             ChangeNotifierProvider<FocusedMonthProvider>.value(value: focusedMonthProvider),
             ChangeNotifierProvider<DomainProvider>.value(value: domainProvider),
             ChangeNotifierProvider<OnboardingProvider>.value(value: onboardingProvider),
+            ChangeNotifierProvider<NavigationHistoryService>.value(value: navigationHistoryService),
           ],
           child: const MyApp(),
         ),
@@ -155,6 +160,7 @@ void main() {
       final focusedMonthProvider = FocusedMonthProvider();
       final domainProvider = DomainProvider();
       final onboardingProvider = OnboardingProvider();
+      final navigationHistoryService = NavigationHistoryService();
 
       final prefs = await SharedPreferences.getInstance();
       await categoryProvider.loadCategoriesFromLocalStorage(prefs);
@@ -181,6 +187,7 @@ void main() {
             ChangeNotifierProvider<FocusedMonthProvider>.value(value: focusedMonthProvider),
             ChangeNotifierProvider<DomainProvider>.value(value: domainProvider),
             ChangeNotifierProvider<OnboardingProvider>.value(value: onboardingProvider),
+            ChangeNotifierProvider<NavigationHistoryService>.value(value: navigationHistoryService),
           ],
           child: const MyApp(),
         ),
@@ -220,6 +227,7 @@ void main() {
       final focusedMonthProvider = FocusedMonthProvider();
       final domainProvider = DomainProvider();
       final onboardingProvider = OnboardingProvider();
+      final navigationHistoryService = NavigationHistoryService();
 
       final prefs = await SharedPreferences.getInstance();
       await categoryProvider.loadCategoriesFromLocalStorage(prefs);
@@ -239,6 +247,7 @@ void main() {
             ChangeNotifierProvider<FocusedMonthProvider>.value(value: focusedMonthProvider),
             ChangeNotifierProvider<DomainProvider>.value(value: domainProvider),
             ChangeNotifierProvider<OnboardingProvider>.value(value: onboardingProvider),
+            ChangeNotifierProvider<NavigationHistoryService>.value(value: navigationHistoryService),
           ],
           child: const MyApp(),
         ),

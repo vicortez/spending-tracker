@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:spending_tracker/router/route_utils.dart';
+import 'package:spending_tracker/services/navigation_history_service.dart';
 
 class AppBottomNavigationBar extends StatelessWidget {
   const AppBottomNavigationBar({super.key});
@@ -8,7 +10,14 @@ class AppBottomNavigationBar extends StatelessWidget {
   void _onItemTapped(int index, BuildContext context) {
     final path = AppRouteConstants.tabIndexToPath[index];
     if (path != null) {
-      context.go(path);
+      final currentLocation = GoRouterState.of(context).uri.toString();
+
+      // Only navigate and track history if switching to a different tab
+      if (currentLocation != path) {
+        // Add to navigation history before navigating
+        context.read<NavigationHistoryService>().push(path);
+        context.go(path);
+      }
     }
   }
 
