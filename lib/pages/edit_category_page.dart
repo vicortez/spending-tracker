@@ -7,6 +7,7 @@ import 'package:spending_tracker/repository/category/category_provider.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
+import 'package:spending_tracker/utils/toast_utils.dart';
 
 class EditCategoryPage extends StatefulWidget {
   final CategoryEntity category;
@@ -152,36 +153,13 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                                             expenseProvider,
                                           )) {
                                             categoryProvider.removeCategory(widget.category.id);
-                                            scaffoldMessenger.showSnackBar(
-                                              const SnackBar(content: Text('Category removed')),
-                                            );
+                                            showToast(context, 'Category removed');
                                             Navigator.pop(context);
                                           } else {
-                                            scaffoldMessenger.showSnackBar(
-                                              SnackBar(
-                                                content: Container(
-                                                  child: Row(
-                                                    children: [
-                                                      const Expanded(
-                                                        child: Text(
-                                                          'Can\'t delete category. Delete expenses using it',
-                                                        ),
-                                                      ),
-                                                      IconButton(
-                                                        onPressed: () {
-                                                          scaffoldMessenger.hideCurrentSnackBar();
-                                                        },
-                                                        icon: Icon(
-                                                          Icons.close,
-                                                          color: Theme.of(
-                                                            context,
-                                                          ).colorScheme.primary,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
+                                            showToast(
+                                              context,
+                                              'Can\'t delete category. Delete expenses using it',
+                                              duration: const Duration(seconds: 4),
                                             );
                                           }
                                         },
@@ -209,9 +187,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                                             catIsEnabled,
                                           );
                                           if (success) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(content: Text('Category updated')),
-                                            );
+                                            showToast(context, 'Category updated');
                                             Navigator.pop(context);
                                           }
                                         },

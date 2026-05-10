@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:spending_tracker/components/navigation_shell.dart';
+import 'package:spending_tracker/pages/add_expense_page.dart';
 import 'package:spending_tracker/pages/choose_entity_to_manage_page.dart';
 import 'package:spending_tracker/pages/edit_expense_page.dart';
 import 'package:spending_tracker/pages/home_page.dart';
@@ -23,6 +24,18 @@ final GoRouter appRouter = GoRouter(
       },
       routes: [
         GoRoute(path: AppRouteConstants.homePath, builder: (context, state) => const HomePage()),
+        GoRoute(
+          path: '/add-expense',
+          builder: (context, state) {
+            final extra = state.extra as Map<String, dynamic>;
+            return AddExpensePage(
+              categoryId: extra['categoryId'] as int,
+              categoryName: extra['categoryName'] as String,
+              amount: extra['amount'] as String,
+              date: extra['date'] as String,
+            );
+          },
+        ),
         GoRoute(
           path: AppRouteConstants.categoriesPath,
           builder: (context, state) => ChooseEntityToManagePage(

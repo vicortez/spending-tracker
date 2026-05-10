@@ -3,12 +3,17 @@ import 'package:spending_tracker/utils/color_utils.dart';
 
 enum ButtonType { normal, danger }
 
-class BasicButton extends StatelessWidget {
+class BoringButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
   final ButtonType type;
 
-  const BasicButton({super.key, required this.text, this.onPressed, this.type = ButtonType.normal});
+  const BoringButton({
+    super.key,
+    required this.text,
+    this.onPressed,
+    this.type = ButtonType.normal,
+  });
 
   @override
   Widget build(BuildContext context) {

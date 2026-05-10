@@ -52,14 +52,20 @@ class ExpenseProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void addExpense(int categoryId, String categoryName, double amount) {
-    DateTime date = DateTime.now();
-    date = DateTime(date.year, date.month, date.day, date.hour, date.minute);
+  void addExpense(int categoryId, String categoryName, double amount, {DateTime? date}) {
+    DateTime expenseDate = date ?? DateTime.now();
+    expenseDate = DateTime(
+      expenseDate.year,
+      expenseDate.month,
+      expenseDate.day,
+      expenseDate.hour,
+      expenseDate.minute,
+    );
     ExpenseEntity expense = ExpenseEntity(
       id: getNextId(),
       categoryId: categoryId,
       amount: amount,
-      date: date,
+      date: expenseDate,
     );
     expenses.add(expense);
     _persistChanges();

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:spending_tracker/components/ui/cool_button.dart';
 import 'package:spending_tracker/utils/color_utils.dart';
+import 'package:spending_tracker/utils/toast_utils.dart';
 
 class ButtonShowcasePage extends StatelessWidget {
   const ButtonShowcasePage({super.key});
@@ -127,6 +128,67 @@ class ButtonShowcasePage extends StatelessWidget {
 
             _sectionTitle(context, 'Disabled States'),
             _buttonRow('Disabled', const CoolButton(text: 'Disabled', onPressed: null)),
+
+            _sectionTitle(context, 'Toast Testing'),
+            _buttonRow(
+              'Basic Toast',
+              CoolButton(
+                text: 'Show Toast',
+                onPressed: () => showToast(context, 'This is a test toast message'),
+              ),
+            ),
+            _buttonRow(
+              'Long Message',
+              CoolButton(
+                text: 'Long Toast',
+                onPressed: () => showToast(
+                  context,
+                  'This is a much longer toast message that demonstrates how the toast handles extended content with multiple words',
+                ),
+                type: ButtonType.secondary,
+              ),
+            ),
+            _buttonRow(
+              'Short Duration (2s)',
+              CoolButton(
+                text: '2 Second Toast',
+                onPressed: () => showToast(
+                  context,
+                  'Quick toast message',
+                  duration: const Duration(seconds: 2),
+                ),
+                type: ButtonType.theme,
+                outline: true,
+              ),
+            ),
+            _buttonRow(
+              'Long Duration (8s)',
+              CoolButton(
+                text: '8 Second Toast',
+                onPressed: () => showToast(
+                  context,
+                  'This toast will stay for 8 seconds',
+                  duration: const Duration(seconds: 8),
+                ),
+                bgColor: Colors.purple,
+              ),
+            ),
+            _buttonRow(
+              'Rapid Fire',
+              CoolButton(
+                text: 'Multiple Toasts',
+                onPressed: () {
+                  showToast(context, 'First toast');
+                  Future.delayed(const Duration(milliseconds: 500), () {
+                    showToast(context, 'Second toast');
+                  });
+                  Future.delayed(const Duration(milliseconds: 1000), () {
+                    showToast(context, 'Third toast');
+                  });
+                },
+                type: ButtonType.danger,
+              ),
+            ),
 
             const SizedBox(height: 40),
           ],

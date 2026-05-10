@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:spending_tracker/utils/color_utils.dart';
 
@@ -6,6 +8,7 @@ enum ButtonType { normal, secondary, danger, theme }
 class CoolButton extends StatefulWidget {
   final String text;
   final VoidCallback? onPressed;
+  final VoidCallback? onHold;
   final ButtonType type;
   final bool outline;
   final Color? bgColor;
@@ -17,6 +20,7 @@ class CoolButton extends StatefulWidget {
     super.key,
     required this.text,
     this.onPressed,
+    this.onHold,
     this.type = ButtonType.normal,
     this.outline = false,
     this.bgColor,
@@ -32,11 +36,15 @@ class CoolButton extends StatefulWidget {
 class _CoolButtonState extends State<CoolButton> {
   bool _isPressed = false;
   DateTime? _pressStartTime;
+  Timer? _holdTimer;
+  bool _isHolding = false;
+  double _scale = 1.0;
 
   static const int baseAnimationDurationMs = 40;
   static const double borderRadius = 10.0;
   static const double depth = 4.0;
   static const double buttonHeight = 50.0;
+  static const int holdTimerMS = 400;
 
   void _handleTapDown() {
     setState(() {
@@ -69,6 +77,74 @@ class _CoolButtonState extends State<CoolButton> {
     });
   }
 
+  void _handleLongPressStart(LongPressStartDetails details) {
+    final bool isEnabled = widget.onPressed != null;
+    if (!isEnabled || widget.onHold == null) return;
+
+    setState(() {
+      _isPressed = true;
+      _pressStartTime = DateTime.now();
+      _isHolding = false;
+    });
+
+    // Start timer for hold threshold
+    _holdTimer = Timer(const Duration(milliseconds: holdTimerMS), () {
+      if (mounted) {
+        _triggerHoldAction();
+      }
+    });
+  }
+
+  void _triggerHoldAction() async {
+    setState(() => _isHolding = true);
+
+    // Quick scale-pulse animation
+    // Scale up
+    setState(() => _scale = 1.15);
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    // Scale down
+    if (mounted) {
+      setState(() => _scale = 1.0);
+    }
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    // Trigger callback
+    widget.onHold?.call();
+
+    if (mounted) {
+      setState(() => _isHolding = false);
+    }
+  }
+
+  void _handleLongPressEnd(LongPressEndDetails details) {
+    _holdTimer?.cancel();
+    _holdTimer = null;
+
+    if (!_isHolding && mounted) {
+      setState(() => _isPressed = false);
+    }
+  }
+
+  void _handleLongPressCancel() {
+    _holdTimer?.cancel();
+    _holdTimer = null;
+
+    if (mounted) {
+      setState(() {
+        _isPressed = false;
+        _isHolding = false;
+        _scale = 1.0;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _holdTimer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isEnabled = widget.onPressed != null;
@@ -91,52 +167,60 @@ class _CoolButtonState extends State<CoolButton> {
       onTapDown: isEnabled ? (_) => _handleTapDown() : null,
       onTapUp: isEnabled ? (_) => _handleTapUp() : null,
       onTapCancel: isEnabled ? () => _handleTapCancel() : null,
-      child: SizedBox(
-        width: double.infinity,
-        height: buttonHeight,
-        child: Stack(
-          children: [
-            // Base layer (Shadow/Depth + Outline container)
-            AnimatedPositioned(
-              duration: const Duration(milliseconds: baseAnimationDurationMs),
-              top: isActuallyPressed ? depth : 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: baseColor,
-                  borderRadius: BorderRadius.circular(borderRadius),
+      onLongPressStart: isEnabled && widget.onHold != null ? _handleLongPressStart : null,
+      onLongPressEnd: isEnabled && widget.onHold != null ? _handleLongPressEnd : null,
+      onLongPressCancel: isEnabled && widget.onHold != null ? _handleLongPressCancel : null,
+      child: AnimatedScale(
+        scale: _scale,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeInOut,
+        child: SizedBox(
+          width: double.infinity,
+          height: buttonHeight,
+          child: Stack(
+            children: [
+              // Base layer (Shadow/Depth + Outline container)
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: baseAnimationDurationMs),
+                top: isActuallyPressed ? depth : 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: baseColor,
+                    borderRadius: BorderRadius.circular(borderRadius),
+                  ),
                 ),
               ),
-            ),
-            // Face layer
-            AnimatedPositioned(
-              duration: const Duration(milliseconds: baseAnimationDurationMs),
-              top: currentOutlineWidth + (isActuallyPressed ? depth : 0),
-              left: currentOutlineWidth,
-              right: currentOutlineWidth,
-              bottom: currentOutlineWidth + (isActuallyPressed ? 0 : depth),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: faceColor,
-                  borderRadius: BorderRadius.circular(borderRadius - currentOutlineWidth),
-                ),
+              // Face layer
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: baseAnimationDurationMs),
+                top: currentOutlineWidth + (isActuallyPressed ? depth : 0),
+                left: currentOutlineWidth,
+                right: currentOutlineWidth,
+                bottom: currentOutlineWidth + (isActuallyPressed ? 0 : depth),
                 child: Container(
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Text(
-                    widget.text,
-                    style: TextStyle(
-                      color: textColor,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2,
+                  decoration: BoxDecoration(
+                    color: faceColor,
+                    borderRadius: BorderRadius.circular(borderRadius - currentOutlineWidth),
+                  ),
+                  child: Container(
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(
+                      widget.text,
+                      style: TextStyle(
+                        color: textColor,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

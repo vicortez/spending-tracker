@@ -14,6 +14,7 @@ import 'package:spending_tracker/repository/expense/expense.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
 import 'package:spending_tracker/repository/focused_month/focused_month_provider.dart';
 import 'package:spending_tracker/utils/sheet_exporter.dart';
+import 'package:spending_tracker/utils/toast_utils.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -108,9 +109,7 @@ class SettingsPage extends StatelessWidget {
                       text: 'Delete all expenses'.toUpperCase(),
                       onPressed: () {
                         expenseProvider.removeALl();
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(const SnackBar(content: Text('Expenses deleted')));
+                        showToast(context, 'Expenses deleted');
                       },
                       type: ButtonType.danger,
                     ),
@@ -149,13 +148,9 @@ class SettingsPage extends StatelessWidget {
             .toList();
       }
       final String filePath = await sheetExporter.exportToExcel(domains, categories, expenses);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Expenses exported to: $filePath')));
+      showToast(context, 'Expenses exported to: $filePath');
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to export exercises')));
+      showToast(context, 'Failed to export exercises');
     }
   }
 
@@ -170,14 +165,10 @@ class SettingsPage extends StatelessWidget {
   void handleToastFileExportResult(bool res, BuildContext context, String fileName) {
     if (res) {
       String topLevelFolderName = Platform.isAndroid ? 'Android/data' : 'Download';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('File exported $fileName exported')),
-        // SnackBar(content: Text("File exported to $topLevelFolderName folder as $fileName")),
-      );
+      showToast(context, 'File exported $fileName exported');
+      // showToast(context, "File exported to $topLevelFolderName folder as $fileName");
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Error exporting file :(')));
+      showToast(context, 'Error exporting file :(');
     }
   }
 
@@ -235,9 +226,7 @@ class SettingsPage extends StatelessWidget {
       categoryProvider.setDataFromImport(jsonData[CategoryEntity.PERSIST_NAME]);
       expenseProvider.setDataFromImport(jsonData[ExpenseEntity.PERSIST_NAME]);
       domainProvider.setDataFromImport(jsonData[DomainEntity.PERSIST_NAME]);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Data imported'), duration: Duration(seconds: 2)),
-      );
+      showToast(context, 'Data imported', duration: const Duration(seconds: 2));
     }
     return;
   }

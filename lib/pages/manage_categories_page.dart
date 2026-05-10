@@ -6,6 +6,7 @@ import 'package:spending_tracker/pages/edit_category_page.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
+import 'package:spending_tracker/utils/toast_utils.dart';
 
 import '../repository/category/category.dart';
 
@@ -86,9 +87,7 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
                         onFieldSubmitted: (value) {
                           if (_formKey.currentState!.validate()) {
                             submitCategory();
-                            ScaffoldMessenger.of(
-                              context,
-                            ).showSnackBar(const SnackBar(content: Text('Category added')));
+                            showToast(context, 'Category added');
                             myFocusNode.requestFocus();
                           }
                         },
@@ -99,9 +98,7 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         submitCategory();
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(const SnackBar(content: Text('Category added')));
+                        showToast(context, 'Category added');
                       }
                     },
                     icon: const Icon(Icons.add_outlined),

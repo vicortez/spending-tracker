@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
+import 'package:spending_tracker/utils/toast_utils.dart';
 
 class ManageDomainsPage extends StatefulWidget {
   const ManageDomainsPage({super.key});
@@ -60,9 +61,7 @@ class _ManageDomainsPageState extends State<ManageDomainsPage> {
                         onFieldSubmitted: (value) {
                           if (_formKey.currentState!.validate()) {
                             submitDomain();
-                            ScaffoldMessenger.of(
-                              context,
-                            ).showSnackBar(const SnackBar(content: Text('Domain added')));
+                            showToast(context, 'Domain added');
                           }
                         },
                       ),
@@ -72,9 +71,7 @@ class _ManageDomainsPageState extends State<ManageDomainsPage> {
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         submitDomain();
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(const SnackBar(content: Text('Domain added')));
+                        showToast(context, 'Domain added');
                       }
                     },
                     icon: const Icon(Icons.add_outlined),
@@ -96,12 +93,10 @@ class _ManageDomainsPageState extends State<ManageDomainsPage> {
                               if (canRemoveDomain(domain.id, categoryProvider)) {
                                 domainProvider.removeDomain(domain.id);
                               } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Can\'t delete domain. Delete categories using it',
-                                    ),
-                                  ),
+                                showToast(
+                                  context,
+                                  'Can\'t delete domain. Delete categories using it',
+                                  duration: const Duration(seconds: 4),
                                 );
                               }
                             },

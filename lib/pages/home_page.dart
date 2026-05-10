@@ -3,12 +3,14 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:spending_tracker/components/ui/add_expense_bottom_sheet.dart';
 import 'package:spending_tracker/components/ui/cool_button.dart';
 import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
+import 'package:spending_tracker/utils/toast_utils.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -77,6 +79,16 @@ class _HomePageState extends State<HomePage> {
                               expenseAmountTextController.text,
                             );
                           },
+                          onHold: () {
+                            final domainName = domain?.name ?? 'No domain';
+                            showAddExpenseBottomSheet(
+                              context: context,
+                              categoryId: category.id,
+                              categoryName: category.name,
+                              domainName: domainName,
+                              expenseAmount: expenseAmountTextController.text,
+                            );
+                          },
                           type: ButtonType.theme,
                           outline: true,
                           baseColor: Colors.grey[900],
@@ -109,7 +121,7 @@ class _HomePageState extends State<HomePage> {
   void handleSubmitExpense(int categoryId, String categoryName, String text) {
     double? amount = double.tryParse(text);
     if (amount == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Invalid expense')));
+      showToast(context, 'Invalid expense');
     } else {
       var expenseProvider = context.read<ExpenseProvider>();
       expenseProvider.addExpense(categoryId, categoryName, amount);

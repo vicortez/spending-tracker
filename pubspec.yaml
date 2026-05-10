@@ -46,6 +46,7 @@ dependencies:
   share_plus: ^12.0.1
   go_router: ^17.2.3
   dio: ^5.9.2
+  another_flushbar: ^1.12.30
   #  http: ^1.2.1
 
   collection: any
