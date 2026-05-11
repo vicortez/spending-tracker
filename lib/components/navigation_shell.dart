@@ -64,10 +64,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
           body: SafeArea(
             child: Container(
               color: Theme.of(context).colorScheme.surface,
-              child: Container(
-                margin: const EdgeInsets.all(10.0),
-                child: widget.child,
-              ),
+              child: Container(margin: const EdgeInsets.all(10.0), child: widget.child),
             ),
           ),
           bottomNavigationBar: const AppBottomNavigationBar(),
