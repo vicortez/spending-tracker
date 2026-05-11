@@ -31,19 +31,27 @@ class LatestExpensesCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Latest expenses',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                TextButton.icon(
+                Text('Latest expenses', style: Theme.of(context).textTheme.titleMedium),
+                TextButton(
                   onPressed: () {
                     // TODO: Navigate to all expenses page
                   },
-                  icon: const Text('See All'),
-                  label: const Icon(Icons.chevron_right, size: 16),
                   style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: EdgeInsets.zero,
                     backgroundColor: Colors.grey[800],
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Padding(padding: EdgeInsets.only(left: 4), child: Text('See All')),
+                        SizedBox(width: 4),
+                        Icon(Icons.chevron_right, size: 16),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -55,18 +63,17 @@ class LatestExpensesCard extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Colors.cyan.withOpacity(0.3),
-                  Colors.cyan.withOpacity(0.1),
+                  Colors.cyan.withValues(alpha: 0.2), // Transparent on left
+                  Colors.cyan.withValues(alpha: 0.3), // Visible in middle
+                  Colors.cyan.withValues(alpha: 0.2), // Transparent on right
                 ],
+                stops: const [0.0, 0.5, 1.0], // Left, center, right
               ),
             ),
           ),
           // Content section - expense list
           if (latestExpenses.isEmpty)
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text('No expenses yet'),
-            )
+            const Padding(padding: EdgeInsets.all(16.0), child: Text('No expenses yet'))
           else
             ...latestExpenses.asMap().entries.map((entry) {
               final index = entry.key;
@@ -81,10 +88,7 @@ class LatestExpensesCard extends StatelessWidget {
                   _buildExpenseItem(context, expense, category.name),
                   // Divider between items (except after last item)
                   if (index < latestExpenses.length - 1)
-                    Container(
-                      height: 1,
-                      color: Colors.grey.withOpacity(0.1),
-                    ),
+                    Container(height: 1, color: Colors.grey.withValues(alpha: 0.1)),
                 ],
               );
             }),
@@ -106,8 +110,8 @@ class LatestExpensesCard extends StatelessWidget {
       onTap: () {
         context.pushWithHistory('/reports/edit/${expense.id}');
       },
-      splashColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-      highlightColor: Colors.grey.withOpacity(0.05),
+      splashColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+      highlightColor: Colors.grey.withValues(alpha: 0.05),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         child: Row(
@@ -118,16 +122,13 @@ class LatestExpensesCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    categoryName,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
+                  Text(categoryName, style: Theme.of(context).textTheme.bodyMedium),
                   const SizedBox(height: 4),
                   Text(
                     dateStr,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                        ),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
                   ),
                 ],
               ),
@@ -138,14 +139,8 @@ class LatestExpensesCard extends StatelessWidget {
                 RichText(
                   text: TextSpan(
                     children: [
-                      TextSpan(
-                        text: integerPart,
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                      TextSpan(
-                        text: '.$decimalPart',
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
+                      TextSpan(text: integerPart, style: Theme.of(context).textTheme.bodyLarge),
+                      TextSpan(text: '.$decimalPart', style: Theme.of(context).textTheme.bodySmall),
                     ],
                   ),
                 ),
@@ -153,7 +148,7 @@ class LatestExpensesCard extends StatelessWidget {
                 Icon(
                   Icons.chevron_right,
                   size: 20,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                 ),
               ],
             ),
