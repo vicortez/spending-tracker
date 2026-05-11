@@ -9,7 +9,7 @@ import 'package:spending_tracker/pages/info_page.dart';
 import 'package:spending_tracker/pages/manage_categories_page.dart';
 import 'package:spending_tracker/pages/manage_domains_page.dart';
 import 'package:spending_tracker/pages/settings_page.dart';
-import 'package:spending_tracker/pages/spending_report_page.dart';
+import 'package:spending_tracker/pages/reports_page.dart';
 import 'package:spending_tracker/router/route_utils.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -54,7 +54,7 @@ final GoRouter appRouter = GoRouter(
         ),
         GoRoute(
           path: AppRouteConstants.reportsPath,
-          builder: (context, state) => const SpendingReportPage(),
+          builder: (context, state) => const ReportsPage(),
           routes: [
             GoRoute(
               path: AppRouteConstants.editExpensePath,

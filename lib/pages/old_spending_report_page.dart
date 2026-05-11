@@ -1,7 +1,6 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
@@ -25,8 +24,8 @@ class RowData {
   RowData(this.expense, this.backgroundColor, this.isAggregate, this.total, this.catName);
 }
 
-class SpendingReportPage extends StatelessWidget {
-  const SpendingReportPage({super.key});
+class OldSpendingReportPage extends StatelessWidget {
+  const OldSpendingReportPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -59,29 +58,31 @@ class SpendingReportPage extends StatelessWidget {
       darken(Theme.of(context).colorScheme.primary, 30),
       categories,
     );
-    return SelectionArea(
-      child: Column(
-        children: [
-          Text("Showing report for ${seeAllMonths ? "all months" : monthNames[month.month]}"),
-          const SizedBox(height: 10),
-          Expanded(
-            child: ListView.builder(
-              itemCount: rowData.length + 1,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return _buildHeader(index, context);
-                }
-                return _buildRow(index, context, rowData[index - 1]);
-              },
+    return Scaffold(
+      appBar: AppBar(leading: const BackButton(), title: const Text('Old Spending Reports')),
+      body: SelectionArea(
+        child: Column(
+          children: [
+            Text("Showing report for ${seeAllMonths ? "all months" : monthNames[month.month]}"),
+            const SizedBox(height: 10),
+            Expanded(
+              child: ListView.builder(
+                itemCount: rowData.length + 1,
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    return _buildHeader(index, context);
+                  }
+                  return _buildRow(index, context, rowData[index - 1]);
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   SizedBox _buildHeader(int index, context) {
-    double columnSeparatorSize = 3;
     var textStyle = const TextStyle(fontWeight: FontWeight.w800);
     return SizedBox(
       height: 40,
