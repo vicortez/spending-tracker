@@ -21,7 +21,10 @@ class CustomCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: borderColor ?? defaultBorderColor, width: 1),
       ),
-      child: child,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(7), // 8 - 1 (border width)
+        child: child,
+      ),
     );
   }
 }

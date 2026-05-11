@@ -26,13 +26,7 @@ class LatestExpensesCard extends StatelessWidget {
         children: [
           // Header section
           Container(
-            decoration: BoxDecoration(
-              color: Colors.grey[900],
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(8),
-                topRight: Radius.circular(8),
-              ),
-            ),
+            color: Colors.grey[900],
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
