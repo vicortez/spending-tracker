@@ -221,6 +221,18 @@ class _EditExpenseFormState extends State<EditExpenseForm> {
                   ],
                 ),
               ),
+              if (widget.isEditMode) ...[
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                  child: Text(
+                    'Created at: ${widget.expense!.createdAt.toString().substring(0, 16)}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                    ),
+                  ),
+                ),
+              ],
               const Spacer(),
               if (widget.isEditMode) ...[
                 CoolButton(
@@ -282,10 +294,7 @@ class _EditExpenseFormState extends State<EditExpenseForm> {
                   }
 
                   if (success) {
-                    showToast(
-                      context,
-                      widget.isEditMode ? 'Expense updated' : 'Expense added',
-                    );
+                    showToast(context, widget.isEditMode ? 'Expense updated' : 'Expense added');
                     context.pop();
                   } else {
                     showToast(context, 'Error saving expense');

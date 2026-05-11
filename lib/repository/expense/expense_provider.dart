@@ -66,6 +66,7 @@ class ExpenseProvider with ChangeNotifier {
       categoryId: categoryId,
       amount: amount,
       date: expenseDate,
+      createdAt: DateTime.now(),
     );
     expenses.add(expense);
     _persistChanges();
@@ -86,10 +87,7 @@ class ExpenseProvider with ChangeNotifier {
 
   Future<void> _persistChanges() async {
     if (_persistenceService != null) {
-      await _persistenceService!.saveRecords(
-        expenses,
-        ExpenseEntity.PERSIST_NAME,
-      );
+      await _persistenceService!.saveRecords(expenses, ExpenseEntity.PERSIST_NAME);
     }
   }
 
