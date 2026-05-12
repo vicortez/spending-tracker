@@ -1,15 +1,10 @@
 import 'package:spending_tracker/repository/category/category.dart';
+import 'package:spending_tracker/repository/domain/domain.dart';
 import 'package:spending_tracker/repository/expense/expense.dart';
 
-enum SortField {
-  createdAt,
-  expenseDate,
-}
+enum SortField { createdAt, expenseDate, domainName, categoryName }
 
-enum SortOrder {
-  ascending,
-  descending,
-}
+enum SortOrder { ascending, descending }
 
 class SortCriteria {
   final SortField field;
@@ -66,6 +61,7 @@ List<ExpenseEntity> filterExpenses({
   required List<ExpenseEntity> expenses,
   required ExpenseFilter filter,
   required List<CategoryEntity> categories,
+  List<DomainEntity> domains = const [],
 }) {
   // Filter
   var result = expenses.where((expense) {
@@ -106,13 +102,43 @@ List<ExpenseEntity> filterExpenses({
   if (filter.sortBy.isNotEmpty) {
     result.sort((a, b) {
       for (var criteria in filter.sortBy) {
-        int comparison;
+        int comparison = 0;
         switch (criteria.field) {
           case SortField.createdAt:
             comparison = a.createdAt.compareTo(b.createdAt);
             break;
           case SortField.expenseDate:
             comparison = a.date.compareTo(b.date);
+            break;
+          case SortField.categoryName:
+            final catA = categories.firstWhere(
+              (c) => c.id == a.categoryId,
+              orElse: () => categories.first,
+            );
+            final catB = categories.firstWhere(
+              (c) => c.id == b.categoryId,
+              orElse: () => categories.first,
+            );
+            comparison = catA.name.toLowerCase().compareTo(catB.name.toLowerCase());
+            break;
+          case SortField.domainName:
+            final catA = categories.firstWhere(
+              (c) => c.id == a.categoryId,
+              orElse: () => categories.first,
+            );
+            final catB = categories.firstWhere(
+              (c) => c.id == b.categoryId,
+              orElse: () => categories.first,
+            );
+            final domA = domains.firstWhere(
+              (d) => d.id == catA.domainId,
+              orElse: () => DomainEntity(id: -1, name: ''),
+            );
+            final domB = domains.firstWhere(
+              (d) => d.id == catB.domainId,
+              orElse: () => DomainEntity(id: -1, name: ''),
+            );
+            comparison = domA.name.toLowerCase().compareTo(domB.name.toLowerCase());
             break;
         }
 

@@ -104,6 +104,17 @@ class SettingsPage extends StatelessWidget {
                         'Importing is currently unavailable for web',
                         style: TextStyle(fontSize: 12),
                       ),
+                    const SizedBox(height: 15),
+                    CoolButton(
+                      text: 'Merge expenses files',
+                      onPressed: kIsWeb ? null : () => handleMergeFiles(context, configProvider),
+                      type: ButtonType.normal,
+                    ),
+                    if (kIsWeb)
+                      const Text(
+                        'Merging is currently unavailable for web',
+                        style: TextStyle(fontSize: 12),
+                      ),
                     const SizedBox(height: 30),
                     CoolButton(
                       text: 'Delete all expenses'.toUpperCase(),
@@ -229,5 +240,36 @@ class SettingsPage extends StatelessWidget {
       showToast(context, 'Data imported', duration: const Duration(seconds: 2));
     }
     return;
+  }
+
+  void handleMergeFiles(BuildContext context, ConfigProvider configProvider) async {
+    List<Map<String, dynamic>>? filesData = await configProvider.pickMultipleJsonFiles();
+
+    if (filesData == null) {
+      if (context.mounted) {
+        showToast(context, 'Please select 2 or more files');
+      }
+      return;
+    }
+
+    Map<String, dynamic>? mergedData = configProvider.mergeJsonFiles(filesData);
+
+    if (mergedData == null) {
+      if (context.mounted) {
+        showToast(
+          context,
+          'Merge failed: Inconsistent IDs or names for domains/categories',
+          duration: const Duration(seconds: 4),
+        );
+      }
+      return;
+    }
+
+    if (context.mounted) {
+      String fileName = 'merged-expenses-${DateTime.now().toString().substring(0, 10)}';
+      configProvider
+          .exportJSONFile(mergedData, fileName)
+          .then((res) => handleToastFileExportResult(res, context, fileName));
+    }
   }
 }

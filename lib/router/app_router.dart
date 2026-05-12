@@ -6,10 +6,11 @@ import 'package:spending_tracker/pages/choose_entity_to_manage_page.dart';
 import 'package:spending_tracker/pages/edit_expense_page.dart';
 import 'package:spending_tracker/pages/home_page.dart';
 import 'package:spending_tracker/pages/info_page.dart';
+import 'package:spending_tracker/pages/list_expenses_page.dart';
 import 'package:spending_tracker/pages/manage_categories_page.dart';
 import 'package:spending_tracker/pages/manage_domains_page.dart';
-import 'package:spending_tracker/pages/settings_page.dart';
 import 'package:spending_tracker/pages/reports_page.dart';
+import 'package:spending_tracker/pages/settings_page.dart';
 import 'package:spending_tracker/router/route_utils.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -46,10 +47,7 @@ final GoRouter appRouter = GoRouter(
               path: 'manage-categories',
               builder: (context, state) => const ManageCategoriesPage(),
             ),
-            GoRoute(
-              path: 'manage-domains',
-              builder: (context, state) => const ManageDomainsPage(),
-            ),
+            GoRoute(path: 'manage-domains', builder: (context, state) => const ManageDomainsPage()),
           ],
         ),
         GoRoute(
@@ -64,6 +62,10 @@ final GoRouter appRouter = GoRouter(
               },
             ),
           ],
+        ),
+        GoRoute(
+          path: AppRouteConstants.allExpensesPath,
+          builder: (context, state) => const ListExpensesPage(),
         ),
         GoRoute(
           path: AppRouteConstants.settingsPath,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class AppTheme {
   // static const Color tiffanyBlue = Color(0xFF0ABAB5);
   static const Color teal = Colors.teal;
+  static const Color veryDarkGrey = Color(0xFF141414);
 
   static ThemeData light() {
     return ThemeData(

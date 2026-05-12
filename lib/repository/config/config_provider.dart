@@ -148,6 +148,113 @@ class ConfigProvider with ChangeNotifier {
     }
   }
 
+  Future<List<Map<String, dynamic>>?> pickMultipleJsonFiles() async {
+    try {
+      if (kIsWeb) return null;
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+        allowMultiple: true,
+      );
+      if (result == null || result.files.length < 2) return null;
+
+      List<Map<String, dynamic>> filesData = [];
+      for (var file in result.files) {
+        String jsonString = await File(file.path!).readAsString();
+        filesData.add(json.decode(jsonString));
+      }
+      return filesData;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Map<String, dynamic>? mergeJsonFiles(List<Map<String, dynamic>> filesData) {
+    try {
+      Map<int, String> domainIdToName = {};
+      Map<String, int> domainNameToId = {};
+      Map<int, String> categoryIdToName = {};
+      Map<String, int> categoryNameToId = {};
+
+      List<dynamic> allDomains = [];
+      List<dynamic> allCategories = [];
+      List<dynamic> allExpenses = [];
+
+      int maxExpenseId = 0;
+
+      for (int i = 0; i < filesData.length; i++) {
+        var fileData = filesData[i];
+
+        // Process Domains
+        var domainsStr = fileData[DomainEntity.PERSIST_NAME] as String?;
+        if (domainsStr != null) {
+          var domains = json.decode(domainsStr) as List<dynamic>;
+          for (var dom in domains) {
+            int id = dom['id'];
+            String name = dom['name'];
+            if (domainNameToId.containsKey(name) && domainNameToId[name] != id) {
+              return null; // Inconsistency
+            }
+            if (domainIdToName.containsKey(id) && domainIdToName[id] != name) {
+              return null; // Inconsistency
+            }
+            if (!domainNameToId.containsKey(name)) {
+              domainNameToId[name] = id;
+              domainIdToName[id] = name;
+              allDomains.add(dom);
+            }
+          }
+        }
+
+        // Process Categories
+        var categoriesStr = fileData[CategoryEntity.PERSIST_NAME] as String?;
+        if (categoriesStr != null) {
+          var categories = json.decode(categoriesStr) as List<dynamic>;
+          for (var cat in categories) {
+            int id = cat['id'];
+            String name = cat['name'];
+            if (categoryNameToId.containsKey(name) && categoryNameToId[name] != id) {
+              return null; // Inconsistency
+            }
+            if (categoryIdToName.containsKey(id) && categoryIdToName[id] != name) {
+              return null; // Inconsistency
+            }
+            if (!categoryNameToId.containsKey(name)) {
+              categoryNameToId[name] = id;
+              categoryIdToName[id] = name;
+              allCategories.add(cat);
+            }
+          }
+        }
+
+        // Process Expenses and find initial maxExpenseId
+        var expensesStr = fileData[ExpenseEntity.PERSIST_NAME] as String?;
+        if (expensesStr != null) {
+          var expenses = json.decode(expensesStr) as List<dynamic>;
+          for (var exp in expenses) {
+            if (i == 0) {
+              allExpenses.add(exp);
+              if (exp['id'] > maxExpenseId) maxExpenseId = exp['id'];
+            } else {
+              maxExpenseId++;
+              var newExp = Map<String, dynamic>.from(exp);
+              newExp['id'] = maxExpenseId;
+              allExpenses.add(newExp);
+            }
+          }
+        }
+      }
+
+      return {
+        DomainEntity.PERSIST_NAME: json.encode(allDomains),
+        CategoryEntity.PERSIST_NAME: json.encode(allCategories),
+        ExpenseEntity.PERSIST_NAME: json.encode(allExpenses),
+      };
+    } catch (e) {
+      return null;
+    }
+  }
+
   void setAllDataFromJson(Map<String, dynamic> jsonData) {
     prefs?.setString(CategoryEntity.PERSIST_NAME, jsonData[CategoryEntity.PERSIST_NAME]!);
     prefs?.setString(ExpenseEntity.PERSIST_NAME, jsonData[ExpenseEntity.PERSIST_NAME]!);
