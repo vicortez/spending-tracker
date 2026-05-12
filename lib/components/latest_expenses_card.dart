@@ -134,10 +134,21 @@ class LatestExpensesCard extends StatelessWidget {
                 children: [
                   Text(categoryName, style: Theme.of(context).textTheme.bodyMedium),
                   const SizedBox(height: 4),
-                  Text(
-                    '$dateStr · $createdAtStr',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  RichText(
+                    text: TextSpan(
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                      children: [
+                        TextSpan(text: dateStr),
+                        const TextSpan(text: ' · '),
+                        TextSpan(
+                          text: 'Created: $createdAtStr',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
