@@ -15,6 +15,7 @@ class CoolButton extends StatefulWidget {
   final Color? textColor;
   final Color? baseColor;
   final bool autoBaseColor;
+  final IconData? icon;
 
   const CoolButton({
     super.key,
@@ -27,6 +28,7 @@ class CoolButton extends StatefulWidget {
     this.textColor,
     this.baseColor,
     this.autoBaseColor = true,
+    this.icon,
   });
 
   @override
@@ -208,13 +210,22 @@ class _CoolButtonState extends State<CoolButton> {
                   child: Container(
                     alignment: Alignment.center,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text(
-                      widget.text,
-                      style: TextStyle(
-                        color: textColor,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.2,
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (widget.icon != null) ...[
+                          Icon(widget.icon, color: textColor, size: 20),
+                          const SizedBox(width: 8),
+                        ],
+                        Text(
+                          widget.text,
+                          style: TextStyle(
+                            color: textColor,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

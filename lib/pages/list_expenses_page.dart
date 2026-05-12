@@ -1,13 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/components/expenses_table.dart';
+import 'package:spending_tracker/components/filter_bottom_sheet_content.dart';
+import 'package:spending_tracker/components/ui/cool_button.dart';
+import 'package:spending_tracker/components/ui/my_bottom_sheet.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense_filter.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
 
-class ListExpensesPage extends StatelessWidget {
+class ListExpensesPage extends StatefulWidget {
   const ListExpensesPage({super.key});
+
+  @override
+  State<ListExpensesPage> createState() => _ListExpensesPageState();
+}
+
+class _ListExpensesPageState extends State<ListExpensesPage> {
+  ExpenseFilter _filter = ExpenseFilter(
+    sortBy: [
+      SortCriteria(field: SortField.domainName, order: SortOrder.ascending),
+      SortCriteria(field: SortField.categoryName, order: SortOrder.ascending),
+      SortCriteria(field: SortField.expenseDate, order: SortOrder.descending),
+    ],
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -15,17 +31,9 @@ class ListExpensesPage extends StatelessWidget {
     final categoryProvider = context.watch<CategoryProvider>();
     final domainProvider = context.watch<DomainProvider>();
 
-    final filter = ExpenseFilter(
-      sortBy: [
-        SortCriteria(field: SortField.domainName, order: SortOrder.ascending),
-        SortCriteria(field: SortField.categoryName, order: SortOrder.ascending),
-        SortCriteria(field: SortField.expenseDate, order: SortOrder.descending),
-      ],
-    );
-
     final filteredExpenses = filterExpenses(
       expenses: expenseProvider.expenses,
-      filter: filter,
+      filter: _filter,
       categories: categoryProvider.categories,
       domains: domainProvider.domains,
     );
@@ -35,7 +43,29 @@ class ListExpensesPage extends StatelessWidget {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: CoolButton(
+                    text: 'Filter',
+                    onPressed: () => _showFilterBottomSheet(context, categoryProvider.categories),
+                    icon: Icons.filter_list,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: CoolButton(
+                    text: 'Sort',
+                    onPressed: () => _showSortBottomSheet(context),
+                    icon: Icons.sort,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
             child: Text(
               'Click an expense to manage it',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -53,6 +83,30 @@ class ListExpensesPage extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showFilterBottomSheet(BuildContext context, List<dynamic> categories) {
+    showMyBottomSheet(
+      context: context,
+      title: 'Filter Expenses',
+      content: FilterBottomSheetContent(
+        currentFilter: _filter,
+        categories: categories.cast(),
+        onFilterChanged: (newFilter) {
+          setState(() {
+            _filter = newFilter;
+          });
+        },
+      ),
+    );
+  }
+
+  void _showSortBottomSheet(BuildContext context) {
+    showMyBottomSheet(
+      context: context,
+      title: 'Sort Expenses',
+      content: const SizedBox(height: 100, child: Center(child: Text('Sort controls coming soon'))),
     );
   }
 }
