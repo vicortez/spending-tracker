@@ -17,9 +17,9 @@ class LatestExpensesCard extends StatelessWidget {
     final expenseProvider = context.watch<ExpenseProvider>();
     final categoryProvider = context.watch<CategoryProvider>();
 
-    // Get latest 5 expenses (sorted by date descending)
+    // Get latest 5 expenses (sorted by createdAt descending)
     final expenses = [...expenseProvider.expenses];
-    expenses.sort((a, b) => b.date.compareTo(a.date));
+    expenses.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     final latestExpenses = expenses.take(5).toList();
 
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
