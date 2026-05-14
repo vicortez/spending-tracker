@@ -17,13 +17,22 @@ class ListExpensesPage extends StatefulWidget {
 }
 
 class _ListExpensesPageState extends State<ListExpensesPage> {
-  ExpenseFilter _filter = ExpenseFilter(
-    sortBy: [
-      SortCriteria(field: SortField.domainName, order: SortOrder.ascending),
-      SortCriteria(field: SortField.categoryName, order: SortOrder.ascending),
-      SortCriteria(field: SortField.expenseDate, order: SortOrder.descending),
-    ],
-  );
+  late ExpenseFilter _filter;
+
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    _filter = ExpenseFilter(
+      year: now.year,
+      month: now.month,
+      sortBy: [
+        SortCriteria(field: SortField.domainName, order: SortOrder.ascending),
+        SortCriteria(field: SortField.categoryName, order: SortOrder.ascending),
+        SortCriteria(field: SortField.expenseDate, order: SortOrder.descending),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

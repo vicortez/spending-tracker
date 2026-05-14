@@ -46,8 +46,9 @@ class _FilterBottomSheetContentState extends State<FilterBottomSheetContent> {
   void _reset() {
     setState(() {
       selectedCategoryIds = [];
-      selectedYear = null;
-      selectedMonth = null;
+      final now = DateTime.now();
+      selectedYear = now.year;
+      selectedMonth = now.month;
     });
   }
 
