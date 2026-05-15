@@ -42,6 +42,7 @@ class ExpenseFilter {
   final DateRange? expenseDateRange;
   final int? month; // 1-12
   final int? year;
+  final int? day;
   final List<int>? categoryIds;
   final List<int>? domainIds;
   final List<SortCriteria> sortBy;
@@ -51,6 +52,7 @@ class ExpenseFilter {
     this.expenseDateRange,
     this.month,
     this.year,
+    this.day,
     this.categoryIds,
     this.domainIds,
     this.sortBy = const [],
@@ -75,9 +77,10 @@ List<ExpenseEntity> filterExpenses({
       if (!filter.expenseDateRange!.contains(expense.date)) return false;
     }
 
-    // Filter by month/year
+    // Filter by month/year/day
     if (filter.month != null && expense.date.month != filter.month) return false;
     if (filter.year != null && expense.date.year != filter.year) return false;
+    if (filter.day != null && expense.date.day != filter.day) return false;
 
     // Filter by category
     if (filter.categoryIds != null && filter.categoryIds!.isNotEmpty) {
