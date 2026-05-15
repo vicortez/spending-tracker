@@ -1,6 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:spending_tracker/pages/experimental_page.dart';
+import 'package:spending_tracker/pages/experimental/experimental_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class InfoPage extends StatelessWidget {
@@ -21,9 +21,7 @@ class InfoPage extends StatelessWidget {
         RichText(
           text: TextSpan(
             text: '',
-            style: DefaultTextStyle
-                .of(context)
-                .style,
+            style: DefaultTextStyle.of(context).style,
             children: <TextSpan>[
               TextSpan(
                 text: 'Open experimental features page',

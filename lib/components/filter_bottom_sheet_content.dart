@@ -118,14 +118,19 @@ class _FilterBottomSheetContentState extends State<FilterBottomSheetContent> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('Categories', style: TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
+        const SizedBox(height: 4),
         Wrap(
-          spacing: 8,
+          spacing: 4,
+          runSpacing: 3,
           children: widget.categories.map((cat) {
             final isSelected = selectedCategoryIds.contains(cat.id);
             return FilterChip(
-              label: Text(cat.name),
+              label: Text(cat.name, style: const TextStyle(fontSize: 12)),
               selected: isSelected,
+              visualDensity: VisualDensity.compact,
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+              labelPadding: const EdgeInsets.symmetric(horizontal: 2, vertical: -2),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               onSelected: (selected) {
                 setState(() {
                   if (selected) {

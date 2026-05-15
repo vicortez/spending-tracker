@@ -7,13 +7,19 @@ void showMyBottomSheet({
   String? subtitle,
   List<Widget>? actions,
   Widget? content,
+  double maxHeightFactor = 0.8,
 }) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (context) =>
-        MyBottomSheet(title: title, subtitle: subtitle, actions: actions, content: content),
+    builder: (context) => MyBottomSheet(
+      title: title,
+      subtitle: subtitle,
+      actions: actions,
+      content: content,
+      maxHeightFactor: maxHeightFactor,
+    ),
   );
 }
 
@@ -23,8 +29,16 @@ class MyBottomSheet extends StatelessWidget {
   final String? subtitle;
   final List<Widget>? actions;
   final Widget? content;
+  final double maxHeightFactor;
 
-  const MyBottomSheet({super.key, required this.title, this.subtitle, this.actions, this.content});
+  const MyBottomSheet({
+    super.key,
+    required this.title,
+    this.subtitle,
+    this.actions,
+    this.content,
+    this.maxHeightFactor = 0.8,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,9 +46,7 @@ class MyBottomSheet extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Container(
-      constraints: BoxConstraints(
-        maxHeight: screenHeight * 0.5, // Up to middle of screen
-      ),
+      constraints: BoxConstraints(maxHeight: screenHeight * maxHeightFactor),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: const BorderRadius.only(

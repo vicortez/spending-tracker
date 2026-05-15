@@ -6,8 +6,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/components/ui/cool_button.dart';
-import 'package:spending_tracker/pages/button_showcase_page.dart';
-import 'package:spending_tracker/pages/old_spending_report_page.dart';
+import 'package:spending_tracker/pages/experimental/button_showcase_page.dart';
+import 'package:spending_tracker/pages/experimental/old_spending_report_page.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
 import 'package:spending_tracker/repository/config/config_name.dart';
 import 'package:spending_tracker/repository/config/config_provider.dart';
@@ -19,7 +19,7 @@ import 'package:spending_tracker/repository/focused_month/focused_month_provider
 import 'package:spending_tracker/repository/month_names.dart';
 import 'package:spending_tracker/utils/number_utils.dart';
 
-import '../repository/category/category.dart';
+import '../../repository/category/category.dart';
 
 class AccCategory {
   const AccCategory(this.catId, this.acc);
