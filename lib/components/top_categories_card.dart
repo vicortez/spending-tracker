@@ -43,9 +43,16 @@ class TopCategoriesCard extends StatelessWidget {
               width: double.infinity,
               color: Colors.grey[900],
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Text(
-                'Top categories this month',
-                style: Theme.of(context).textTheme.titleMedium,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Top categories this month', style: Theme.of(context).textTheme.titleMedium),
+                  Icon(
+                    Icons.chevron_right,
+                    size: 20,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+                  ),
+                ],
               ),
             ),
             // Divider

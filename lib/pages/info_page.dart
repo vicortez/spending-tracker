@@ -21,7 +21,9 @@ class InfoPage extends StatelessWidget {
         RichText(
           text: TextSpan(
             text: '',
-            style: DefaultTextStyle.of(context).style,
+            style: DefaultTextStyle
+                .of(context)
+                .style,
             children: <TextSpan>[
               TextSpan(
                 text: 'Open experimental features page',
@@ -38,7 +40,7 @@ class InfoPage extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-        const Text('Version 0.28.0'),
+        const Text('Version 0.29.0'),
         const SizedBox(height: 5),
       ],
     );
