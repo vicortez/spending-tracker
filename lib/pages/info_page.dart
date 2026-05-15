@@ -38,7 +38,7 @@ class InfoPage extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-        const Text('Version 0.27.0'),
+        const Text('Version 0.28.0'),
         const SizedBox(height: 5),
       ],
     );
