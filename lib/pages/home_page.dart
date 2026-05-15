@@ -125,6 +125,11 @@ class _HomePageState extends State<HomePage> {
     } else {
       var expenseProvider = context.read<ExpenseProvider>();
       expenseProvider.addExpense(categoryId, categoryName, amount);
+      showToast(
+        context,
+        '$amount spent on $categoryName',
+        duration: const Duration(milliseconds: 1500),
+      );
       expenseAmountTextController.clear();
     }
   }

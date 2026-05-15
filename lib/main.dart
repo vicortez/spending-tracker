@@ -10,6 +10,7 @@ import 'package:spending_tracker/repository/focused_month/focused_month_provider
 import 'package:spending_tracker/repository/onboarding/onboarding_provider.dart';
 import 'package:spending_tracker/router/app_router.dart';
 import 'package:spending_tracker/services/backup_service.dart';
+import 'package:spending_tracker/services/logger_service.dart';
 import 'package:spending_tracker/services/navigation_history_service.dart';
 import 'package:spending_tracker/theme/app_theme.dart';
 
@@ -18,7 +19,8 @@ void main() async {
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  // Run daily backup
+  // Initialize services
+  await LoggerService.init(prefs);
   await BackupService().runDailyBackup(prefs);
 
   runApp(MultiProvider(providers: initializeGlobalProviders(prefs), child: const MyApp()));

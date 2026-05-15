@@ -1,6 +1,8 @@
 import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/repository/interfaces/mappable.dart';
+import 'package:spending_tracker/services/logger_service.dart';
 
 /// Service for persisting and loading entities to/from local storage
 class PersistenceService {
@@ -12,14 +14,13 @@ class PersistenceService {
   ///
   /// [records] - List of entities to save
   /// [persistenceKey] - The key to use for storage
-  Future<void> saveRecords<T extends Mappable>(
-    List<T> records,
-    String persistenceKey,
-  ) async {
-    final String encodedData = json.encode(
-      records.map((e) => e.toMap()).toList(),
-    );
-    await _prefs.setString(persistenceKey, encodedData);
+  Future<void> saveRecords<T extends Mappable>(List<T> records, String persistenceKey) async {
+    try {
+      final String encodedData = json.encode(records.map((e) => e.toMap()).toList());
+      await _prefs.setString(persistenceKey, encodedData);
+    } catch (e) {
+      LoggerService.logError('Failed to save $persistenceKey: $e');
+    }
   }
 
   /// Loads a list of records from local storage
@@ -38,11 +39,9 @@ class PersistenceService {
 
     try {
       final List<dynamic> decoded = json.decode(encodedData) as List<dynamic>;
-      return decoded
-          .map<T>((item) => fromMap(item as Map<String, dynamic>))
-          .toList();
+      return decoded.map<T>((item) => fromMap(item as Map<String, dynamic>)).toList();
     } catch (e) {
-      // Return empty list if decoding fails
+      LoggerService.logError('Failed to load $persistenceKey: $e');
       return [];
     }
   }
@@ -52,7 +51,11 @@ class PersistenceService {
   /// [data] - The raw string data to save
   /// [persistenceKey] - The key to use for storage
   Future<void> saveRawData(String data, String persistenceKey) async {
-    await _prefs.setString(persistenceKey, data);
+    try {
+      await _prefs.setString(persistenceKey, data);
+    } catch (e) {
+      LoggerService.logError('Failed to save raw $persistenceKey: $e');
+    }
   }
 
   /// Gets raw string data from local storage (for import/export)
@@ -60,6 +63,11 @@ class PersistenceService {
   /// [persistenceKey] - The key used for storage
   /// Returns the raw string data, or null if not found
   String? getRawData(String persistenceKey) {
-    return _prefs.getString(persistenceKey);
+    try {
+      return _prefs.getString(persistenceKey);
+    } catch (e) {
+      LoggerService.logError('Failed to read raw $persistenceKey: $e');
+      return null;
+    }
   }
 }

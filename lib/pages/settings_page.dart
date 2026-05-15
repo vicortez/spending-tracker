@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/components/ui/cool_button.dart';
+import 'package:spending_tracker/components/ui/my_bottom_sheet.dart';
 import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
 import 'package:spending_tracker/repository/config/config_name.dart';
@@ -13,6 +14,7 @@ import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
 import 'package:spending_tracker/repository/focused_month/focused_month_provider.dart';
+import 'package:spending_tracker/services/logger_service.dart';
 import 'package:spending_tracker/utils/sheet_exporter.dart';
 import 'package:spending_tracker/utils/toast_utils.dart';
 
@@ -115,6 +117,12 @@ class SettingsPage extends StatelessWidget {
                         'Merging is currently unavailable for web',
                         style: TextStyle(fontSize: 12),
                       ),
+                    const SizedBox(height: 15),
+                    CoolButton(
+                      text: 'View Error Logs',
+                      onPressed: () => _showErrorLogsBottomSheet(context),
+                      type: ButtonType.normal,
+                    ),
                     const SizedBox(height: 30),
                     CoolButton(
                       text: 'Delete all expenses'.toUpperCase(),
@@ -271,5 +279,38 @@ class SettingsPage extends StatelessWidget {
           .exportJSONFile(mergedData, fileName)
           .then((res) => handleToastFileExportResult(res, context, fileName));
     }
+  }
+
+  void _showErrorLogsBottomSheet(BuildContext context) {
+    final logs = LoggerService.getErrorLogs();
+
+    showMyBottomSheet(
+      context: context,
+      title: 'Error Logs',
+      content: logs.isEmpty
+          ? const Center(
+              child: Padding(padding: EdgeInsets.all(24.0), child: Text('No errors recorded')),
+            )
+          : Column(
+              children: [
+                ...logs.map(
+                  (log) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(log, style: const TextStyle(fontFamily: 'monospace', fontSize: 12)),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                CoolButton(
+                  text: 'Clear Logs',
+                  type: ButtonType.danger,
+                  onPressed: () {
+                    LoggerService.clearLogs();
+                    Navigator.of(context).pop();
+                    showToast(context, 'Logs cleared');
+                  },
+                ),
+              ],
+            ),
+    );
   }
 }
