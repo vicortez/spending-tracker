@@ -10,7 +10,7 @@ class CoolButton extends StatefulWidget {
   final VoidCallback? onPressed;
   final VoidCallback? onHold;
   final ButtonType type;
-  final bool outline;
+  final bool? outline;
   final Color? bgColor;
   final Color? textColor;
   final Color? baseColor;
@@ -23,7 +23,7 @@ class CoolButton extends StatefulWidget {
     this.onPressed,
     this.onHold,
     this.type = ButtonType.normal,
-    this.outline = false,
+    this.outline,
     this.bgColor,
     this.textColor,
     this.baseColor,
@@ -56,13 +56,11 @@ class _CoolButtonState extends State<CoolButton> {
   }
 
   void _handleTapUp() async {
-    // Call onPressed immediately for instant responsiveness
     widget.onPressed?.call();
 
     final pressedDuration = DateTime.now().difference(_pressStartTime ?? DateTime.now());
-    final minAnimationDuration = Duration(milliseconds: baseAnimationDurationMs);
+    final minAnimationDuration = const Duration(milliseconds: baseAnimationDurationMs);
 
-    // Ensure animation is visible for at least minAnimationDuration
     if (pressedDuration < minAnimationDuration) {
       await Future.delayed(minAnimationDuration - pressedDuration);
     }
@@ -89,7 +87,6 @@ class _CoolButtonState extends State<CoolButton> {
       _isHolding = false;
     });
 
-    // Start timer for hold threshold
     _holdTimer = Timer(const Duration(milliseconds: holdTimerMS), () {
       if (mounted) {
         _triggerHoldAction();
@@ -100,18 +97,14 @@ class _CoolButtonState extends State<CoolButton> {
   void _triggerHoldAction() async {
     setState(() => _isHolding = true);
 
-    // Quick scale-pulse animation
-    // Scale up
     setState(() => _scale = 1.15);
     await Future.delayed(const Duration(milliseconds: 100));
 
-    // Scale down
     if (mounted) {
       setState(() => _scale = 1.0);
     }
     await Future.delayed(const Duration(milliseconds: 100));
 
-    // Trigger callback
     widget.onHold?.call();
 
     if (mounted) {
@@ -149,20 +142,30 @@ class _CoolButtonState extends State<CoolButton> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final bool isEnabled = widget.onPressed != null;
 
     final style = _getStyle(context, isEnabled);
 
+    // Calculate effective values
+    final bool effectiveOutline =
+        widget.outline ?? (widget.type == ButtonType.theme ? true : false);
+
+    final Color effectiveTextColor =
+        widget.textColor ??
+        (widget.type == ButtonType.theme ? colorScheme.primary : style.textColor);
+
     final Color faceColor = widget.bgColor ?? style.faceColor;
-    final Color baseColor =
+
+    final Color effectiveBaseColor =
         widget.baseColor ??
-        (widget.autoBaseColor && widget.bgColor != null
-            ? darken(widget.bgColor!, 20)
-            : style.baseColor);
-    final Color textColor = widget.textColor ?? style.textColor;
+        (widget.type == ButtonType.theme
+            ? Colors.grey[900]!
+            : (widget.autoBaseColor && widget.bgColor != null
+                  ? darken(widget.bgColor!, 20)
+                  : style.baseColor));
 
-    final double currentOutlineWidth = widget.outline ? 2.0 : 0.0;
-
+    final double currentOutlineWidth = effectiveOutline ? 2.0 : 0.0;
     final bool isActuallyPressed = isEnabled && _isPressed;
 
     return GestureDetector(
@@ -181,7 +184,6 @@ class _CoolButtonState extends State<CoolButton> {
           height: buttonHeight,
           child: Stack(
             children: [
-              // Base layer (Shadow/Depth + Outline container)
               AnimatedPositioned(
                 duration: const Duration(milliseconds: baseAnimationDurationMs),
                 top: isActuallyPressed ? depth : 0,
@@ -190,12 +192,11 @@ class _CoolButtonState extends State<CoolButton> {
                 bottom: 0,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: baseColor,
+                    color: effectiveBaseColor,
                     borderRadius: BorderRadius.circular(borderRadius),
                   ),
                 ),
               ),
-              // Face layer
               AnimatedPositioned(
                 duration: const Duration(milliseconds: baseAnimationDurationMs),
                 top: currentOutlineWidth + (isActuallyPressed ? depth : 0),
@@ -214,13 +215,13 @@ class _CoolButtonState extends State<CoolButton> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         if (widget.icon != null) ...[
-                          Icon(widget.icon, color: textColor, size: 20),
+                          Icon(widget.icon, color: effectiveTextColor, size: 20),
                           const SizedBox(width: 8),
                         ],
                         Text(
                           widget.text,
                           style: TextStyle(
-                            color: textColor,
+                            color: effectiveTextColor,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 1.2,
                           ),

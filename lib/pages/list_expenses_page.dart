@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/components/expenses_table.dart';
 import 'package:spending_tracker/components/filter_bottom_sheet_content.dart';
+import 'package:spending_tracker/components/sort_bottom_sheet_content.dart';
 import 'package:spending_tracker/components/ui/cool_button.dart';
 import 'package:spending_tracker/components/ui/my_bottom_sheet.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
@@ -26,11 +27,7 @@ class _ListExpensesPageState extends State<ListExpensesPage> {
     _filter = ExpenseFilter(
       year: now.year,
       month: now.month,
-      sortBy: [
-        SortCriteria(field: SortField.domainName, order: SortOrder.ascending),
-        SortCriteria(field: SortField.categoryName, order: SortOrder.ascending),
-        SortCriteria(field: SortField.expenseDate, order: SortOrder.descending),
-      ],
+      sortBy: [SortCriteria(field: SortField.expenseDate, order: SortOrder.descending)],
     );
   }
 
@@ -115,7 +112,21 @@ class _ListExpensesPageState extends State<ListExpensesPage> {
     showMyBottomSheet(
       context: context,
       title: 'Sort Expenses',
-      content: const SizedBox(height: 100, child: Center(child: Text('Sort controls coming soon'))),
+      content: SortBottomSheetContent(
+        currentSortBy: _filter.sortBy,
+        onSortChanged: (newSortBy) {
+          setState(() {
+            _filter = ExpenseFilter(
+              categoryIds: _filter.categoryIds,
+              year: _filter.year,
+              month: _filter.month,
+              createdAtRange: _filter.createdAtRange,
+              expenseDateRange: _filter.expenseDateRange,
+              sortBy: newSortBy,
+            );
+          });
+        },
+      ),
     );
   }
 }

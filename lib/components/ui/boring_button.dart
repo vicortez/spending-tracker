@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:spending_tracker/utils/color_utils.dart';
 
-enum ButtonType { normal, danger }
+enum BoringButtonType { normal, danger }
 
 class BoringButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
-  final ButtonType type;
+  final BoringButtonType type;
 
   const BoringButton({
     super.key,
     required this.text,
     this.onPressed,
-    this.type = ButtonType.normal,
+    this.type = BoringButtonType.normal,
   });
 
   @override
@@ -20,11 +20,11 @@ class BoringButton extends StatelessWidget {
     Color backgroundColor;
     Color fontColor;
     switch (type) {
-      case ButtonType.normal:
+      case BoringButtonType.normal:
         backgroundColor = lighten(Theme.of(context).colorScheme.surface, 8);
         fontColor = Theme.of(context).colorScheme.primary;
         break;
-      case ButtonType.danger:
+      case BoringButtonType.danger:
         backgroundColor = Colors.red.withOpacity(0.7);
         fontColor = getTextColorForBackground(backgroundColor);
         break;
