@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:spending_tracker/components/latest_expenses_card.dart';
+import 'package:spending_tracker/components/shared_expenses_card.dart';
 import 'package:spending_tracker/components/top_categories_card.dart';
 
 class ReportsPage extends StatelessWidget {
@@ -11,8 +12,10 @@ class ReportsPage extends StatelessWidget {
       child: Column(
         children: [
           SizedBox(width: double.infinity, child: LatestExpensesCard()),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           SizedBox(width: double.infinity, child: TopCategoriesCard()),
+          SizedBox(height: 12),
+          SizedBox(width: double.infinity, child: SharedExpensesCard()),
         ],
       ),
     );

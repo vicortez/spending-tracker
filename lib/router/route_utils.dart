@@ -7,6 +7,7 @@ class AppRouteConstants {
   static const String allExpensesPath = '/all-expenses';
   static const String editExpensePath = 'edit/:id';
   static const String topCategoriesPath = '/reports/top-categories';
+  static const String sharedExpensesPath = '/reports/shared-expenses';
 
   static const Map<int, String> tabIndexToPath = {
     0: homePath,
