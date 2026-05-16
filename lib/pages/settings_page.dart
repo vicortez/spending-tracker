@@ -119,6 +119,19 @@ class SettingsPage extends StatelessWidget {
                       ),
                     const SizedBox(height: 15),
                     CoolButton(
+                      text: 'Export backups',
+                      onPressed: kIsWeb
+                          ? null
+                          : () => onPressedExportBackupsAction(configProvider, context),
+                      type: ButtonType.normal,
+                    ),
+                    if (kIsWeb)
+                      const Text(
+                        'Exporting is currently unavailable for web',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    const SizedBox(height: 15),
+                    CoolButton(
                       text: 'View Error Logs',
                       onPressed: () => _showErrorLogsBottomSheet(context),
                       type: ButtonType.normal,
@@ -178,6 +191,18 @@ class SettingsPage extends StatelessWidget {
     String fileName = configProvider.getExportDataFilename();
     configProvider
         .exportJSONFile(jsonAppData, fileName)
+        .then((res) => handleToastFileExportResult(res, context, fileName));
+  }
+
+  void onPressedExportBackupsAction(ConfigProvider configProvider, BuildContext context) {
+    Map<String, dynamic>? backupsData = configProvider.getBackupsData();
+    if (backupsData == null) {
+      showToast(context, 'No backups found');
+      return;
+    }
+    String fileName = 'spending-tracker-backups-${DateTime.now().toString().substring(0, 10)}';
+    configProvider
+        .exportJSONFile(backupsData, fileName)
         .then((res) => handleToastFileExportResult(res, context, fileName));
   }
 

@@ -10,6 +10,7 @@ import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/config/config_name.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
 import 'package:spending_tracker/repository/expense/expense.dart';
+import 'package:spending_tracker/services/backup_service.dart';
 
 class ConfigProvider with ChangeNotifier {
   Map<ConfigName, dynamic> config = {ConfigName.theme: 'dark', ConfigName.seeAllMonths: true};
@@ -259,6 +260,27 @@ class ConfigProvider with ChangeNotifier {
     prefs?.setString(CategoryEntity.PERSIST_NAME, jsonData[CategoryEntity.PERSIST_NAME]!);
     prefs?.setString(ExpenseEntity.PERSIST_NAME, jsonData[ExpenseEntity.PERSIST_NAME]!);
     notifyListeners();
+  }
+
+  Map<String, dynamic>? getBackupsData() {
+    final String? backupsStr = prefs?.getString(BackupService.BACKUP_KEY);
+    if (backupsStr == null) return null;
+
+    try {
+      final Map<String, dynamic> backups = json.decode(backupsStr) as Map<String, dynamic>;
+      if (backups.isEmpty) return null;
+
+      // Ensure we only have the latest 5
+      final sortedDates = backups.keys.toList()..sort((a, b) => b.compareTo(a));
+      final Map<String, dynamic> latestBackups = {};
+      final int count = sortedDates.length > 5 ? 5 : sortedDates.length;
+      for (int i = 0; i < count; i++) {
+        latestBackups[sortedDates[i]] = backups[sortedDates[i]];
+      }
+      return latestBackups;
+    } catch (e) {
+      return null;
+    }
   }
 
   // void toggleTheme() {
