@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
-import 'package:spending_tracker/repository/config/config_name.dart';
-import 'package:spending_tracker/repository/config/config_provider.dart';
 import 'package:spending_tracker/repository/expense/expense.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
 import 'package:spending_tracker/repository/focused_month/focused_month_provider.dart';
@@ -32,18 +30,14 @@ class OldSpendingReportPage extends StatelessWidget {
     var expenseProvider = context.watch<ExpenseProvider>();
     var categoryProvider = context.watch<CategoryProvider>();
     var focusedMonthProvider = context.watch<FocusedMonthProvider>();
-    var configProvider = context.watch<ConfigProvider>();
 
-    bool seeAllMonths = configProvider.getConfig(ConfigName.seeAllMonths);
     DateTime month = focusedMonthProvider.getMonth();
     List<ExpenseEntity> expenses = [...expenseProvider.expenses];
     List<CategoryEntity> categories = [...categoryProvider.categories];
     expenses.sort((a, b) => a.date.compareTo(b.date));
-    if (!seeAllMonths) {
-      expenses = expenses
-          .where((expense) => expense.date.year == month.year && expense.date.month == month.month)
-          .toList();
-    }
+    expenses = expenses
+        .where((expense) => expense.date.year == month.year && expense.date.month == month.month)
+        .toList();
 
     // Quick and dirty way. Not scalable. Ideally we want a global object dictionary with theme name as keys.
     // or maybe there is a "fluttery" way to do it.
@@ -63,7 +57,7 @@ class OldSpendingReportPage extends StatelessWidget {
       body: SelectionArea(
         child: Column(
           children: [
-            Text("Showing report for ${seeAllMonths ? "all months" : monthNames[month.month]}"),
+            Text("Showing report for ${monthNames[month.month]}"),
             const SizedBox(height: 10),
             Expanded(
               child: ListView.builder(

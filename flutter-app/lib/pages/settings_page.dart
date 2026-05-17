@@ -7,7 +7,6 @@ import 'package:spending_tracker/components/ui/cool_button.dart';
 import 'package:spending_tracker/components/ui/my_bottom_sheet.dart';
 import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
-import 'package:spending_tracker/repository/config/config_name.dart';
 import 'package:spending_tracker/repository/config/config_provider.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
@@ -40,13 +39,6 @@ class SettingsPage extends StatelessWidget {
                 padding: const EdgeInsets.all(10),
                 child: Column(
                   children: [
-                    CheckboxListTile(
-                      title: const Text('See all months'),
-                      value: configProvider.getConfig(ConfigName.seeAllMonths),
-                      onChanged: (newValue) =>
-                          configProvider.updateConfig(ConfigName.seeAllMonths, newValue),
-                    ),
-                    const SizedBox(height: 15),
                     CoolButton(
                       text: 'Export to sheet (excel)',
                       onPressed: kIsWeb
@@ -170,15 +162,6 @@ class SettingsPage extends StatelessWidget {
 
       final SheetExporter sheetExporter = SheetExporter();
 
-      bool seeAllMonths = configProvider.getConfig(ConfigName.seeAllMonths);
-      DateTime month = focusedMonthProvider.getMonth();
-      if (!seeAllMonths) {
-        expenses = expenses
-            .where(
-              (expense) => expense.date.year == month.year && expense.date.month == month.month,
-            )
-            .toList();
-      }
       final String filePath = await sheetExporter.exportToExcel(domains, categories, expenses);
       showToast(context, 'Expenses exported to: $filePath');
     } catch (e) {

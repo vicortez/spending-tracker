@@ -9,7 +9,6 @@ import 'package:spending_tracker/components/ui/cool_button.dart';
 import 'package:spending_tracker/pages/experimental/button_showcase_page.dart';
 import 'package:spending_tracker/pages/experimental/old_spending_report_page.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
-import 'package:spending_tracker/repository/config/config_name.dart';
 import 'package:spending_tracker/repository/config/config_provider.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
@@ -42,15 +41,12 @@ class TestPage extends StatelessWidget {
     var categories = categoryProvider.getCategories();
     List<DomainEntity> domains = domainProvider.domains;
 
-    bool seeAllMonths = configProvider.getConfig(ConfigName.seeAllMonths);
     DateTime month = focusedMonthProvider.getMonth();
     List<ExpenseEntity> expenses = [...expenseProvider.expenses];
     expenses.sort((a, b) => a.date.compareTo(b.date));
-    if (!seeAllMonths) {
-      expenses = expenses
-          .where((expense) => expense.date.year == month.year && expense.date.month == month.month)
-          .toList();
-    }
+    expenses = expenses
+        .where((expense) => expense.date.year == month.year && expense.date.month == month.month)
+        .toList();
     double totalSpentCurrentMonth = expenses.fold(0, (sum, expense) => sum + expense.amount);
 
     return Scaffold(

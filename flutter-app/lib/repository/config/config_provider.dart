@@ -13,7 +13,7 @@ import 'package:spending_tracker/repository/expense/expense.dart';
 import 'package:spending_tracker/services/backup_service.dart';
 
 class ConfigProvider with ChangeNotifier {
-  Map<ConfigName, dynamic> config = {ConfigName.theme: 'dark', ConfigName.seeAllMonths: true};
+  Map<ConfigName, dynamic> config = {ConfigName.theme: 'dark'};
   String PERSIST_NAME = 'config';
 
   SharedPreferences? prefs;

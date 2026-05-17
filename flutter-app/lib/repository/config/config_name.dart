@@ -1,1 +1,1 @@
-enum ConfigName { seeAllMonths, theme }
+enum ConfigName { theme }
