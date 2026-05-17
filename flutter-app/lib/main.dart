@@ -3,6 +3,7 @@ import 'package:nested/nested.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
+import 'package:spending_tracker/repository/config/config_name.dart';
 import 'package:spending_tracker/repository/config/config_provider.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
@@ -31,12 +32,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final configProvider = context.watch<ConfigProvider>();
+    final themeConfig = configProvider.getConfig(ConfigName.theme);
+
     return MaterialApp.router(
       routerConfig: appRouter,
       title: 'Spending Tracker',
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
-      themeMode: ThemeMode.system,
+      themeMode: AppTheme.getThemeMode(themeConfig),
     );
   }
 }

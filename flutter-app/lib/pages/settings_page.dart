@@ -7,6 +7,7 @@ import 'package:spending_tracker/components/ui/cool_button.dart';
 import 'package:spending_tracker/components/ui/my_bottom_sheet.dart';
 import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
+import 'package:spending_tracker/repository/config/config_name.dart';
 import 'package:spending_tracker/repository/config/config_provider.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
@@ -39,6 +40,26 @@ class SettingsPage extends StatelessWidget {
                 padding: const EdgeInsets.all(10),
                 child: Column(
                   children: [
+                    ListTile(
+                      title: const Text('Theme Mode'),
+                      trailing: DropdownButton<String>(
+                        value: configProvider.getConfig(ConfigName.theme) ?? 'dark',
+                        onChanged: (String? newValue) {
+                          if (newValue != null) {
+                            configProvider.updateConfig(ConfigName.theme, newValue);
+                          }
+                        },
+                        items: <String>['dark', 'light'].map<DropdownMenuItem<String>>((
+                          String value,
+                        ) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value[0].toUpperCase() + value.substring(1)),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
                     CoolButton(
                       text: 'Export to sheet (excel)',
                       onPressed: kIsWeb

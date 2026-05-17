@@ -31,4 +31,11 @@ class AppTheme {
       appBarTheme: const AppBarTheme(backgroundColor: Colors.black87, foregroundColor: teal),
     );
   }
+
+  static ThemeMode getThemeMode(String? themeConfig) {
+    if (themeConfig == 'light') {
+      return ThemeMode.light;
+    }
+    return ThemeMode.dark;
+  }
 }
