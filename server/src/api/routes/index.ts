@@ -1,10 +1,14 @@
 import { Router } from 'express'
-import { createTestRouter } from './test.routes.js'
+import { createTestRouter, type TestRouterDeps } from './test.routes.js'
 
-export function createApiRouter(): Router {
+export type ApiRouterOptions = {
+  testRouterDeps?: TestRouterDeps
+}
+
+export function createApiRouter(options: ApiRouterOptions = {}): Router {
   const router = Router()
 
-  router.use('/test', createTestRouter())
+  router.use('/test', createTestRouter(options.testRouterDeps))
 
   return router
 }

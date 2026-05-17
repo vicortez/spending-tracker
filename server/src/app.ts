@@ -5,14 +5,16 @@ import { corsMiddleware } from './api/middleware/cors.js'
 import { errorHandler } from './api/middleware/error-handler.js'
 import { notFoundHandler } from './api/middleware/not-found.js'
 import { createApiRouter } from './api/routes/index.js'
+import type { TestRouterDeps } from './api/routes/test.routes.js'
 import { env } from './config/env.js'
 
 export type CreateAppOptions = {
   enableRequestLogging?: boolean
+  testRouterDeps?: TestRouterDeps
 }
 
 export function createApp(options: CreateAppOptions = {}): Express {
-  const { enableRequestLogging = !env.isTest } = options
+  const { enableRequestLogging = !env.isTest, testRouterDeps } = options
   const app = express()
 
   app.disable('x-powered-by')
@@ -27,7 +29,7 @@ export function createApp(options: CreateAppOptions = {}): Express {
   app.use(express.urlencoded({ extended: true }))
   app.use(cookieParser())
 
-  app.use('/api', createApiRouter())
+  app.use('/api', createApiRouter({ testRouterDeps }))
 
   app.use(notFoundHandler)
   app.use(errorHandler)
