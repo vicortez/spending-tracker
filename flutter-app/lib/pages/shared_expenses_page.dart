@@ -1,5 +1,5 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:spending_tracker/repository/services/api_service.dart';
 
 class SharedExpensesPage extends StatefulWidget {
   const SharedExpensesPage({super.key});
@@ -9,7 +9,7 @@ class SharedExpensesPage extends StatefulWidget {
 }
 
 class _SharedExpensesPageState extends State<SharedExpensesPage> {
-  final Dio _dio = Dio();
+  final ApiService _apiService = ApiService();
   String _content = 'Loading...';
   bool _isLoading = true;
 
@@ -21,7 +21,7 @@ class _SharedExpensesPageState extends State<SharedExpensesPage> {
 
   Future<void> _fetchData() async {
     try {
-      final response = await _dio.get('https://example.com');
+      final response = await _apiService.get('/test');
       if (mounted) {
         setState(() {
           _content = response.data.toString();
