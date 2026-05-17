@@ -13,6 +13,8 @@
     "test": "cross-env NODE_ENV=test vitest run",
     "test:watch": "cross-env NODE_ENV=test vitest",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit -p tsconfig.check.json",
+    "verify": "npm run db:generate && npm run typecheck && npm run lint && npm run test",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio"

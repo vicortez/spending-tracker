@@ -22,5 +22,3 @@ export const env = {
   isProduction: nodeEnv === 'production',
   isTest: nodeEnv === 'test',
 } as const
-
-console.log(env)

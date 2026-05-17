@@ -1,0 +1,51 @@
+---
+description: TypeScript Express API conventions for spending-tracker-server
+alwaysApply: true
+---
+
+# Spending Tracker API (Express)
+
+This is a TypeScript Express API for mobile (and later web). Keep it modular and easy to test.
+
+## Structure
+
+- `src/index.ts` — start the HTTP server and graceful shutdown only.
+- `src/app.ts` — export `createApp()`; wire middleware and routes. Do not call `listen()` here.
+- `src/config/env.ts` — read and parse environment variables (including injected config like `ALLOWED_ORIGINS`). Avoid `isProduction`-style branching for values that belong in env.
+- `src/api/routes/` — route modules mounted under `/api`.
+- `src/api/middleware/` — Express middleware (CORS, errors, etc.).
+
+## Testability
+
+- Test HTTP behavior with **supertest** against `createApp()`, not a running server.
+- Prefer factories and injected dependencies over globals so units can be tested in isolation.
+- Disable request logging in tests (`enableRequestLogging: false`).
+
+## External integrations
+
+Use `src/external/` for any integration with **external systems** (third-party HTTP APIs, email, payment providers, etc.). Do not put that logic in route handlers or `app.ts`.
+
+Use `src/external/persistence/` for **databases** (Prisma client, repositories, query helpers). Route and service layers depend on abstractions from persistence, not raw ORM calls scattered across the app.
+
+```
+src/external/
+  persistence/     # DB access (Prisma, repositories)
+  <provider>/      # Other external systems (HTTP clients, SDK wrappers)
+```
+
+## General
+
+- Match existing style (imports, naming, ESM `.js` extensions in relative imports).
+- Keep changes focused; no drive-by refactors.
+- Add or update tests when changing behavior.
+
+## Before finishing a change
+
+Run `npm run verify` at the end of each agent change. It runs, in order:
+
+1. `db:generate` — Prisma client generation
+2. `typecheck` — `tsc --noEmit` (src + tests)
+3. `lint` — ESLint
+4. `test` — Vitest
+
+Fix any failures before considering the task done.
