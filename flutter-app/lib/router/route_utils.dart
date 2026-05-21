@@ -4,6 +4,7 @@ class AppRouteConstants {
   static const String reportsPath = '/reports';
   static const String settingsPath = '/settings';
   static const String aboutPath = '/about';
+  static const String loginPath = '/login';
   static const String allExpensesPath = '/all-expenses';
   static const String editExpensePath = 'edit/:id';
   static const String topCategoriesPath = '/reports/top-categories';

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:spending_tracker/repository/services/api_service.dart';
+import 'package:spending_tracker/repository/services/auth_provider.dart';
 
 class SharedExpensesPage extends StatefulWidget {
   const SharedExpensesPage({super.key});
@@ -40,13 +42,39 @@ class _SharedExpensesPageState extends State<SharedExpensesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    final user = authProvider.user;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Shared Expenses')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(child: Text(_content)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (user != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: Text(
+                  'Current User: ${user.toString()}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              )
+            else
+              const Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: Text(
+                  'Not logged in',
+                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                ),
+              ),
+            Expanded(
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : SingleChildScrollView(child: Text(_content)),
+            ),
+          ],
+        ),
       ),
     );
   }

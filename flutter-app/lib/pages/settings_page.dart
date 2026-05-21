@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/components/ui/cool_button.dart';
 import 'package:spending_tracker/components/ui/my_bottom_sheet.dart';
@@ -14,6 +15,8 @@ import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
 import 'package:spending_tracker/repository/focused_month/focused_month_provider.dart';
+import 'package:spending_tracker/repository/services/auth_provider.dart';
+import 'package:spending_tracker/router/route_utils.dart';
 import 'package:spending_tracker/services/logger_service.dart';
 import 'package:spending_tracker/utils/sheet_exporter.dart';
 import 'package:spending_tracker/utils/toast_utils.dart';
@@ -28,6 +31,7 @@ class SettingsPage extends StatelessWidget {
     var categoryProvider = context.watch<CategoryProvider>();
     var configProvider = context.watch<ConfigProvider>();
     var focusedMonthProvider = context.watch<FocusedMonthProvider>();
+    var authProvider = context.watch<AuthProvider>();
 
     return Column(
       mainAxisSize: MainAxisSize.max,
@@ -59,6 +63,18 @@ class SettingsPage extends StatelessWidget {
                         }).toList(),
                       ),
                     ),
+                    const SizedBox(height: 15),
+                    authProvider.isAuthenticated
+                        ? CoolButton(
+                            text: 'Logout (${authProvider.user?.username})',
+                            onPressed: () => authProvider.logout(),
+                            type: ButtonType.danger,
+                          )
+                        : CoolButton(
+                            text: 'Login',
+                            onPressed: () => context.push(AppRouteConstants.loginPath),
+                            type: ButtonType.normal,
+                          ),
                     const SizedBox(height: 15),
                     CoolButton(
                       text: 'Export to sheet (excel)',

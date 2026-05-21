@@ -5,8 +5,9 @@ import {
   isDatabaseError,
   isPrismaClientError,
   logDatabaseError,
-  parseSchemaFromDatabaseUrl,
 } from '../../src/external/persistence/database-error.js'
+import { env } from '../../src/config/env.js'
+import { parseSchemaFromDatabaseUrl } from '../../src/external/persistence/client.js'
 import type { PrismaClient } from '../../src/generated/prisma/client.js'
 
 describe('parseSchemaFromDatabaseUrl', () => {
@@ -91,7 +92,7 @@ describe('logDatabaseError', () => {
       'Database context:',
       {
         database: 'spending_tracker',
-        schema: 'public',
+        schema: parseSchemaFromDatabaseUrl(env.databaseUrl ?? ''),
         tables: ['_prisma_migrations'],
       },
     ])

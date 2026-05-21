@@ -20,7 +20,7 @@ function createMockBookRepository(
   }
 }
 
-describe('POST /api/test/create-dummy', () => {
+describe('POST /api/test/dummy', () => {
   it('creates a dummy book and returns 201', async () => {
     const createDummy = vi.fn().mockResolvedValue(mockBook)
     const app = createApp({
@@ -30,7 +30,7 @@ describe('POST /api/test/create-dummy', () => {
       },
     })
 
-    const response = await request(app).post('/api/test/create-dummy')
+    const response = await request(app).post('/api/test/dummy')
 
     expect(response.status).toBe(201)
     expect(createDummy).toHaveBeenCalledOnce()
@@ -42,7 +42,7 @@ describe('POST /api/test/create-dummy', () => {
   })
 })
 
-describe('GET /api/test/get-dummy', () => {
+describe('GET /api/test/dummy', () => {
   it('returns all books as JSON', async () => {
     const findAll = vi.fn().mockResolvedValue([mockBook])
     const app = createApp({
@@ -52,7 +52,7 @@ describe('GET /api/test/get-dummy', () => {
       },
     })
 
-    const response = await request(app).get('/api/test/get-dummy')
+    const response = await request(app).get('/api/test/dummy')
 
     expect(response.status).toBe(200)
     expect(findAll).toHaveBeenCalledOnce()

@@ -7,6 +7,7 @@ import 'package:spending_tracker/pages/edit_expense_page.dart';
 import 'package:spending_tracker/pages/home_page.dart';
 import 'package:spending_tracker/pages/info_page.dart';
 import 'package:spending_tracker/pages/list_expenses_page.dart';
+import 'package:spending_tracker/pages/login_page.dart';
 import 'package:spending_tracker/pages/manage_categories_page.dart';
 import 'package:spending_tracker/pages/manage_domains_page.dart';
 import 'package:spending_tracker/pages/reports_page.dart';
@@ -22,6 +23,7 @@ final GoRouter appRouter = GoRouter(
   initialLocation: AppRouteConstants.homePath,
   navigatorKey: rootNavigatorKey,
   routes: [
+    GoRoute(path: AppRouteConstants.loginPath, builder: (context, state) => const LoginPage()),
     ShellRoute(
       navigatorKey: shellNavigatorKey,
       builder: (context, state, child) {
