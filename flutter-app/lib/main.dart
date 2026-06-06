@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:nested/nested.dart';
 import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
 import 'package:spending_tracker/repository/config/config_name.dart';
 import 'package:spending_tracker/repository/config/config_provider.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
-import 'package:spending_tracker/repository/focused_month/focused_month_provider.dart';
 import 'package:spending_tracker/repository/onboarding/onboarding_provider.dart';
 import 'package:spending_tracker/repository/services/auth_provider.dart';
 import 'package:spending_tracker/router/app_router.dart';
@@ -25,7 +24,9 @@ void main() async {
   await LoggerService.init(prefs);
   await BackupService().runDailyBackup(prefs);
 
-  runApp(MultiProvider(providers: initializeGlobalProviders(prefs), child: const MyApp()));
+  final providers = await loadStores(prefs);
+
+  runApp(MultiProvider(providers: providers, child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -46,17 +47,30 @@ class MyApp extends StatelessWidget {
   }
 }
 
-List<SingleChildWidget> initializeGlobalProviders(SharedPreferences prefs) {
+Future<List<SingleChildWidget>> loadStores(SharedPreferences prefs) async {
+  final expenseProvider = ExpenseProvider();
+  final categoryProvider = CategoryProvider();
+  final configProvider = ConfigProvider();
+  final domainProvider = DomainProvider();
+  final authProvider = AuthProvider();
+  final onboardingProvider = OnboardingProvider();
+
+  await Future.wait([
+    expenseProvider.loadFromLocalStorage(prefs),
+    categoryProvider.loadFromLocalStorage(prefs),
+    configProvider.loadFromLocalStorage(prefs),
+    domainProvider.loadFromLocalStorage(prefs),
+    authProvider.loadFromLocalStorage(prefs),
+    onboardingProvider.init(prefs),
+  ]);
+
   return [
-    ChangeNotifierProvider(create: (ctx) => ExpenseProvider()..loadFromLocalStorage(prefs)),
-    ChangeNotifierProvider(
-      create: (ctx) => CategoryProvider()..loadCategoriesFromLocalStorage(prefs),
-    ),
-    ChangeNotifierProvider(create: (ctx) => ConfigProvider()..loadFromLocalStorage(prefs)),
-    ChangeNotifierProvider(create: (ctx) => FocusedMonthProvider()..loadFromLocalStorage(prefs)),
-    ChangeNotifierProvider(create: (ctx) => DomainProvider()..loadFromLocalStorage(prefs)),
-    ChangeNotifierProvider(create: (ctx) => AuthProvider()..loadFromLocalStorage(prefs)),
-    ChangeNotifierProvider(create: (ctx) => OnboardingProvider()..init(prefs)),
-    ChangeNotifierProvider(create: (ctx) => NavigationHistoryService()),
+    ChangeNotifierProvider<ExpenseProvider>.value(value: expenseProvider),
+    ChangeNotifierProvider<CategoryProvider>.value(value: categoryProvider),
+    ChangeNotifierProvider<ConfigProvider>.value(value: configProvider),
+    ChangeNotifierProvider<DomainProvider>.value(value: domainProvider),
+    ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
+    ChangeNotifierProvider<OnboardingProvider>.value(value: onboardingProvider),
+    ChangeNotifierProvider<NavigationHistoryService>(create: (ctx) => NavigationHistoryService()),
   ];
 }

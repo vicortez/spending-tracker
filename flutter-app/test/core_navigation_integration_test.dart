@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:spending_tracker/repository/config/config_provider.dart';
 import 'package:spending_tracker/main.dart';
 import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
+import 'package:spending_tracker/repository/config/config_provider.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
-import 'package:spending_tracker/repository/focused_month/focused_month_provider.dart';
 import 'package:spending_tracker/repository/onboarding/onboarding_provider.dart';
+import 'package:spending_tracker/repository/services/auth_provider.dart';
 import 'package:spending_tracker/services/navigation_history_service.dart';
 
 void main() {
@@ -24,13 +24,13 @@ void main() {
     final categoryProvider = CategoryProvider();
     final expenseProvider = ExpenseProvider();
     final configProvider = ConfigProvider();
-    final focusedMonthProvider = FocusedMonthProvider();
     final domainProvider = DomainProvider();
     final onboardingProvider = OnboardingProvider();
+    final authProvider = AuthProvider();
     final navigationHistoryService = NavigationHistoryService();
 
     // 2. Setup mock categories
-    categoryProvider.setCategories([
+    categoryProvider.set([
       CategoryEntity(id: 1, name: 'Food', enabled: true),
       CategoryEntity(id: 2, name: 'Transport', enabled: true),
     ], syncStorage: false);
@@ -42,9 +42,9 @@ void main() {
           ChangeNotifierProvider<ExpenseProvider>.value(value: expenseProvider),
           ChangeNotifierProvider<CategoryProvider>.value(value: categoryProvider),
           ChangeNotifierProvider<ConfigProvider>.value(value: configProvider),
-          ChangeNotifierProvider<FocusedMonthProvider>.value(value: focusedMonthProvider),
           ChangeNotifierProvider<DomainProvider>.value(value: domainProvider),
           ChangeNotifierProvider<OnboardingProvider>.value(value: onboardingProvider),
+          ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
           ChangeNotifierProvider<NavigationHistoryService>.value(value: navigationHistoryService),
         ],
         child: const MyApp(),

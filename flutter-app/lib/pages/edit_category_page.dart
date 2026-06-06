@@ -147,14 +147,18 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                                     Expanded(
                                       child: CoolButton(
                                         text: 'Delete',
-                                        onPressed: () {
+                                        onPressed: () async {
                                           if (canRemoveCategory(
                                             widget.category.id,
                                             expenseProvider,
                                           )) {
-                                            categoryProvider.removeCategory(widget.category.id);
-                                            showToast(context, 'Category removed');
-                                            Navigator.pop(context);
+                                            await categoryProvider.removeCategory(
+                                              widget.category.id,
+                                            );
+                                            if (context.mounted) {
+                                              showToast(context, 'Category removed');
+                                              Navigator.pop(context);
+                                            }
                                           } else {
                                             showToast(
                                               context,
@@ -174,19 +178,19 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                                     Expanded(
                                       child: CoolButton(
                                         text: 'Save',
-                                        onPressed: () {
+                                        onPressed: () async {
                                           if (!_formKey.currentState!.validate()) {
                                             return;
                                           }
                                           String newCatName = _categoryNameTextController.text;
                                           int catId = widget.category.id;
-                                          bool success = categoryProvider.updateCategory(
+                                          bool success = await categoryProvider.updateCategory(
                                             catId,
                                             newCatName,
                                             domainFromCategory?.id,
                                             catIsEnabled,
                                           );
-                                          if (success) {
+                                          if (success && context.mounted) {
                                             showToast(context, 'Category updated');
                                             Navigator.pop(context);
                                           }

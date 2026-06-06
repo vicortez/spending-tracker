@@ -257,7 +257,7 @@ class _EditExpenseFormState extends State<EditExpenseForm> {
                     );
 
                     if (shouldDelete == true && context.mounted) {
-                      expenseProvider.removeExpense(widget.expense!.id);
+                      await expenseProvider.removeExpense(widget.expense!.id);
                       showToast(context, 'Expense removed');
                       context.pop();
                     }
@@ -268,14 +268,14 @@ class _EditExpenseFormState extends State<EditExpenseForm> {
               ],
               CoolButton(
                 text: 'Save',
-                onPressed: () {
+                onPressed: () async {
                   var amount = double.tryParse(_expenseAmountTextController.text);
                   bool success = false;
 
                   if (amount != null && selectedDate != null && relatedCategory != null) {
                     if (widget.isEditMode) {
                       // Update existing expense
-                      success = expenseProvider.updateExpense(
+                      success = await expenseProvider.updateExpense(
                         widget.expense!.id,
                         relatedCategory!.id,
                         amount,
@@ -283,7 +283,7 @@ class _EditExpenseFormState extends State<EditExpenseForm> {
                       );
                     } else {
                       // Add new expense
-                      expenseProvider.addExpense(
+                      await expenseProvider.addExpense(
                         relatedCategory!.id,
                         relatedCategory!.name,
                         amount,
@@ -293,10 +293,10 @@ class _EditExpenseFormState extends State<EditExpenseForm> {
                     }
                   }
 
-                  if (success) {
+                  if (success && context.mounted) {
                     showToast(context, widget.isEditMode ? 'Expense updated' : 'Expense added');
                     context.pop();
-                  } else {
+                  } else if (context.mounted) {
                     showToast(context, 'Error saving expense');
                   }
                 },

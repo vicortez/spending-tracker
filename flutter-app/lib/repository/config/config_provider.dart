@@ -8,17 +8,28 @@ import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/config/config_name.dart';
+import 'package:spending_tracker/repository/interfaces/persistable_store.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
 import 'package:spending_tracker/repository/expense/expense.dart';
 import 'package:spending_tracker/services/backup_service.dart';
 
-class ConfigProvider with ChangeNotifier {
-  Map<ConfigName, dynamic> config = {ConfigName.theme: 'dark'};
+class ConfigProvider with ChangeNotifier implements PersistableStore<Map<ConfigName, dynamic>> {
+  Map<ConfigName, dynamic> config = {ConfigName.theme: 'dark', ConfigName.developerMode: false};
   String PERSIST_NAME = 'config';
 
   SharedPreferences? prefs;
 
-  void loadFromLocalStorage(SharedPreferences prefs) {
+  @override
+  void set(Map<ConfigName, dynamic> data, {bool syncStorage = true}) {
+    config = data;
+    notifyListeners();
+    if (syncStorage) {
+      persistChanges();
+    }
+  }
+
+  @override
+  Future<void> loadFromLocalStorage(SharedPreferences prefs) async {
     this.prefs = prefs;
     final String? configStr = prefs.getString(PERSIST_NAME);
     if (configStr != null) {
@@ -35,12 +46,13 @@ class ConfigProvider with ChangeNotifier {
     config[configName] = value;
 
     if (prefs != null) {
-      updateLocalStorage();
+      persistChanges();
     }
     notifyListeners();
   }
 
-  void updateLocalStorage() {
+  @override
+  Future<void> persistChanges() async {
     Map<String, dynamic> encodableMap = Map.fromEntries(
       config.entries.map((entry) => MapEntry(entry.key.name, entry.value)),
     );
@@ -49,12 +61,16 @@ class ConfigProvider with ChangeNotifier {
 
   Map<ConfigName, dynamic> decode(String configStr) {
     var decodedMap = json.decode(configStr) as Map<String, dynamic>;
-    Map<ConfigName, dynamic> map = Map.fromEntries(
-      decodedMap.entries.map((entry) {
-        ConfigName configName = ConfigName.values.firstWhere((e) => e.name == entry.key);
-        return MapEntry(configName, entry.value);
-      }),
-    );
+    Map<ConfigName, dynamic> map = {};
+
+    for (var entry in decodedMap.entries) {
+      for (var configName in ConfigName.values) {
+        if (configName.name == entry.key) {
+          map[configName] = entry.value;
+          break;
+        }
+      }
+    }
     return map;
   }
 
@@ -260,6 +276,13 @@ class ConfigProvider with ChangeNotifier {
     prefs?.setString(CategoryEntity.PERSIST_NAME, jsonData[CategoryEntity.PERSIST_NAME]!);
     prefs?.setString(ExpenseEntity.PERSIST_NAME, jsonData[ExpenseEntity.PERSIST_NAME]!);
     notifyListeners();
+  }
+
+  @override
+  Future<void> setDataFromImport(dynamic data) async {
+    if (data is Map<String, dynamic>) {
+      setAllDataFromJson(data);
+    }
   }
 
   Map<String, dynamic>? getBackupsData() {

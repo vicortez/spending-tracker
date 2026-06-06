@@ -3,21 +3,25 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spending_tracker/repository/interfaces/persistable_store.dart';
 import 'package:spending_tracker/repository/services/persistence_service.dart';
+import 'package:spending_tracker/services/logger_service.dart';
 
 import 'category.dart';
 
-class CategoryProvider with ChangeNotifier {
+class CategoryProvider with ChangeNotifier implements PersistableStore<List<CategoryEntity>> {
   List<CategoryEntity> _categories = [];
   PersistenceService? _persistenceService;
+  bool _loadSuccessful = false;
 
   List<CategoryEntity> get categories => List.from(_categories);
 
-  void setCategories(List<CategoryEntity> newCategories, {bool syncStorage = true}) {
+  @override
+  void set(List<CategoryEntity> newCategories, {bool syncStorage = true}) {
     _categories = newCategories;
     notifyListeners();
     if (syncStorage) {
-      _persistChanges();
+      persistChanges();
     }
   }
 
@@ -28,12 +32,27 @@ class CategoryProvider with ChangeNotifier {
     return _categories;
   }
 
-  Future<void> loadCategoriesFromLocalStorage(SharedPreferences prefs) async {
+  Future<void> loadFromLocalStorage(SharedPreferences prefs) async {
     _persistenceService = PersistenceService(prefs);
-    _categories = await _persistenceService!.loadRecords(
-      CategoryEntity.fromMap,
-      CategoryEntity.PERSIST_NAME,
-    );
+    try {
+      final String? encodedData = prefs.getString(CategoryEntity.PERSIST_NAME);
+      final bool isFirstRun = prefs.getBool('isFirstRun') ?? true;
+
+      if (encodedData == null && !isFirstRun) {
+        _loadSuccessful = false;
+        LoggerService.logError(
+          'Critical: Storage returned null for categories, but this is not the first run. Aborting to prevent data loss.',
+        );
+      } else {
+        _categories = await _persistenceService!.loadRecords(
+          CategoryEntity.fromMap,
+          CategoryEntity.PERSIST_NAME,
+        );
+        _loadSuccessful = true;
+      }
+    } catch (e) {
+      _loadSuccessful = false;
+    }
     notifyListeners();
   }
 
@@ -42,21 +61,27 @@ class CategoryProvider with ChangeNotifier {
 
     dynamic value = data ?? '[]';
     await _persistenceService!.saveRawData(value, CategoryEntity.PERSIST_NAME);
-    _categories = await _persistenceService!.loadRecords(
-      CategoryEntity.fromMap,
-      CategoryEntity.PERSIST_NAME,
-    );
-    notifyListeners();
+    try {
+      _categories = await _persistenceService!.loadRecords(
+        CategoryEntity.fromMap,
+        CategoryEntity.PERSIST_NAME,
+      );
+      _loadSuccessful = true;
+      notifyListeners();
+    } catch (e) {
+      _loadSuccessful = false;
+      LoggerService.logError('Failed to load imported categories: $e');
+    }
   }
 
-  void addCategory(String name) {
+  Future<void> addCategory(String name) async {
     CategoryEntity category = CategoryEntity(id: getNextId(), name: name, enabled: true);
     _categories.add(category);
-    _persistChanges();
+    await persistChanges();
     notifyListeners();
   }
 
-  bool updateCategory(int id, String newName, int? newDomainId, bool? enabled) {
+  Future<bool> updateCategory(int id, String newName, int? newDomainId, bool? enabled) async {
     CategoryEntity? category = _categories.firstWhereOrNull((element) => element.id == id);
     if (category == null) {
       return false;
@@ -66,20 +91,20 @@ class CategoryProvider with ChangeNotifier {
     if (enabled != null) {
       category.enabled = enabled;
     }
-    _persistChanges();
+    await persistChanges();
     notifyListeners();
     return true;
   }
 
-  void removeCategoryByName(String name) {
+  Future<void> removeCategoryByName(String name) async {
     _categories.removeWhere((cat) => cat.name == name);
-    _persistChanges();
+    await persistChanges();
     notifyListeners();
   }
 
-  void removeCategory(int id) {
+  Future<void> removeCategory(int id) async {
     _categories.removeWhere((cat) => cat.id == id);
-    _persistChanges();
+    await persistChanges();
     notifyListeners();
   }
 
@@ -91,12 +116,16 @@ class CategoryProvider with ChangeNotifier {
     }
   }
 
-  Future<void> _persistChanges() async {
+  @override
+  Future<void> persistChanges() async {
     if (_persistenceService != null) {
-      await _persistenceService!.saveRecords(
-        _categories,
-        CategoryEntity.PERSIST_NAME,
-      );
+      if (!_loadSuccessful && _categories.isNotEmpty) {
+        LoggerService.logError(
+          'Aborting save: Category list was not successfully loaded from storage.',
+        );
+        return;
+      }
+      await _persistenceService!.saveRecords(_categories, CategoryEntity.PERSIST_NAME);
     }
   }
 

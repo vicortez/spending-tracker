@@ -8,7 +8,6 @@ import 'package:spending_tracker/repository/category/category_provider.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense_filter.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
-import 'package:spending_tracker/repository/focused_month/focused_month_provider.dart';
 import 'package:spending_tracker/utils/number_utils.dart';
 import 'package:spending_tracker/utils/spending_utils.dart';
 
@@ -26,8 +25,8 @@ class _TopCategoriesPageState extends State<TopCategoriesPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_filter == null) {
-      final focusedMonth = context.read<FocusedMonthProvider>().getMonth();
-      _filter = ExpenseFilter(year: focusedMonth.year, month: focusedMonth.month);
+      final now = DateTime.now();
+      _filter = ExpenseFilter(year: now.year, month: now.month);
     }
   }
 

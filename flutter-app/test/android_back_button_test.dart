@@ -7,7 +7,6 @@ import 'package:spending_tracker/repository/category/category_provider.dart';
 import 'package:spending_tracker/repository/config/config_provider.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
-import 'package:spending_tracker/repository/focused_month/focused_month_provider.dart';
 import 'package:spending_tracker/repository/onboarding/onboarding_provider.dart';
 import 'package:spending_tracker/services/navigation_history_service.dart';
 
@@ -23,7 +22,6 @@ void main() {
       final categoryProvider = CategoryProvider();
       final expenseProvider = ExpenseProvider();
       final configProvider = ConfigProvider();
-      final focusedMonthProvider = FocusedMonthProvider();
       final domainProvider = DomainProvider();
       final onboardingProvider = OnboardingProvider();
       final navigationHistoryService = NavigationHistoryService();
@@ -35,7 +33,6 @@ void main() {
             ChangeNotifierProvider<ExpenseProvider>.value(value: expenseProvider),
             ChangeNotifierProvider<CategoryProvider>.value(value: categoryProvider),
             ChangeNotifierProvider<ConfigProvider>.value(value: configProvider),
-            ChangeNotifierProvider<FocusedMonthProvider>.value(value: focusedMonthProvider),
             ChangeNotifierProvider<DomainProvider>.value(value: domainProvider),
             ChangeNotifierProvider<OnboardingProvider>.value(value: onboardingProvider),
             ChangeNotifierProvider<NavigationHistoryService>.value(value: navigationHistoryService),
@@ -100,7 +97,6 @@ void main() {
       final categoryProvider = CategoryProvider();
       final expenseProvider = ExpenseProvider();
       final configProvider = ConfigProvider();
-      final focusedMonthProvider = FocusedMonthProvider();
       final domainProvider = DomainProvider();
       final onboardingProvider = OnboardingProvider();
       final navigationHistoryService = NavigationHistoryService();
@@ -111,7 +107,6 @@ void main() {
             ChangeNotifierProvider<ExpenseProvider>.value(value: expenseProvider),
             ChangeNotifierProvider<CategoryProvider>.value(value: categoryProvider),
             ChangeNotifierProvider<ConfigProvider>.value(value: configProvider),
-            ChangeNotifierProvider<FocusedMonthProvider>.value(value: focusedMonthProvider),
             ChangeNotifierProvider<DomainProvider>.value(value: domainProvider),
             ChangeNotifierProvider<OnboardingProvider>.value(value: onboardingProvider),
             ChangeNotifierProvider<NavigationHistoryService>.value(value: navigationHistoryService),
@@ -147,7 +142,6 @@ void main() {
       final categoryProvider = CategoryProvider();
       final expenseProvider = ExpenseProvider();
       final configProvider = ConfigProvider();
-      final focusedMonthProvider = FocusedMonthProvider();
       final domainProvider = DomainProvider();
       final onboardingProvider = OnboardingProvider();
       final navigationHistoryService = NavigationHistoryService();
@@ -159,7 +153,6 @@ void main() {
             ChangeNotifierProvider<ExpenseProvider>.value(value: expenseProvider),
             ChangeNotifierProvider<CategoryProvider>.value(value: categoryProvider),
             ChangeNotifierProvider<ConfigProvider>.value(value: configProvider),
-            ChangeNotifierProvider<FocusedMonthProvider>.value(value: focusedMonthProvider),
             ChangeNotifierProvider<DomainProvider>.value(value: domainProvider),
             ChangeNotifierProvider<OnboardingProvider>.value(value: onboardingProvider),
             ChangeNotifierProvider<NavigationHistoryService>.value(value: navigationHistoryService),

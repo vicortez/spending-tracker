@@ -5,31 +5,40 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
+import 'package:spending_tracker/repository/interfaces/persistable_store.dart';
+import 'package:spending_tracker/repository/services/persistence_service.dart';
+import 'package:spending_tracker/services/logger_service.dart';
 
-class DomainProvider with ChangeNotifier {
+class DomainProvider with ChangeNotifier implements PersistableStore<List<DomainEntity>> {
   List<DomainEntity> domains = [];
-  SharedPreferences? prefs;
+  PersistenceService? _persistenceService;
+  bool _loadSuccessful = false;
   String persistName = DomainEntity.PERSIST_NAME;
 
-  void setDomains(List<DomainEntity> domains, {bool syncStorage = true}) {
+  @override
+  void set(List<DomainEntity> domains, {bool syncStorage = true}) {
     this.domains = domains;
     notifyListeners();
-    if (syncStorage && prefs != null) {
-      updateLocalStorage();
+    if (syncStorage) {
+      persistChanges();
     }
   }
 
-  void setDataFromImport(dynamic data) {
+  Future<void> setDataFromImport(dynamic data) async {
+    if (_persistenceService == null) return;
     dynamic value = data ?? '[]';
-    updateLocalStorageFromRawData(value);
-    loadFromLocalStorage(prefs!);
+    await _persistenceService!.saveRawData(value, persistName);
+    try {
+      domains = await _persistenceService!.loadRecords(DomainEntity.fromJson, persistName);
+      _loadSuccessful = true;
+      notifyListeners();
+    } catch (e) {
+      _loadSuccessful = false;
+      LoggerService.logError('Failed to load imported domains: $e');
+    }
   }
 
-  void updateLocalStorageFromRawData(dynamic data) {
-    prefs?.setString(persistName, data);
-  }
-
-  bool updateDomain(int id, String newName) {
+  Future<bool> updateDomain(int id, String newName) async {
     DomainEntity? domain = domains.firstWhereOrNull((dom) => dom.id == id);
     if (domain == null) {
       return false;
@@ -37,50 +46,62 @@ class DomainProvider with ChangeNotifier {
 
     domain.name = newName;
 
-    if (prefs != null) {
-      updateLocalStorage();
-    }
+    await persistChanges();
     notifyListeners();
     return true;
   }
 
-  void loadFromLocalStorage(SharedPreferences prefs) {
-    this.prefs = prefs;
-    final String? domainsStr = prefs.getString(persistName);
-    if (domainsStr != null) {
-      domains = DomainEntity.decodeMany(domainsStr);
-      notifyListeners();
+  Future<void> loadFromLocalStorage(SharedPreferences prefs) async {
+    _persistenceService = PersistenceService(prefs);
+    try {
+      final String? encodedData = prefs.getString(persistName);
+      final bool isFirstRun = prefs.getBool('isFirstRun') ?? true;
+
+      if (encodedData == null && !isFirstRun) {
+        _loadSuccessful = false;
+        LoggerService.logError(
+          'Critical: Storage returned null for domains, but this is not the first run. Aborting to prevent data loss.',
+        );
+      } else {
+        domains = await _persistenceService!.loadRecords(DomainEntity.fromJson, persistName);
+        _loadSuccessful = true;
+      }
+    } catch (e) {
+      _loadSuccessful = false;
     }
+    notifyListeners();
   }
 
-  void addDomain(String name) {
+  Future<void> addDomain(String name) async {
     DomainEntity domain = DomainEntity(id: getNextId(), name: name);
     domains.add(domain);
-
-    if (prefs != null) {
-      updateLocalStorage();
-    }
+    await persistChanges();
     notifyListeners();
   }
 
-  void removeDomain(int id) {
+  Future<void> removeDomain(int id) async {
     domains.removeWhere((dom) => dom.id == id);
-    if (prefs != null) {
-      updateLocalStorage();
-    }
+    await persistChanges();
     notifyListeners();
   }
 
-  void removeALl() {
+  Future<void> removeALl() async {
     domains.clear();
-    if (prefs != null) {
-      updateLocalStorage();
-    }
+    await persistChanges();
     notifyListeners();
   }
 
-  void updateLocalStorage() {
-    prefs?.setString(persistName, DomainEntity.encodeMany(domains));
+  @override
+  Future<void> persistChanges() async {
+    if (_persistenceService != null) {
+      if (!_loadSuccessful && domains.isNotEmpty) {
+        LoggerService.logError(
+          'Aborting save: Domain list was not successfully loaded from storage.',
+        );
+        return;
+      }
+      await _persistenceService!.saveRecords(domains, persistName);
+    }
   }
 
   int getNextId() {

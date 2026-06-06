@@ -3,13 +3,17 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/components/ui/add_expense_bottom_sheet.dart';
 import 'package:spending_tracker/components/ui/cool_button.dart';
 import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
+import 'package:spending_tracker/repository/config/config_name.dart';
+import 'package:spending_tracker/repository/config/config_provider.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
+import 'package:spending_tracker/services/logger_service.dart';
 import 'package:spending_tracker/utils/toast_utils.dart';
 
 class HomePage extends StatefulWidget {
@@ -118,13 +122,43 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void handleSubmitExpense(int categoryId, String categoryName, String text) {
+  void handleSubmitExpense(int categoryId, String categoryName, String text) async {
     double? amount = double.tryParse(text);
     if (amount == null) {
       showToast(context, 'Invalid expense');
     } else {
-      var expenseProvider = context.read<ExpenseProvider>();
-      expenseProvider.addExpense(categoryId, categoryName, amount);
+      final expenseProvider = context.read<ExpenseProvider>();
+      final configProvider = context.read<ConfigProvider>();
+      final bool developerMode = configProvider.getConfig(ConfigName.developerMode) ?? false;
+
+      final int memoryBefore = expenseProvider.expenses.length;
+      int storageBefore = 0;
+      SharedPreferences? prefs;
+
+      if (developerMode) {
+        prefs = await SharedPreferences.getInstance();
+        storageBefore = expenseProvider.getStorageExpenseCount(prefs);
+      }
+
+      await expenseProvider.addExpense(categoryId, categoryName, amount);
+
+      final int memoryAfter = expenseProvider.expenses.length;
+
+      if (memoryAfter == memoryBefore) {
+        LoggerService.logError(
+          'Failed to add expense: List size did not change after adding $amount to $categoryName',
+        );
+      }
+
+      if (developerMode && prefs != null) {
+        final int storageAfter = expenseProvider.getStorageExpenseCount(prefs);
+        showToast(
+          context,
+          'DEBUG: Memory: $memoryBefore -> $memoryAfter | Storage: $storageBefore -> $storageAfter',
+          duration: const Duration(seconds: 5),
+        );
+      }
+
       showToast(
         context,
         '$amount spent on $categoryName',

@@ -14,7 +14,6 @@ import 'package:spending_tracker/repository/domain/domain.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
-import 'package:spending_tracker/repository/focused_month/focused_month_provider.dart';
 import 'package:spending_tracker/repository/services/auth_provider.dart';
 import 'package:spending_tracker/router/route_utils.dart';
 import 'package:spending_tracker/services/logger_service.dart';
@@ -30,157 +29,159 @@ class SettingsPage extends StatelessWidget {
     var domainProvider = context.watch<DomainProvider>();
     var categoryProvider = context.watch<CategoryProvider>();
     var configProvider = context.watch<ConfigProvider>();
-    var focusedMonthProvider = context.watch<FocusedMonthProvider>();
     var authProvider = context.watch<AuthProvider>();
 
-    return Column(
-      mainAxisSize: MainAxisSize.max,
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Container(
-                constraints: const BoxConstraints(maxWidth: 600),
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  children: [
-                    ListTile(
-                      title: const Text('Theme Mode'),
-                      trailing: DropdownButton<String>(
-                        value: configProvider.getConfig(ConfigName.theme) ?? 'dark',
-                        onChanged: (String? newValue) {
-                          if (newValue != null) {
-                            configProvider.updateConfig(ConfigName.theme, newValue);
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    children: [
+                      ListTile(
+                        title: const Text('Theme Mode'),
+                        trailing: DropdownButton<String>(
+                          value: configProvider.getConfig(ConfigName.theme) ?? 'dark',
+                          onChanged: (String? newValue) {
+                            if (newValue != null) {
+                              configProvider.updateConfig(ConfigName.theme, newValue);
+                            }
+                          },
+                          items: <String>['dark', 'light'].map<DropdownMenuItem<String>>((
+                            String value,
+                          ) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value[0].toUpperCase() + value.substring(1)),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      authProvider.isAuthenticated
+                          ? CoolButton(
+                              text: 'Logout (${authProvider.user?.username})',
+                              onPressed: () => authProvider.logout(),
+                              type: ButtonType.danger,
+                            )
+                          : CoolButton(
+                              text: 'Login',
+                              onPressed: () => context.push(AppRouteConstants.loginPath),
+                              type: ButtonType.normal,
+                            ),
+                      const SizedBox(height: 15),
+                      CoolButton(
+                        text: 'Export to sheet (excel)',
+                        onPressed: kIsWeb
+                            ? null
+                            : () => onPressedExportToSheetAction(
+                                domainProvider,
+                                categoryProvider,
+                                expenseProvider,
+                                configProvider,
+                                context,
+                              ),
+                        type: ButtonType.normal,
+                      ),
+                      if (kIsWeb)
+                        const Text(
+                          'Exporting is currently unavailable for web',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      const SizedBox(height: 15),
+                      CoolButton(
+                        text: 'Export all app data',
+                        onPressed: kIsWeb
+                            ? null
+                            : () => onPressedExportAction(configProvider, context),
+                        type: ButtonType.normal,
+                      ),
+                      if (kIsWeb)
+                        const Text(
+                          'Exporting is currently unavailable for web',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      const SizedBox(height: 15),
+                      CoolButton(
+                        text: 'Import app data',
+                        onPressed: kIsWeb
+                            ? null
+                            : () {
+                                showConfirmDialog(
+                                  context,
+                                  () => handleImportFile(
+                                    context,
+                                    configProvider,
+                                    categoryProvider,
+                                    expenseProvider,
+                                    domainProvider,
+                                  ),
+                                  () => {},
+                                  'Confirm',
+                                  'Importing app data will erase any current app data, and load the new one.',
+                                );
+                              },
+                        type: ButtonType.normal,
+                      ),
+                      if (kIsWeb)
+                        const Text(
+                          'Importing is currently unavailable for web',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      const SizedBox(height: 15),
+                      CoolButton(
+                        text: 'Merge expenses files',
+                        onPressed: kIsWeb ? null : () => handleMergeFiles(context, configProvider),
+                        type: ButtonType.normal,
+                      ),
+                      if (kIsWeb)
+                        const Text(
+                          'Merging is currently unavailable for web',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      const SizedBox(height: 15),
+                      CoolButton(
+                        text: 'Export backups',
+                        onPressed: kIsWeb
+                            ? null
+                            : () => onPressedExportBackupsAction(configProvider, context),
+                        type: ButtonType.normal,
+                      ),
+                      if (kIsWeb)
+                        const Text(
+                          'Exporting is currently unavailable for web',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      const SizedBox(height: 15),
+                      CoolButton(
+                        text: 'View Error Logs',
+                        onPressed: () => _showErrorLogsBottomSheet(context),
+                        type: ButtonType.normal,
+                      ),
+                      const SizedBox(height: 30),
+                      CoolButton(
+                        text: 'Delete all expenses'.toUpperCase(),
+                        onPressed: () async {
+                          await expenseProvider.removeALl();
+                          if (context.mounted) {
+                            showToast(context, 'Expenses deleted');
                           }
                         },
-                        items: <String>['dark', 'light'].map<DropdownMenuItem<String>>((
-                          String value,
-                        ) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value[0].toUpperCase() + value.substring(1)),
-                          );
-                        }).toList(),
+                        type: ButtonType.danger,
                       ),
-                    ),
-                    const SizedBox(height: 15),
-                    authProvider.isAuthenticated
-                        ? CoolButton(
-                            text: 'Logout (${authProvider.user?.username})',
-                            onPressed: () => authProvider.logout(),
-                            type: ButtonType.danger,
-                          )
-                        : CoolButton(
-                            text: 'Login',
-                            onPressed: () => context.push(AppRouteConstants.loginPath),
-                            type: ButtonType.normal,
-                          ),
-                    const SizedBox(height: 15),
-                    CoolButton(
-                      text: 'Export to sheet (excel)',
-                      onPressed: kIsWeb
-                          ? null
-                          : () => onPressedExportToSheetAction(
-                              domainProvider,
-                              categoryProvider,
-                              expenseProvider,
-                              configProvider,
-                              focusedMonthProvider,
-                              context,
-                            ),
-                      type: ButtonType.normal,
-                    ),
-                    if (kIsWeb)
-                      const Text(
-                        'Exporting is currently unavailable for web',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    const SizedBox(height: 15),
-                    CoolButton(
-                      text: 'Export all app data',
-                      onPressed: kIsWeb
-                          ? null
-                          : () => onPressedExportAction(configProvider, context),
-                      type: ButtonType.normal,
-                    ),
-                    if (kIsWeb)
-                      const Text(
-                        'Exporting is currently unavailable for web',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    const SizedBox(height: 15),
-                    CoolButton(
-                      text: 'Import app data',
-                      onPressed: kIsWeb
-                          ? null
-                          : () {
-                              showConfirmDialog(
-                                context,
-                                () => handleImportFile(
-                                  context,
-                                  configProvider,
-                                  categoryProvider,
-                                  expenseProvider,
-                                  domainProvider,
-                                ),
-                                () => {},
-                                'Confirm',
-                                'Importing app data will erase any current app data, and load the new one.',
-                              );
-                            },
-                      type: ButtonType.normal,
-                    ),
-                    if (kIsWeb)
-                      const Text(
-                        'Importing is currently unavailable for web',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    const SizedBox(height: 15),
-                    CoolButton(
-                      text: 'Merge expenses files',
-                      onPressed: kIsWeb ? null : () => handleMergeFiles(context, configProvider),
-                      type: ButtonType.normal,
-                    ),
-                    if (kIsWeb)
-                      const Text(
-                        'Merging is currently unavailable for web',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    const SizedBox(height: 15),
-                    CoolButton(
-                      text: 'Export backups',
-                      onPressed: kIsWeb
-                          ? null
-                          : () => onPressedExportBackupsAction(configProvider, context),
-                      type: ButtonType.normal,
-                    ),
-                    if (kIsWeb)
-                      const Text(
-                        'Exporting is currently unavailable for web',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    const SizedBox(height: 15),
-                    CoolButton(
-                      text: 'View Error Logs',
-                      onPressed: () => _showErrorLogsBottomSheet(context),
-                      type: ButtonType.normal,
-                    ),
-                    const SizedBox(height: 30),
-                    CoolButton(
-                      text: 'Delete all expenses'.toUpperCase(),
-                      onPressed: () {
-                        expenseProvider.removeALl();
-                        showToast(context, 'Expenses deleted');
-                      },
-                      type: ButtonType.danger,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -189,7 +190,6 @@ class SettingsPage extends StatelessWidget {
     CategoryProvider categoryProvider,
     ExpenseProvider expenseProvider,
     ConfigProvider configProvider,
-    FocusedMonthProvider focusedMonthProvider,
     BuildContext context,
   ) async {
     try {
@@ -287,10 +287,12 @@ class SettingsPage extends StatelessWidget {
   ) async {
     Map<String, dynamic>? jsonData = await configProvider.importJsonDataFile();
     if (jsonData != null) {
-      categoryProvider.setDataFromImport(jsonData[CategoryEntity.PERSIST_NAME]);
-      expenseProvider.setDataFromImport(jsonData[ExpenseEntity.PERSIST_NAME]);
-      domainProvider.setDataFromImport(jsonData[DomainEntity.PERSIST_NAME]);
-      showToast(context, 'Data imported', duration: const Duration(seconds: 2));
+      await categoryProvider.setDataFromImport(jsonData[CategoryEntity.PERSIST_NAME]);
+      await expenseProvider.setDataFromImport(jsonData[ExpenseEntity.PERSIST_NAME]);
+      await domainProvider.setDataFromImport(jsonData[DomainEntity.PERSIST_NAME]);
+      if (context.mounted) {
+        showToast(context, 'Data imported', duration: const Duration(seconds: 2));
+      }
     }
     return;
   }

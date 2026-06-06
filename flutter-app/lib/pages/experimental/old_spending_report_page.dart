@@ -1,26 +1,13 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
 import 'package:spending_tracker/repository/expense/expense.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
-import 'package:spending_tracker/repository/focused_month/focused_month_provider.dart';
 import 'package:spending_tracker/repository/month_names.dart';
 import 'package:spending_tracker/router/navigation_extensions.dart';
 import 'package:spending_tracker/utils/color_utils.dart';
 import 'package:spending_tracker/utils/number_utils.dart';
-
-class RowData {
-  ExpenseEntity? expense;
-  Color backgroundColor;
-  bool isAggregate;
-  double? total;
-  String catName;
-
-  RowData(this.expense, this.backgroundColor, this.isAggregate, this.total, this.catName);
-}
 
 class OldSpendingReportPage extends StatelessWidget {
   const OldSpendingReportPage({super.key});
@@ -29,9 +16,8 @@ class OldSpendingReportPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var expenseProvider = context.watch<ExpenseProvider>();
     var categoryProvider = context.watch<CategoryProvider>();
-    var focusedMonthProvider = context.watch<FocusedMonthProvider>();
 
-    DateTime month = focusedMonthProvider.getMonth();
+    DateTime month = DateTime.now();
     List<ExpenseEntity> expenses = [...expenseProvider.expenses];
     List<CategoryEntity> categories = [...categoryProvider.categories];
     expenses.sort((a, b) => a.date.compareTo(b.date));
@@ -43,163 +29,122 @@ class OldSpendingReportPage extends StatelessWidget {
     // or maybe there is a "fluttery" way to do it.
     bool isDarkMode = Theme.of(context).colorScheme.brightness == Brightness.dark;
     Color? tableBackground1 = Theme.of(context).colorScheme.surface;
-    Color? tableBackground2 = isDarkMode ? Colors.grey[850] : Colors.grey[300];
+    Color? tableBackground2 = isDarkMode
+        ? lighten(Theme.of(context).colorScheme.surface, 5)
+        : darken(Theme.of(context).colorScheme.surface, 5);
 
-    List<RowData> rowData = getRowsData(
-      expenses,
-      tableBackground1,
-      tableBackground2,
-      darken(Theme.of(context).colorScheme.primary, 30),
-      categories,
-    );
+    double totalSpentCurrentMonth = expenses.fold(0, (sum, expense) => sum + expense.amount);
+
     return Scaffold(
-      appBar: AppBar(leading: const BackButton(), title: const Text('Old Spending Reports')),
-      body: SelectionArea(
+      appBar: AppBar(
+        leading: const BackButton(),
+        title: const Text('Spending Report (Experimental)'),
+      ),
+      body: SingleChildScrollView(
         child: Column(
           children: [
-            Text("Showing report for ${monthNames[month.month]}"),
-            const SizedBox(height: 10),
-            Expanded(
-              child: ListView.builder(
-                itemCount: rowData.length + 1,
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return _buildHeader(index, context);
-                  }
-                  return _buildRow(index, context, rowData[index - 1]);
-                },
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                "Showing report for ${monthNames[month.month]}",
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Total spent: \$${toMaxDecimalPlacesOmitTrailingZeroes(totalSpentCurrentMonth, 2)}',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
+            Table(
+              columnWidths: const {
+                0: FlexColumnWidth(1),
+                1: FlexColumnWidth(2),
+                2: FlexColumnWidth(3),
+                3: FlexColumnWidth(2),
+              },
+              border: TableBorder.all(color: Colors.grey.withValues(alpha: 0.3)),
+              children: [
+                TableRow(
+                  decoration: BoxDecoration(color: Theme.of(context).colorScheme.primaryContainer),
+                  children: const [
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('ID', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('Date', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('Category', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('Amount', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
+                ...expenses.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  ExpenseEntity expense = entry.value;
+                  CategoryEntity? category = categories.firstWhere(
+                    (cat) => cat.id == expense.categoryId,
+                    orElse: () => CategoryEntity(id: -1, name: 'Unknown', enabled: true),
+                  );
+
+                  return TableRow(
+                    decoration: BoxDecoration(
+                      color: index % 2 == 0 ? tableBackground1 : tableBackground2,
+                    ),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(expense.id.toString()),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(expense.date.toString().substring(0, 10)),
+                      ),
+                      Padding(padding: const EdgeInsets.all(8.0), child: Text(category.name)),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('\$${toMaxDecimalPlacesOmitTrailingZeroes(expense.amount, 2)}'),
+                      ),
+                    ],
+                  );
+                }),
+              ],
+            ),
+            const SizedBox(height: 20),
+            const Text("Detailed list view (experimental)"),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: expenses.length,
+              itemBuilder: (context, index) {
+                final expense = expenses[index];
+                final category = categories.firstWhere(
+                  (cat) => cat.id == expense.categoryId,
+                  orElse: () => CategoryEntity(id: -1, name: 'Unknown', enabled: true),
+                );
+
+                return ListTile(
+                  title: Text(category.name),
+                  subtitle: Text(expense.date.toString().substring(0, 16)),
+                  trailing: Text('\$${toMaxDecimalPlacesOmitTrailingZeroes(expense.amount, 2)}'),
+                  onTap: () {
+                    // Navigate to edit page
+                    context.pushWithHistory('/reports/edit/${expense.id}');
+                  },
+                );
+              },
             ),
           ],
         ),
       ),
     );
-  }
-
-  SizedBox _buildHeader(int index, context) {
-    var textStyle = const TextStyle(fontWeight: FontWeight.w800);
-    return SizedBox(
-      height: 40,
-      child: Column(
-        children: [
-          Expanded(
-            child: Row(
-              children: [
-                _buildExpandedCell(8, 'Category', customStyle: textStyle),
-                _buildExpandedCell(6, 'Date', customStyle: textStyle),
-                _buildExpandedCell(7, 'Amount', customStyle: textStyle),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Column _buildRow(int index, BuildContext context, RowData rowData) {
-    TextStyle? style;
-    String dateColText = rowData.expense != null
-        ? rowData.expense!.date.toString().substring(0, 10)
-        : '?';
-    double minHeight = 40;
-    int amountColFlex = 5;
-    double? amount = rowData.expense?.amount;
-
-    if (rowData.isAggregate) {
-      minHeight = 30;
-      amountColFlex = 7;
-      dateColText = 'Total: ';
-      style = const TextStyle(fontWeight: FontWeight.w800);
-      amount = rowData.total;
-    }
-
-    String amountText = amount != null ? toMaxDecimalPlacesOmitTrailingZeroes(amount, 2) : '?';
-
-    return Column(
-      children: [
-        ConstrainedBox(
-          constraints: BoxConstraints(minHeight: minHeight),
-          child: Container(
-            color: rowData.backgroundColor,
-            child: Row(
-              children: [
-                _buildExpandedCell(8, rowData.catName, customStyle: style),
-                _buildExpandedCell(6, dateColText, customStyle: style),
-                _buildExpandedCell(amountColFlex, amountText, customStyle: style),
-                if (!rowData.isAggregate) _buildEditCell(2, rowData.expense, context),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Expanded _buildExpandedCell(
-    int flex,
-    String content, {
-    TextStyle? customStyle,
-    Widget? customWidget,
-    TextAlign? textAlign = TextAlign.start,
-  }) {
-    return Expanded(
-      flex: flex,
-      child: Container(
-        padding: const EdgeInsets.only(left: 4),
-        child: customWidget ?? Text(textAlign: textAlign, content, style: customStyle),
-      ),
-    );
-  }
-
-  Expanded _buildEditCell(int flex, expense, BuildContext context) {
-    return Expanded(
-      flex: flex,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxHeight: 30),
-        child: IconButton(
-          iconSize: 16,
-          icon: const Icon(Icons.edit_outlined),
-          onPressed: () {
-            context.pushWithHistory('/reports/edit/${expense.id}');
-          },
-        ),
-      ),
-    );
-  }
-
-  List<RowData> getRowsData(
-    List<ExpenseEntity> expenses,
-    Color tableBackground1,
-    Color? tableBackground2,
-    Color aggBackgroundColor,
-    List<CategoryEntity> categories,
-  ) {
-    final SplayTreeMap<String, List<ExpenseEntity>> orderedExpensesMap =
-        SplayTreeMap<String, List<ExpenseEntity>>(
-          (a, b) => a.toLowerCase().compareTo(b.toLowerCase()),
-        );
-    for (var expense in expenses) {
-      CategoryEntity category = categories.firstWhere(
-        (element) => element.id == expense.categoryId,
-        orElse: () => CategoryEntity(id: -1, name: '<category not found>', enabled: true),
-      );
-      if (category.enabled) {
-        orderedExpensesMap.putIfAbsent(category.name, () => <ExpenseEntity>[]).add(expense);
-      }
-    }
-
-    List<RowData> tableLinesData = [];
-    for (var expenseGroupEntry in orderedExpensesMap.entries) {
-      String catName = expenseGroupEntry.key;
-      List<ExpenseEntity> groupExpenses = expenseGroupEntry.value;
-      for (var expense in groupExpenses) {
-        var backgroundColor = tableLinesData.length % 2 == 0 ? tableBackground1 : tableBackground2;
-        tableLinesData.add(RowData(expense, backgroundColor!, false, null, catName));
-      }
-      var backgroundColor = aggBackgroundColor;
-      double total = groupExpenses.map((exp) => exp.amount).reduce((acc, element) => acc + element);
-      tableLinesData.add(RowData(null, backgroundColor, true, total, catName));
-    }
-    return tableLinesData;
   }
 }

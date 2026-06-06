@@ -58,20 +58,24 @@ class _ManageDomainsPageState extends State<ManageDomainsPage> {
                           }
                           return null;
                         },
-                        onFieldSubmitted: (value) {
+                        onFieldSubmitted: (value) async {
                           if (_formKey.currentState!.validate()) {
-                            submitDomain();
-                            showToast(context, 'Domain added');
+                            await submitDomain();
+                            if (mounted) {
+                              showToast(context, 'Domain added');
+                            }
                           }
                         },
                       ),
                     ),
                   ),
                   IconButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        submitDomain();
-                        showToast(context, 'Domain added');
+                        await submitDomain();
+                        if (mounted) {
+                          showToast(context, 'Domain added');
+                        }
                       }
                     },
                     icon: const Icon(Icons.add_outlined),
@@ -89,15 +93,17 @@ class _ManageDomainsPageState extends State<ManageDomainsPage> {
                         child: ListTile(
                           title: Text(domain.name),
                           trailing: IconButton(
-                            onPressed: () {
+                            onPressed: () async {
                               if (canRemoveDomain(domain.id, categoryProvider)) {
-                                domainProvider.removeDomain(domain.id);
+                                await domainProvider.removeDomain(domain.id);
                               } else {
-                                showToast(
-                                  context,
-                                  'Can\'t delete domain. Delete categories using it',
-                                  duration: const Duration(seconds: 4),
-                                );
+                                if (mounted) {
+                                  showToast(
+                                    context,
+                                    'Can\'t delete domain. Delete categories using it',
+                                    duration: const Duration(seconds: 4),
+                                  );
+                                }
                               }
                             },
                             icon: const Icon(Icons.delete_outline),
@@ -114,10 +120,10 @@ class _ManageDomainsPageState extends State<ManageDomainsPage> {
     );
   }
 
-  void submitDomain() {
+  Future<void> submitDomain() async {
     String currentText = _currentDomainNameTextController.text;
     var domainProvider = context.read<DomainProvider>();
-    domainProvider.addDomain(currentText);
+    await domainProvider.addDomain(currentText);
     _currentDomainNameTextController.clear();
     myFocusNode.requestFocus();
   }

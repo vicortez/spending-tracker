@@ -84,21 +84,25 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
                           }
                           return null;
                         },
-                        onFieldSubmitted: (value) {
+                        onFieldSubmitted: (value) async {
                           if (_formKey.currentState!.validate()) {
-                            submitCategory();
-                            showToast(context, 'Category added');
-                            myFocusNode.requestFocus();
+                            await submitCategory();
+                            if (mounted) {
+                              showToast(context, 'Category added');
+                              myFocusNode.requestFocus();
+                            }
                           }
                         },
                       ),
                     ),
                   ),
                   IconButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        submitCategory();
-                        showToast(context, 'Category added');
+                        await submitCategory();
+                        if (mounted) {
+                          showToast(context, 'Category added');
+                        }
                       }
                     },
                     icon: const Icon(Icons.add_outlined),
@@ -160,10 +164,10 @@ class _ManageCategoriesPageState extends State<ManageCategoriesPage> {
     );
   }
 
-  void submitCategory() {
+  Future<void> submitCategory() async {
     String currentText = _currentCategoryNameTextController.text;
     var categoryProvider = context.read<CategoryProvider>();
-    categoryProvider.addCategory(currentText);
+    await categoryProvider.addCategory(currentText);
     _currentCategoryNameTextController.clear();
   }
 }

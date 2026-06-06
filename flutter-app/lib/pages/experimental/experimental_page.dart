@@ -6,15 +6,17 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spending_tracker/components/ui/cool_button.dart';
+import 'package:spending_tracker/pages/experimental/backup_viewer_page.dart';
 import 'package:spending_tracker/pages/experimental/button_showcase_page.dart';
 import 'package:spending_tracker/pages/experimental/old_spending_report_page.dart';
+import 'package:spending_tracker/pages/experimental/persistence_viewer_page.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
+import 'package:spending_tracker/repository/config/config_name.dart';
 import 'package:spending_tracker/repository/config/config_provider.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
-import 'package:spending_tracker/repository/focused_month/focused_month_provider.dart';
 import 'package:spending_tracker/repository/month_names.dart';
 import 'package:spending_tracker/utils/number_utils.dart';
 
@@ -36,12 +38,11 @@ class TestPage extends StatelessWidget {
     var domainProvider = context.watch<DomainProvider>();
     var expenseProvider = context.watch<ExpenseProvider>();
     var configProvider = context.watch<ConfigProvider>();
-    var focusedMonthProvider = context.watch<FocusedMonthProvider>();
 
     var categories = categoryProvider.getCategories();
     List<DomainEntity> domains = domainProvider.domains;
 
-    DateTime month = focusedMonthProvider.getMonth();
+    DateTime month = DateTime.now();
     List<ExpenseEntity> expenses = [...expenseProvider.expenses];
     expenses.sort((a, b) => a.date.compareTo(b.date));
     expenses = expenses
@@ -55,6 +56,13 @@ class TestPage extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            SwitchListTile(
+              title: const Text('Developer Mode'),
+              value: configProvider.getConfig(ConfigName.developerMode) ?? false,
+              onChanged: (bool value) {
+                configProvider.updateConfig(ConfigName.developerMode, value);
+              },
+            ),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: CoolButton(
@@ -75,6 +83,30 @@ class TestPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const OldSpendingReportPage()),
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: CoolButton(
+                text: 'Persistence Viewer',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const PersistenceViewerPage()),
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: CoolButton(
+                text: 'Backups Viewer',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const BackupViewerPage()),
                   );
                 },
               ),
@@ -113,7 +145,7 @@ class TestPage extends StatelessWidget {
   ) {
     HashMap<int, double> accCats = HashMap();
     for (var expense in expenses) {
-      int catId = expense.categoryId ?? 999;
+      int catId = expense.categoryId;
       accCats.putIfAbsent(catId, () => 0);
       accCats[catId] = accCats[catId]! + expense.amount;
     }

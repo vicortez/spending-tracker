@@ -1,1 +1,1 @@
-enum ConfigName { theme }
+enum ConfigName { theme, developerMode }
