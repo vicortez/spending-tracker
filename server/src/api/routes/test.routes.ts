@@ -16,7 +16,7 @@ const get: RequestHandler<never, string, never, never> = async (req, res) => {
   console.log(`IP [x-forwarded-for] ${req.headers['x-forwarded-for']}, [ip] ${req.ip}`)
   console.log(`Origin ${req.headers.origin}`)
   console.log(`User agent ${req.headers['user-agent']}`)
-  res.type('text').send('hi')
+  res.type('text').send('hi from server')
 }
 
 export function createTestRouter(deps: TestRouterDeps = {}): Router {

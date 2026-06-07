@@ -74,10 +74,13 @@ class ExpensesTable extends StatelessWidget {
                 (c) => c.id == expense.categoryId,
                 orElse: () => CategoryEntity(id: -1, name: 'Unknown', enabled: true),
               );
-              final domain = domains.firstWhere(
-                (d) => d.id == category.domainId,
-                orElse: () => DomainEntity(id: -1, name: 'Unknown'),
-              );
+              DomainEntity domain = DomainEntity(id: -1, name: 'No domain');
+              if (category.domainId != null && category.domainId != -1) {
+                domain = domains.firstWhere(
+                  (d) => d.id == category.domainId,
+                  orElse: () => DomainEntity(id: -1, name: 'Unknown'),
+                );
+              }
 
               final isEven = index % 2 == 0;
               final backgroundColor = isDarkMode
