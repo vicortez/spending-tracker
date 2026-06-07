@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/main.dart';
 import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
-import 'package:spending_tracker/repository/config/config_provider.dart';
+import 'package:spending_tracker/repository/settings/settings_provider.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
@@ -17,7 +17,7 @@ void main() {
     late CategoryProvider categoryProvider;
     late DomainProvider domainProvider;
     late ExpenseProvider expenseProvider;
-    late ConfigProvider configProvider;
+    late SettingsProvider settingsProvider;
     late OnboardingProvider onboardingProvider;
     late NavigationHistoryService navigationHistoryService;
     late SharedPreferences prefs;
@@ -29,14 +29,14 @@ void main() {
       categoryProvider = CategoryProvider();
       domainProvider = DomainProvider();
       expenseProvider = ExpenseProvider();
-      configProvider = ConfigProvider();
+      settingsProvider = SettingsProvider();
       onboardingProvider = OnboardingProvider();
       navigationHistoryService = NavigationHistoryService();
 
       await categoryProvider.loadFromLocalStorage(prefs);
       await domainProvider.loadFromLocalStorage(prefs);
       await expenseProvider.loadFromLocalStorage(prefs);
-      await configProvider.loadFromLocalStorage(prefs);
+      await settingsProvider.loadFromLocalStorage(prefs);
       await onboardingProvider.init(prefs);
     });
 
@@ -55,7 +55,7 @@ void main() {
           providers: [
             ChangeNotifierProvider<ExpenseProvider>.value(value: expenseProvider),
             ChangeNotifierProvider<CategoryProvider>.value(value: categoryProvider),
-            ChangeNotifierProvider<ConfigProvider>.value(value: configProvider),
+            ChangeNotifierProvider<SettingsProvider>.value(value: settingsProvider),
             ChangeNotifierProvider<DomainProvider>.value(value: domainProvider),
             ChangeNotifierProvider<OnboardingProvider>.value(value: onboardingProvider),
             ChangeNotifierProvider<NavigationHistoryService>.value(value: navigationHistoryService),
@@ -70,6 +70,7 @@ void main() {
       expect(find.text('Food'), findsOneWidget);
 
       // 4. Long press the category button
+      await tester.tap(find.text('Food')); // Just to clear focus if needed
       await tester.longPress(find.text('Food'));
       await tester.pumpAndSettle();
 
@@ -92,7 +93,7 @@ void main() {
           providers: [
             ChangeNotifierProvider<ExpenseProvider>.value(value: expenseProvider),
             ChangeNotifierProvider<CategoryProvider>.value(value: categoryProvider),
-            ChangeNotifierProvider<ConfigProvider>.value(value: configProvider),
+            ChangeNotifierProvider<SettingsProvider>.value(value: settingsProvider),
             ChangeNotifierProvider<DomainProvider>.value(value: domainProvider),
             ChangeNotifierProvider<OnboardingProvider>.value(value: onboardingProvider),
             ChangeNotifierProvider<NavigationHistoryService>.value(value: navigationHistoryService),
@@ -130,7 +131,7 @@ void main() {
           providers: [
             ChangeNotifierProvider<ExpenseProvider>.value(value: expenseProvider),
             ChangeNotifierProvider<CategoryProvider>.value(value: categoryProvider),
-            ChangeNotifierProvider<ConfigProvider>.value(value: configProvider),
+            ChangeNotifierProvider<SettingsProvider>.value(value: settingsProvider),
             ChangeNotifierProvider<DomainProvider>.value(value: domainProvider),
             ChangeNotifierProvider<OnboardingProvider>.value(value: onboardingProvider),
             ChangeNotifierProvider<NavigationHistoryService>.value(value: navigationHistoryService),

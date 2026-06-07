@@ -11,8 +11,8 @@ import 'package:spending_tracker/pages/experimental/button_showcase_page.dart';
 import 'package:spending_tracker/pages/experimental/old_spending_report_page.dart';
 import 'package:spending_tracker/pages/experimental/persistence_viewer_page.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
-import 'package:spending_tracker/repository/config/config_name.dart';
-import 'package:spending_tracker/repository/config/config_provider.dart';
+import 'package:spending_tracker/repository/settings/settings_name.dart';
+import 'package:spending_tracker/repository/settings/settings_provider.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense.dart';
@@ -37,7 +37,7 @@ class TestPage extends StatelessWidget {
     var categoryProvider = context.watch<CategoryProvider>();
     var domainProvider = context.watch<DomainProvider>();
     var expenseProvider = context.watch<ExpenseProvider>();
-    var configProvider = context.watch<ConfigProvider>();
+    var settingsProvider = context.watch<SettingsProvider>();
 
     var categories = categoryProvider.getCategories();
     List<DomainEntity> domains = domainProvider.domains;
@@ -58,9 +58,9 @@ class TestPage extends StatelessWidget {
           children: [
             SwitchListTile(
               title: const Text('Developer Mode'),
-              value: configProvider.getConfig(ConfigName.developerMode) ?? false,
+              value: settingsProvider.getConfig(SettingsName.developerMode) ?? false,
               onChanged: (bool value) {
-                configProvider.updateConfig(ConfigName.developerMode, value);
+                settingsProvider.updateConfig(SettingsName.developerMode, value);
               },
             ),
             Padding(

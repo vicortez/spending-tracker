@@ -15,11 +15,11 @@ class ExpenseProvider with ChangeNotifier implements PersistableStore<List<Expen
   bool _loadSuccessful = false;
 
   @override
-  void set(List<ExpenseEntity> newExpenses, {bool syncStorage = true}) {
+  Future<void> set(List<ExpenseEntity> newExpenses, {bool syncStorage = true}) async {
     expenses = newExpenses;
     notifyListeners();
     if (syncStorage) {
-      persistChanges();
+      await persistChanges();
     }
   }
 

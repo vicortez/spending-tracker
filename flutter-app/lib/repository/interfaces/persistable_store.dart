@@ -7,7 +7,7 @@ abstract class PersistableStore<T> extends ChangeNotifier {
   Future<void> loadFromLocalStorage(SharedPreferences prefs);
 
   /// Updates the in-memory data and optionally triggers persistence
-  void set(T data, {bool syncStorage = true});
+  Future<void> set(T data, {bool syncStorage = true});
 
   /// Persists current in-memory state to storage
   Future<void> persistChanges();

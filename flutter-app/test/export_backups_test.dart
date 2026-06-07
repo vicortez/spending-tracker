@@ -2,68 +2,63 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:spending_tracker/repository/config/config_provider.dart';
+import 'package:spending_tracker/repository/settings/settings_provider.dart';
 import 'package:spending_tracker/services/backup_service.dart';
 
 void main() {
-  group('ConfigProvider - getBackupsData', () {
+  group('SettingsProvider - getBackupsData', () {
     late SharedPreferences prefs;
-    late ConfigProvider configProvider;
+    late SettingsProvider settingsProvider;
 
     setUp(() async {
       SharedPreferences.setMockInitialValues({});
       prefs = await SharedPreferences.getInstance();
-      configProvider = ConfigProvider();
-      configProvider.loadFromLocalStorage(prefs);
+      settingsProvider = SettingsProvider();
+      await settingsProvider.loadFromLocalStorage(prefs);
     });
 
-    test('should return null if no backups exist', () {
-      final result = configProvider.getBackupsData();
+    test('should return null when no backups exist', () {
+      final result = settingsProvider.getBackupsData();
       expect(result, isNull);
     });
 
-    test('should return null if backups string is empty or invalid', () async {
+    test('should return null when backup string is empty or invalid', () async {
       await prefs.setString(BackupService.BACKUP_KEY, '');
-      expect(configProvider.getBackupsData(), isNull);
+      expect(settingsProvider.getBackupsData(), isNull);
 
       await prefs.setString(BackupService.BACKUP_KEY, 'invalid-json');
-      expect(configProvider.getBackupsData(), isNull);
+      expect(settingsProvider.getBackupsData(), isNull);
     });
 
-    test('should return all backups if there are 5 or fewer', () async {
+    test('should return map of backups when valid data exists', () async {
       final backups = {
-        '2024-05-01': {'data': '1'},
-        '2024-05-02': {'data': '2'},
-        '2024-05-03': {'data': '3'},
+        '2024-01-01': {'data': 'old'},
+        '2024-01-02': {'data': 'new'},
       };
       await prefs.setString(BackupService.BACKUP_KEY, json.encode(backups));
 
-      final result = configProvider.getBackupsData();
+      final result = settingsProvider.getBackupsData();
       expect(result, isNotNull);
-      expect(result!.length, 3);
-      expect(result.containsKey('2024-05-01'), isTrue);
-      expect(result.containsKey('2024-05-02'), isTrue);
-      expect(result.containsKey('2024-05-03'), isTrue);
+      expect(result!.length, 2);
+      expect(result['2024-01-02']['data'], 'new');
     });
 
-    test('should return only the latest 5 backups', () async {
+    test('should only return latest 5 backups', () async {
       final backups = {
-        '2024-05-01': {'data': '1'},
-        '2024-05-02': {'data': '2'},
-        '2024-05-03': {'data': '3'},
-        '2024-05-04': {'data': '4'},
-        '2024-05-05': {'data': '5'},
-        '2024-05-06': {'data': '6'},
+        '2024-01-01': {'v': 1},
+        '2024-01-02': {'v': 2},
+        '2024-01-03': {'v': 3},
+        '2024-01-04': {'v': 4},
+        '2024-01-05': {'v': 5},
+        '2024-01-06': {'v': 6},
       };
       await prefs.setString(BackupService.BACKUP_KEY, json.encode(backups));
 
-      final result = configProvider.getBackupsData();
+      final result = settingsProvider.getBackupsData();
       expect(result, isNotNull);
       expect(result!.length, 5);
-      // '2024-05-01' is the oldest and should be excluded
-      expect(result.containsKey('2024-05-01'), isFalse);
-      expect(result.containsKey('2024-05-06'), isTrue);
-      expect(result.containsKey('2024-05-02'), isTrue);
+      expect(result.containsKey('2024-01-01'), false);
+      expect(result.containsKey('2024-01-06'), true);
     });
   });
 }

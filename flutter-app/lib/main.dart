@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
-import 'package:spending_tracker/repository/config/config_name.dart';
-import 'package:spending_tracker/repository/config/config_provider.dart';
+import 'package:spending_tracker/repository/settings/settings_name.dart';
+import 'package:spending_tracker/repository/settings/settings_provider.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
 import 'package:spending_tracker/repository/onboarding/onboarding_provider.dart';
@@ -34,8 +34,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final configProvider = context.watch<ConfigProvider>();
-    final themeConfig = configProvider.getConfig(ConfigName.theme);
+    final settingsProvider = context.watch<SettingsProvider>();
+    final themeConfig = settingsProvider.getConfig(SettingsName.theme);
 
     return MaterialApp.router(
       routerConfig: appRouter,
@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
 Future<List<SingleChildWidget>> loadStores(SharedPreferences prefs) async {
   final expenseProvider = ExpenseProvider();
   final categoryProvider = CategoryProvider();
-  final configProvider = ConfigProvider();
+  final settingsProvider = SettingsProvider();
   final domainProvider = DomainProvider();
   final authProvider = AuthProvider();
   final onboardingProvider = OnboardingProvider();
@@ -58,7 +58,7 @@ Future<List<SingleChildWidget>> loadStores(SharedPreferences prefs) async {
   await Future.wait([
     expenseProvider.loadFromLocalStorage(prefs),
     categoryProvider.loadFromLocalStorage(prefs),
-    configProvider.loadFromLocalStorage(prefs),
+    settingsProvider.loadFromLocalStorage(prefs),
     domainProvider.loadFromLocalStorage(prefs),
     authProvider.loadFromLocalStorage(prefs),
     onboardingProvider.init(prefs),
@@ -67,7 +67,7 @@ Future<List<SingleChildWidget>> loadStores(SharedPreferences prefs) async {
   return [
     ChangeNotifierProvider<ExpenseProvider>.value(value: expenseProvider),
     ChangeNotifierProvider<CategoryProvider>.value(value: categoryProvider),
-    ChangeNotifierProvider<ConfigProvider>.value(value: configProvider),
+    ChangeNotifierProvider<SettingsProvider>.value(value: settingsProvider),
     ChangeNotifierProvider<DomainProvider>.value(value: domainProvider),
     ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
     ChangeNotifierProvider<OnboardingProvider>.value(value: onboardingProvider),

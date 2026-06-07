@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
-import 'package:spending_tracker/repository/config/config_provider.dart';
+import 'package:spending_tracker/repository/settings/settings_provider.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense.dart';
@@ -16,7 +16,7 @@ void main() {
     late CategoryProvider categoryProvider;
     late ExpenseProvider expenseProvider;
     late DomainProvider domainProvider;
-    late ConfigProvider configProvider;
+    late SettingsProvider settingsProvider;
 
     setUp(() async {
       // Initialize Mock SharedPreferences
@@ -27,12 +27,12 @@ void main() {
       categoryProvider = CategoryProvider();
       expenseProvider = ExpenseProvider();
       domainProvider = DomainProvider();
-      configProvider = ConfigProvider();
+      settingsProvider = SettingsProvider();
 
       await categoryProvider.loadFromLocalStorage(prefs);
       await expenseProvider.loadFromLocalStorage(prefs);
       await domainProvider.loadFromLocalStorage(prefs);
-      await configProvider.loadFromLocalStorage(prefs);
+      await settingsProvider.loadFromLocalStorage(prefs);
     });
 
     test('Export and import categories maintains data integrity', () async {
@@ -45,13 +45,13 @@ void main() {
       expect(originalCategories.length, 3);
 
       // 2. Export data (simulate export by getting persisted data)
-      final exportedData = configProvider.getAllAppPersistedData();
+      final exportedData = settingsProvider.getAllAppPersistedData();
       final categoriesJson = exportedData[CategoryEntity.PERSIST_NAME];
 
       expect(categoriesJson, isNotNull);
 
       // 3. Clear current data
-      categoryProvider.set([], syncStorage: false);
+      await categoryProvider.set([], syncStorage: false);
       expect(categoryProvider.getCategories(enabledOnly: false).length, 0);
 
       // 4. Import data back
@@ -78,13 +78,13 @@ void main() {
       expect(originalExpenses.length, 3);
 
       // 2. Export data
-      final exportedData = configProvider.getAllAppPersistedData();
+      final exportedData = settingsProvider.getAllAppPersistedData();
       final expensesJson = exportedData[ExpenseEntity.PERSIST_NAME];
 
       expect(expensesJson, isNotNull);
 
       // 3. Clear current data
-      expenseProvider.set([], syncStorage: false);
+      await expenseProvider.set([], syncStorage: false);
       expect(expenseProvider.expenses.length, 0);
 
       // 4. Import data back
@@ -120,16 +120,16 @@ void main() {
       final originalDomainsCount = domainProvider.domains.length;
 
       // 2. Export all data
-      final exportedData = configProvider.getAllAppPersistedData();
+      final exportedData = settingsProvider.getAllAppPersistedData();
 
       expect(exportedData[CategoryEntity.PERSIST_NAME], isNotNull);
       expect(exportedData[ExpenseEntity.PERSIST_NAME], isNotNull);
       expect(exportedData[DomainEntity.PERSIST_NAME], isNotNull);
 
       // 3. Clear all data
-      categoryProvider.set([], syncStorage: false);
-      expenseProvider.set([], syncStorage: false);
-      domainProvider.set([], syncStorage: false);
+      await categoryProvider.set([], syncStorage: false);
+      await expenseProvider.set([], syncStorage: false);
+      await domainProvider.set([], syncStorage: false);
 
       expect(categoryProvider.getCategories(enabledOnly: false).length, 0);
       expect(expenseProvider.expenses.length, 0);
@@ -166,7 +166,7 @@ void main() {
       await expenseProvider.addExpense(1, 'Food', 100.0);
 
       // 2. Export data
-      final exportedData = configProvider.getAllAppPersistedData();
+      final exportedData = settingsProvider.getAllAppPersistedData();
 
       // 3. Create new providers (simulating app restart)
       final newCategoryProvider = CategoryProvider();
@@ -202,7 +202,7 @@ void main() {
       // Don't add any data
 
       // Export empty data
-      final exportedData = configProvider.getAllAppPersistedData();
+      final exportedData = settingsProvider.getAllAppPersistedData();
 
       // Should return null or empty strings for persistence keys
       expect(exportedData[CategoryEntity.PERSIST_NAME], isNull);
@@ -233,11 +233,11 @@ void main() {
       await categoryProvider.updateCategory(categoryId, 'Food', domainId, true);
 
       // 2. Export data
-      final exportedData = configProvider.getAllAppPersistedData();
+      final exportedData = settingsProvider.getAllAppPersistedData();
 
       // 3. Clear data
-      categoryProvider.set([], syncStorage: false);
-      domainProvider.set([], syncStorage: false);
+      await categoryProvider.set([], syncStorage: false);
+      await domainProvider.set([], syncStorage: false);
 
       // 4. Import data
       await domainProvider.setDataFromImport(exportedData[DomainEntity.PERSIST_NAME]);
@@ -258,11 +258,11 @@ void main() {
       final expenseId = expenseProvider.expenses[0].id;
 
       // 2. Export data
-      final exportedData = configProvider.getAllAppPersistedData();
+      final exportedData = settingsProvider.getAllAppPersistedData();
 
       // 3. Clear data
-      categoryProvider.set([], syncStorage: false);
-      expenseProvider.set([], syncStorage: false);
+      await categoryProvider.set([], syncStorage: false);
+      await expenseProvider.set([], syncStorage: false);
 
       // 4. Import data
       await categoryProvider.setDataFromImport(exportedData[CategoryEntity.PERSIST_NAME]);
@@ -285,10 +285,10 @@ void main() {
       final originalDate = originalExpense.date;
 
       // 2. Export data
-      final exportedData = configProvider.getAllAppPersistedData();
+      final exportedData = settingsProvider.getAllAppPersistedData();
 
       // 3. Clear data
-      expenseProvider.set([], syncStorage: false);
+      await expenseProvider.set([], syncStorage: false);
 
       // 4. Import data
       await expenseProvider.setDataFromImport(exportedData[ExpenseEntity.PERSIST_NAME]);

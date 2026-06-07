@@ -17,11 +17,11 @@ class CategoryProvider with ChangeNotifier implements PersistableStore<List<Cate
   List<CategoryEntity> get categories => List.from(_categories);
 
   @override
-  void set(List<CategoryEntity> newCategories, {bool syncStorage = true}) {
+  Future<void> set(List<CategoryEntity> newCategories, {bool syncStorage = true}) async {
     _categories = newCategories;
     notifyListeners();
     if (syncStorage) {
-      persistChanges();
+      await persistChanges();
     }
   }
 

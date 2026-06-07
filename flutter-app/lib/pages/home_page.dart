@@ -8,11 +8,11 @@ import 'package:spending_tracker/components/ui/add_expense_bottom_sheet.dart';
 import 'package:spending_tracker/components/ui/cool_button.dart';
 import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
-import 'package:spending_tracker/repository/config/config_name.dart';
-import 'package:spending_tracker/repository/config/config_provider.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
+import 'package:spending_tracker/repository/settings/settings_name.dart';
+import 'package:spending_tracker/repository/settings/settings_provider.dart';
 import 'package:spending_tracker/services/logger_service.dart';
 import 'package:spending_tracker/utils/toast_utils.dart';
 
@@ -33,10 +33,10 @@ class _HomePageState extends State<HomePage> {
 
     List<CategoryEntity> categories = categoryProvider.getCategories();
     List<DomainEntity> domains = domainProvider.domains;
-
     domains.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     categories.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-    LinkedHashMap<DomainEntity?, List<CategoryEntity>> catByDomain = LinkedHashMap();
+
+    LinkedHashMap<DomainEntity, List<CategoryEntity>> catByDomain = LinkedHashMap();
 
     for (DomainEntity domain in domains) {
       List<CategoryEntity> foundCategories = categories
@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> {
         .where((cat) => cat.domainId == null)
         .toList();
     if (noDomainCategories.isNotEmpty) {
-      catByDomain[null] = noDomainCategories;
+      catByDomain[DomainEntity(id: -1, name: 'Categories with no domain')] = noDomainCategories;
     }
 
     return Center(
@@ -61,11 +61,8 @@ class _HomePageState extends State<HomePage> {
               itemCount: catByDomain.length,
               separatorBuilder: (BuildContext ctx, int index) => const SizedBox(height: 15),
               itemBuilder: (context, index) {
-                DomainEntity? domain = catByDomain.keys.elementAtOrNull(index);
-                String domainLabel = 'Categories with no domain';
-                if (domain?.name != null && domain!.name.isNotEmpty) {
-                  domainLabel = domain.name;
-                }
+                DomainEntity domain = catByDomain.keys.elementAt(index);
+                String domainLabel = domain.name;
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -84,7 +81,9 @@ class _HomePageState extends State<HomePage> {
                             );
                           },
                           onHold: () {
-                            final domainName = domain?.name ?? 'No domain';
+                            final domainName = category.domainId != null
+                                ? domainLabel
+                                : 'No domain';
                             showAddExpenseBottomSheet(
                               context: context,
                               categoryId: category.id,
@@ -112,10 +111,14 @@ class _HomePageState extends State<HomePage> {
           ),
           TextField(
             autofocus: true,
-            decoration: const InputDecoration(hintText: '💸 Register expense'),
-            keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+
             controller: expenseAmountTextController,
-            inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9.-]+'))],
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: '💸 Register expense',
+            ),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^-?\d+\.?\d{0,2}$'))],
           ),
         ],
       ),
@@ -128,8 +131,8 @@ class _HomePageState extends State<HomePage> {
       showToast(context, 'Invalid expense');
     } else {
       final expenseProvider = context.read<ExpenseProvider>();
-      final configProvider = context.read<ConfigProvider>();
-      final bool developerMode = configProvider.getConfig(ConfigName.developerMode) ?? false;
+      final settingsProvider = context.read<SettingsProvider>();
+      final bool developerMode = settingsProvider.getConfig(SettingsName.developerMode) ?? false;
 
       final int memoryBefore = expenseProvider.expenses.length;
       int storageBefore = 0;

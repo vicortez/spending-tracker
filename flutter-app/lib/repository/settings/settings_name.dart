@@ -1,0 +1,1 @@
+enum SettingsName { theme, developerMode }

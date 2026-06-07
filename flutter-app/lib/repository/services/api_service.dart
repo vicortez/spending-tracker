@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:spending_tracker/repository/config/app_config.dart';
+import 'package:spending_tracker/app_config/app_config.dart';
 import 'package:spending_tracker/repository/services/auth_models.dart';
 
 class ApiService {

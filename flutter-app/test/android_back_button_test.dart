@@ -4,16 +4,17 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/main.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
-import 'package:spending_tracker/repository/config/config_provider.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
 import 'package:spending_tracker/repository/onboarding/onboarding_provider.dart';
+import 'package:spending_tracker/repository/settings/settings_provider.dart';
 import 'package:spending_tracker/services/navigation_history_service.dart';
 
 void main() {
   group('Android Back Button Navigation Tests', () {
-    testWidgets('Back button should navigate from Categories to Home instead of closing app',
-        (WidgetTester tester) async {
+    testWidgets('Back button should navigate from Categories to Home instead of closing app', (
+      WidgetTester tester,
+    ) async {
       // 1. Initialize Mock SharedPreferences
       SharedPreferences.setMockInitialValues({
         'isFirstRun': false, // Skip onboarding
@@ -21,7 +22,7 @@ void main() {
 
       final categoryProvider = CategoryProvider();
       final expenseProvider = ExpenseProvider();
-      final configProvider = ConfigProvider();
+      final settingsProvider = SettingsProvider();
       final domainProvider = DomainProvider();
       final onboardingProvider = OnboardingProvider();
       final navigationHistoryService = NavigationHistoryService();
@@ -32,7 +33,7 @@ void main() {
           providers: [
             ChangeNotifierProvider<ExpenseProvider>.value(value: expenseProvider),
             ChangeNotifierProvider<CategoryProvider>.value(value: categoryProvider),
-            ChangeNotifierProvider<ConfigProvider>.value(value: configProvider),
+            ChangeNotifierProvider<SettingsProvider>.value(value: settingsProvider),
             ChangeNotifierProvider<DomainProvider>.value(value: domainProvider),
             ChangeNotifierProvider<OnboardingProvider>.value(value: onboardingProvider),
             ChangeNotifierProvider<NavigationHistoryService>.value(value: navigationHistoryService),
@@ -59,11 +60,10 @@ void main() {
       expect(find.text('Categories'), findsOneWidget, reason: 'Should be on Categories page');
 
       // Verify navigation history tracked the navigation
-      expect(
-        navigationHistoryService.history,
-        ['/', '/categories'],
-        reason: 'History should track Home -> Categories navigation',
-      );
+      expect(navigationHistoryService.history, [
+        '/',
+        '/categories',
+      ], reason: 'History should track Home -> Categories navigation');
 
       // 6. Simulate Android back button press
       // This triggers the PopScope's onPopInvokedWithResult callback
@@ -83,11 +83,9 @@ void main() {
       expect(bottomNav.currentIndex, 0, reason: 'Should be on Home tab (index 0)');
 
       // Verify navigation history was popped
-      expect(
-        navigationHistoryService.history,
-        ['/'],
-        reason: 'History should be back to just home after pop',
-      );
+      expect(navigationHistoryService.history, [
+        '/',
+      ], reason: 'History should be back to just home after pop');
     });
 
     testWidgets('Back button on Home page should allow app exit', (WidgetTester tester) async {
@@ -96,7 +94,7 @@ void main() {
 
       final categoryProvider = CategoryProvider();
       final expenseProvider = ExpenseProvider();
-      final configProvider = ConfigProvider();
+      final settingsProvider = SettingsProvider();
       final domainProvider = DomainProvider();
       final onboardingProvider = OnboardingProvider();
       final navigationHistoryService = NavigationHistoryService();
@@ -106,7 +104,7 @@ void main() {
           providers: [
             ChangeNotifierProvider<ExpenseProvider>.value(value: expenseProvider),
             ChangeNotifierProvider<CategoryProvider>.value(value: categoryProvider),
-            ChangeNotifierProvider<ConfigProvider>.value(value: configProvider),
+            ChangeNotifierProvider<SettingsProvider>.value(value: settingsProvider),
             ChangeNotifierProvider<DomainProvider>.value(value: domainProvider),
             ChangeNotifierProvider<OnboardingProvider>.value(value: onboardingProvider),
             ChangeNotifierProvider<NavigationHistoryService>.value(value: navigationHistoryService),
@@ -132,16 +130,16 @@ void main() {
       expect(navigationHistoryService.hasHistory, false, reason: 'No history to navigate back to');
     });
 
-    testWidgets(
-        'Back button should navigate through GoRouter history '
-        '(Categories -> Manage Categories -> Back -> Categories -> Back -> Home)',
-        (WidgetTester tester) async {
+    testWidgets('Back button should navigate through GoRouter history '
+        '(Categories -> Manage Categories -> Back -> Categories -> Back -> Home)', (
+      WidgetTester tester,
+    ) async {
       // Initialize
       SharedPreferences.setMockInitialValues({'isFirstRun': false});
 
       final categoryProvider = CategoryProvider();
       final expenseProvider = ExpenseProvider();
-      final configProvider = ConfigProvider();
+      final settingsProvider = SettingsProvider();
       final domainProvider = DomainProvider();
       final onboardingProvider = OnboardingProvider();
       final navigationHistoryService = NavigationHistoryService();
@@ -152,7 +150,7 @@ void main() {
           providers: [
             ChangeNotifierProvider<ExpenseProvider>.value(value: expenseProvider),
             ChangeNotifierProvider<CategoryProvider>.value(value: categoryProvider),
-            ChangeNotifierProvider<ConfigProvider>.value(value: configProvider),
+            ChangeNotifierProvider<SettingsProvider>.value(value: settingsProvider),
             ChangeNotifierProvider<DomainProvider>.value(value: domainProvider),
             ChangeNotifierProvider<OnboardingProvider>.value(value: onboardingProvider),
             ChangeNotifierProvider<NavigationHistoryService>.value(value: navigationHistoryService),
@@ -185,11 +183,10 @@ void main() {
       // Verify on Manage Categories page
       expect(find.text('Manage categories'), findsOneWidget);
       // Global history should NOT change for pushed routes (GoRouter handles them)
-      expect(
-        navigationHistoryService.history,
-        ['/', '/categories'],
-        reason: 'Pushed routes are not tracked in global history',
-      );
+      expect(navigationHistoryService.history, [
+        '/',
+        '/categories',
+      ], reason: 'Pushed routes are not tracked in global history');
 
       // Press back button - GoRouter automatically pops to Categories page
       await tester.binding.handlePopRoute();
@@ -203,11 +200,10 @@ void main() {
       );
 
       // Global history unchanged (pushed route wasn't tracked)
-      expect(
-        navigationHistoryService.history,
-        ['/', '/categories'],
-        reason: 'History unchanged - GoRouter handled the push/pop',
-      );
+      expect(navigationHistoryService.history, [
+        '/',
+        '/categories',
+      ], reason: 'History unchanged - GoRouter handled the push/pop');
 
       // Press back again - should go to Home
       await tester.binding.handlePopRoute();

@@ -16,11 +16,11 @@ class DomainProvider with ChangeNotifier implements PersistableStore<List<Domain
   String persistName = DomainEntity.PERSIST_NAME;
 
   @override
-  void set(List<DomainEntity> domains, {bool syncStorage = true}) {
+  Future<void> set(List<DomainEntity> domains, {bool syncStorage = true}) async {
     this.domains = domains;
     notifyListeners();
     if (syncStorage) {
-      persistChanges();
+      await persistChanges();
     }
   }
 

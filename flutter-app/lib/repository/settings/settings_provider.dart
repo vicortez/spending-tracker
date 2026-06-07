@@ -7,24 +7,27 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/repository/category/category.dart';
-import 'package:spending_tracker/repository/config/config_name.dart';
-import 'package:spending_tracker/repository/interfaces/persistable_store.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
 import 'package:spending_tracker/repository/expense/expense.dart';
+import 'package:spending_tracker/repository/interfaces/persistable_store.dart';
+import 'package:spending_tracker/repository/settings/settings_name.dart';
 import 'package:spending_tracker/services/backup_service.dart';
 
-class ConfigProvider with ChangeNotifier implements PersistableStore<Map<ConfigName, dynamic>> {
-  Map<ConfigName, dynamic> config = {ConfigName.theme: 'dark', ConfigName.developerMode: false};
+class SettingsProvider with ChangeNotifier implements PersistableStore<Map<SettingsName, dynamic>> {
+  Map<SettingsName, dynamic> config = {
+    SettingsName.theme: 'dark',
+    SettingsName.developerMode: false,
+  };
   String PERSIST_NAME = 'config';
 
   SharedPreferences? prefs;
 
   @override
-  void set(Map<ConfigName, dynamic> data, {bool syncStorage = true}) {
+  Future<void> set(Map<SettingsName, dynamic> data, {bool syncStorage = true}) async {
     config = data;
     notifyListeners();
     if (syncStorage) {
-      persistChanges();
+      await persistChanges();
     }
   }
 
@@ -38,11 +41,11 @@ class ConfigProvider with ChangeNotifier implements PersistableStore<Map<ConfigN
     }
   }
 
-  dynamic getConfig(ConfigName configName) {
+  dynamic getConfig(SettingsName configName) {
     return config[configName];
   }
 
-  void updateConfig(ConfigName configName, dynamic value) {
+  void updateConfig(SettingsName configName, dynamic value) {
     config[configName] = value;
 
     if (prefs != null) {
@@ -59,12 +62,12 @@ class ConfigProvider with ChangeNotifier implements PersistableStore<Map<ConfigN
     prefs?.setString(PERSIST_NAME, json.encode(encodableMap));
   }
 
-  Map<ConfigName, dynamic> decode(String configStr) {
+  Map<SettingsName, dynamic> decode(String configStr) {
     var decodedMap = json.decode(configStr) as Map<String, dynamic>;
-    Map<ConfigName, dynamic> map = {};
+    Map<SettingsName, dynamic> map = {};
 
     for (var entry in decodedMap.entries) {
-      for (var configName in ConfigName.values) {
+      for (var configName in SettingsName.values) {
         if (configName.name == entry.key) {
           map[configName] = entry.value;
           break;
@@ -305,13 +308,4 @@ class ConfigProvider with ChangeNotifier implements PersistableStore<Map<ConfigN
       return null;
     }
   }
-
-  // void toggleTheme() {
-  //   if (config['theme'] == "dark") {
-  //     config['theme'] = "light";
-  //   } else {
-  //     config['theme'] = "dark";
-  //   }
-  //   notifyListeners();
-  // }
 }

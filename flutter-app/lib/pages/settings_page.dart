@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -8,13 +6,13 @@ import 'package:spending_tracker/components/ui/cool_button.dart';
 import 'package:spending_tracker/components/ui/my_bottom_sheet.dart';
 import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
-import 'package:spending_tracker/repository/config/config_name.dart';
-import 'package:spending_tracker/repository/config/config_provider.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
 import 'package:spending_tracker/repository/services/auth_provider.dart';
+import 'package:spending_tracker/repository/settings/settings_name.dart';
+import 'package:spending_tracker/repository/settings/settings_provider.dart';
 import 'package:spending_tracker/router/route_utils.dart';
 import 'package:spending_tracker/services/logger_service.dart';
 import 'package:spending_tracker/utils/sheet_exporter.dart';
@@ -28,7 +26,7 @@ class SettingsPage extends StatelessWidget {
     var expenseProvider = context.watch<ExpenseProvider>();
     var domainProvider = context.watch<DomainProvider>();
     var categoryProvider = context.watch<CategoryProvider>();
-    var configProvider = context.watch<ConfigProvider>();
+    var settingsProvider = context.watch<SettingsProvider>();
     var authProvider = context.watch<AuthProvider>();
 
     return SingleChildScrollView(
@@ -46,10 +44,10 @@ class SettingsPage extends StatelessWidget {
                       ListTile(
                         title: const Text('Theme Mode'),
                         trailing: DropdownButton<String>(
-                          value: configProvider.getConfig(ConfigName.theme) ?? 'dark',
+                          value: settingsProvider.getConfig(SettingsName.theme) ?? 'dark',
                           onChanged: (String? newValue) {
                             if (newValue != null) {
-                              configProvider.updateConfig(ConfigName.theme, newValue);
+                              settingsProvider.updateConfig(SettingsName.theme, newValue);
                             }
                           },
                           items: <String>['dark', 'light'].map<DropdownMenuItem<String>>((
@@ -83,7 +81,7 @@ class SettingsPage extends StatelessWidget {
                                 domainProvider,
                                 categoryProvider,
                                 expenseProvider,
-                                configProvider,
+                                settingsProvider,
                                 context,
                               ),
                         type: ButtonType.normal,
@@ -98,7 +96,7 @@ class SettingsPage extends StatelessWidget {
                         text: 'Export all app data',
                         onPressed: kIsWeb
                             ? null
-                            : () => onPressedExportAction(configProvider, context),
+                            : () => onPressedExportAction(settingsProvider, context),
                         type: ButtonType.normal,
                       ),
                       if (kIsWeb)
@@ -116,7 +114,7 @@ class SettingsPage extends StatelessWidget {
                                   context,
                                   () => handleImportFile(
                                     context,
-                                    configProvider,
+                                    settingsProvider,
                                     categoryProvider,
                                     expenseProvider,
                                     domainProvider,
@@ -136,7 +134,9 @@ class SettingsPage extends StatelessWidget {
                       const SizedBox(height: 15),
                       CoolButton(
                         text: 'Merge expenses files',
-                        onPressed: kIsWeb ? null : () => handleMergeFiles(context, configProvider),
+                        onPressed: kIsWeb
+                            ? null
+                            : () => handleMergeFiles(context, settingsProvider),
                         type: ButtonType.normal,
                       ),
                       if (kIsWeb)
@@ -149,7 +149,7 @@ class SettingsPage extends StatelessWidget {
                         text: 'Export backups',
                         onPressed: kIsWeb
                             ? null
-                            : () => onPressedExportBackupsAction(configProvider, context),
+                            : () => onPressedExportBackupsAction(settingsProvider, context),
                         type: ButtonType.normal,
                       ),
                       if (kIsWeb)
@@ -189,7 +189,7 @@ class SettingsPage extends StatelessWidget {
     DomainProvider domainProvider,
     CategoryProvider categoryProvider,
     ExpenseProvider expenseProvider,
-    ConfigProvider configProvider,
+    SettingsProvider settingsProvider,
     BuildContext context,
   ) async {
     try {
@@ -206,31 +206,29 @@ class SettingsPage extends StatelessWidget {
     }
   }
 
-  void onPressedExportAction(ConfigProvider configProvider, BuildContext context) {
-    Map<String, dynamic> jsonAppData = configProvider.getAllAppPersistedData();
-    String fileName = configProvider.getExportDataFilename();
-    configProvider
+  void onPressedExportAction(SettingsProvider settingsProvider, BuildContext context) {
+    Map<String, dynamic> jsonAppData = settingsProvider.getAllAppPersistedData();
+    String fileName = settingsProvider.getExportDataFilename();
+    settingsProvider
         .exportJSONFile(jsonAppData, fileName)
         .then((res) => handleToastFileExportResult(res, context, fileName));
   }
 
-  void onPressedExportBackupsAction(ConfigProvider configProvider, BuildContext context) {
-    Map<String, dynamic>? backupsData = configProvider.getBackupsData();
+  void onPressedExportBackupsAction(SettingsProvider settingsProvider, BuildContext context) {
+    Map<String, dynamic>? backupsData = settingsProvider.getBackupsData();
     if (backupsData == null) {
       showToast(context, 'No backups found');
       return;
     }
     String fileName = 'spending-tracker-backups-${DateTime.now().toString().substring(0, 10)}';
-    configProvider
+    settingsProvider
         .exportJSONFile(backupsData, fileName)
         .then((res) => handleToastFileExportResult(res, context, fileName));
   }
 
   void handleToastFileExportResult(bool res, BuildContext context, String fileName) {
     if (res) {
-      String topLevelFolderName = Platform.isAndroid ? 'Android/data' : 'Download';
       showToast(context, 'File exported $fileName exported');
-      // showToast(context, "File exported to $topLevelFolderName folder as $fileName");
     } else {
       showToast(context, 'Error exporting file :(');
     }
@@ -280,12 +278,12 @@ class SettingsPage extends StatelessWidget {
 
   void handleImportFile(
     BuildContext context,
-    ConfigProvider configProvider,
+    SettingsProvider settingsProvider,
     CategoryProvider categoryProvider,
     ExpenseProvider expenseProvider,
     DomainProvider domainProvider,
   ) async {
-    Map<String, dynamic>? jsonData = await configProvider.importJsonDataFile();
+    Map<String, dynamic>? jsonData = await settingsProvider.importJsonDataFile();
     if (jsonData != null) {
       await categoryProvider.setDataFromImport(jsonData[CategoryEntity.PERSIST_NAME]);
       await expenseProvider.setDataFromImport(jsonData[ExpenseEntity.PERSIST_NAME]);
@@ -297,8 +295,8 @@ class SettingsPage extends StatelessWidget {
     return;
   }
 
-  void handleMergeFiles(BuildContext context, ConfigProvider configProvider) async {
-    List<Map<String, dynamic>>? filesData = await configProvider.pickMultipleJsonFiles();
+  void handleMergeFiles(BuildContext context, SettingsProvider settingsProvider) async {
+    List<Map<String, dynamic>>? filesData = await settingsProvider.pickMultipleJsonFiles();
 
     if (filesData == null) {
       if (context.mounted) {
@@ -307,7 +305,7 @@ class SettingsPage extends StatelessWidget {
       return;
     }
 
-    Map<String, dynamic>? mergedData = configProvider.mergeJsonFiles(filesData);
+    Map<String, dynamic>? mergedData = settingsProvider.mergeJsonFiles(filesData);
 
     if (mergedData == null) {
       if (context.mounted) {
@@ -322,7 +320,7 @@ class SettingsPage extends StatelessWidget {
 
     if (context.mounted) {
       String fileName = 'merged-expenses-${DateTime.now().toString().substring(0, 10)}';
-      configProvider
+      settingsProvider
           .exportJSONFile(mergedData, fileName)
           .then((res) => handleToastFileExportResult(res, context, fileName));
     }

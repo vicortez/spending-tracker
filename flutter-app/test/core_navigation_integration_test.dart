@@ -5,11 +5,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/main.dart';
 import 'package:spending_tracker/repository/category/category.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
-import 'package:spending_tracker/repository/config/config_provider.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
 import 'package:spending_tracker/repository/onboarding/onboarding_provider.dart';
 import 'package:spending_tracker/repository/services/auth_provider.dart';
+import 'package:spending_tracker/repository/settings/settings_provider.dart';
 import 'package:spending_tracker/services/navigation_history_service.dart';
 
 void main() {
@@ -19,18 +19,30 @@ void main() {
     // 1. Initialize Mock SharedPreferences
     SharedPreferences.setMockInitialValues({
       'isFirstRun': false, // Avoid welcome dialog for simplicity
+      'expenses': '[]',
+      'categories': '[]',
+      'domains': '[]',
+      'config': '{}',
     });
 
     final categoryProvider = CategoryProvider();
     final expenseProvider = ExpenseProvider();
-    final configProvider = ConfigProvider();
+    final settingsProvider = SettingsProvider();
     final domainProvider = DomainProvider();
     final onboardingProvider = OnboardingProvider();
     final authProvider = AuthProvider();
     final navigationHistoryService = NavigationHistoryService();
 
+    final prefs = await SharedPreferences.getInstance();
+    await categoryProvider.loadFromLocalStorage(prefs);
+    await expenseProvider.loadFromLocalStorage(prefs);
+    await domainProvider.loadFromLocalStorage(prefs);
+    await settingsProvider.loadFromLocalStorage(prefs);
+    await onboardingProvider.init(prefs);
+    await authProvider.loadFromLocalStorage(prefs);
+
     // 2. Setup mock categories
-    categoryProvider.set([
+    await categoryProvider.set([
       CategoryEntity(id: 1, name: 'Food', enabled: true),
       CategoryEntity(id: 2, name: 'Transport', enabled: true),
     ], syncStorage: false);
@@ -41,7 +53,7 @@ void main() {
         providers: [
           ChangeNotifierProvider<ExpenseProvider>.value(value: expenseProvider),
           ChangeNotifierProvider<CategoryProvider>.value(value: categoryProvider),
-          ChangeNotifierProvider<ConfigProvider>.value(value: configProvider),
+          ChangeNotifierProvider<SettingsProvider>.value(value: settingsProvider),
           ChangeNotifierProvider<DomainProvider>.value(value: domainProvider),
           ChangeNotifierProvider<OnboardingProvider>.value(value: onboardingProvider),
           ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
@@ -78,10 +90,10 @@ void main() {
     expect(find.text('Food'), findsWidgets);
     expect(find.text('50'), findsAtLeastNWidgets(1));
 
-    // 7. Edit the expense
-    final editIcon = find.byIcon(Icons.edit_outlined);
-    expect(editIcon, findsOneWidget);
-    await tester.tap(editIcon);
+    // 7. Edit the expense - tap the chevron or the list item
+    final editIcon = find.byIcon(Icons.chevron_right);
+    expect(editIcon, findsAtLeastNWidgets(1));
+    await tester.tap(editIcon.first);
     await tester.pumpAndSettle();
 
     final amountEditField = find.widgetWithText(TextFormField, 'Amount');

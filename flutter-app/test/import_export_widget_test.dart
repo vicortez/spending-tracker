@@ -4,22 +4,28 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/main.dart';
 import 'package:spending_tracker/repository/category/category_provider.dart';
-import 'package:spending_tracker/repository/config/config_provider.dart';
 import 'package:spending_tracker/repository/domain/domain_provider.dart';
 import 'package:spending_tracker/repository/expense/expense_provider.dart';
 import 'package:spending_tracker/repository/onboarding/onboarding_provider.dart';
 import 'package:spending_tracker/repository/services/auth_provider.dart';
+import 'package:spending_tracker/repository/settings/settings_provider.dart';
 import 'package:spending_tracker/services/navigation_history_service.dart';
 
 void main() {
   group('Import/Export Widget Integration Tests', () {
     testWidgets('Navigate to settings and test export button exists', (WidgetTester tester) async {
       // 1. Initialize Mock SharedPreferences
-      SharedPreferences.setMockInitialValues({'isFirstRun': false});
+      SharedPreferences.setMockInitialValues({
+        'isFirstRun': false,
+        'expenses': '[]',
+        'categories': '[]',
+        'domains': '[]',
+        'config': '{}',
+      });
 
       final categoryProvider = CategoryProvider();
       final expenseProvider = ExpenseProvider();
-      final configProvider = ConfigProvider();
+      final settingsProvider = SettingsProvider();
       final domainProvider = DomainProvider();
       final onboardingProvider = OnboardingProvider();
       final authProvider = AuthProvider();
@@ -29,7 +35,7 @@ void main() {
       await categoryProvider.loadFromLocalStorage(prefs);
       await expenseProvider.loadFromLocalStorage(prefs);
       await domainProvider.loadFromLocalStorage(prefs);
-      await configProvider.loadFromLocalStorage(prefs);
+      await settingsProvider.loadFromLocalStorage(prefs);
       await onboardingProvider.init(prefs);
       await authProvider.loadFromLocalStorage(prefs);
 
@@ -43,7 +49,7 @@ void main() {
           providers: [
             ChangeNotifierProvider<ExpenseProvider>.value(value: expenseProvider),
             ChangeNotifierProvider<CategoryProvider>.value(value: categoryProvider),
-            ChangeNotifierProvider<ConfigProvider>.value(value: configProvider),
+            ChangeNotifierProvider<SettingsProvider>.value(value: settingsProvider),
             ChangeNotifierProvider<DomainProvider>.value(value: domainProvider),
             ChangeNotifierProvider<OnboardingProvider>.value(value: onboardingProvider),
             ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
@@ -69,11 +75,17 @@ void main() {
 
     testWidgets('Import dialog shows and continue button works', (WidgetTester tester) async {
       // 1. Initialize Mock SharedPreferences
-      SharedPreferences.setMockInitialValues({'isFirstRun': false});
+      SharedPreferences.setMockInitialValues({
+        'isFirstRun': false,
+        'expenses': '[]',
+        'categories': '[]',
+        'domains': '[]',
+        'config': '{}',
+      });
 
       final categoryProvider = CategoryProvider();
       final expenseProvider = ExpenseProvider();
-      final configProvider = ConfigProvider();
+      final settingsProvider = SettingsProvider();
       final domainProvider = DomainProvider();
       final onboardingProvider = OnboardingProvider();
       final authProvider = AuthProvider();
@@ -83,7 +95,7 @@ void main() {
       await categoryProvider.loadFromLocalStorage(prefs);
       await expenseProvider.loadFromLocalStorage(prefs);
       await domainProvider.loadFromLocalStorage(prefs);
-      await configProvider.loadFromLocalStorage(prefs);
+      await settingsProvider.loadFromLocalStorage(prefs);
       await onboardingProvider.init(prefs);
       await authProvider.loadFromLocalStorage(prefs);
 
@@ -97,7 +109,7 @@ void main() {
           providers: [
             ChangeNotifierProvider<ExpenseProvider>.value(value: expenseProvider),
             ChangeNotifierProvider<CategoryProvider>.value(value: categoryProvider),
-            ChangeNotifierProvider<ConfigProvider>.value(value: configProvider),
+            ChangeNotifierProvider<SettingsProvider>.value(value: settingsProvider),
             ChangeNotifierProvider<DomainProvider>.value(value: domainProvider),
             ChangeNotifierProvider<OnboardingProvider>.value(value: onboardingProvider),
             ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
@@ -140,11 +152,17 @@ void main() {
 
     testWidgets('Delete all expenses button works correctly', (WidgetTester tester) async {
       // 1. Initialize Mock SharedPreferences
-      SharedPreferences.setMockInitialValues({'isFirstRun': false});
+      SharedPreferences.setMockInitialValues({
+        'isFirstRun': false,
+        'expenses': '[]',
+        'categories': '[]',
+        'domains': '[]',
+        'config': '{}',
+      });
 
       final categoryProvider = CategoryProvider();
       final expenseProvider = ExpenseProvider();
-      final configProvider = ConfigProvider();
+      final settingsProvider = SettingsProvider();
       final domainProvider = DomainProvider();
       final onboardingProvider = OnboardingProvider();
       final authProvider = AuthProvider();
@@ -154,7 +172,7 @@ void main() {
       await categoryProvider.loadFromLocalStorage(prefs);
       await expenseProvider.loadFromLocalStorage(prefs);
       await domainProvider.loadFromLocalStorage(prefs);
-      await configProvider.loadFromLocalStorage(prefs);
+      await settingsProvider.loadFromLocalStorage(prefs);
       await onboardingProvider.init(prefs);
       await authProvider.loadFromLocalStorage(prefs);
 
@@ -171,7 +189,7 @@ void main() {
           providers: [
             ChangeNotifierProvider<ExpenseProvider>.value(value: expenseProvider),
             ChangeNotifierProvider<CategoryProvider>.value(value: categoryProvider),
-            ChangeNotifierProvider<ConfigProvider>.value(value: configProvider),
+            ChangeNotifierProvider<SettingsProvider>.value(value: settingsProvider),
             ChangeNotifierProvider<DomainProvider>.value(value: domainProvider),
             ChangeNotifierProvider<OnboardingProvider>.value(value: onboardingProvider),
             ChangeNotifierProvider<AuthProvider>.value(value: authProvider),

@@ -1,20 +1,22 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_tracker/repository/category/category.dart';
-import 'package:spending_tracker/repository/config/config_provider.dart';
 import 'package:spending_tracker/repository/domain/domain.dart';
 import 'package:spending_tracker/repository/expense/expense.dart';
+import 'package:spending_tracker/repository/settings/settings_provider.dart';
 
 void main() {
-  group('ConfigProvider - Merge Logic', () {
-    late ConfigProvider configProvider;
+  group('SettingsProvider - Merge Logic', () {
+    late SettingsProvider settingsProvider;
 
-    setUp(() {
-      configProvider = ConfigProvider();
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({});
+      settingsProvider = SettingsProvider();
     });
 
-    test('should merge two consistent files and remap expense IDs', () {
+    test('should successfully merge two valid files with distinct expenses', () {
       final file1 = {
         DomainEntity.PERSIST_NAME: json.encode([
           {'id': 1, 'name': 'Personal'},
@@ -23,7 +25,7 @@ void main() {
           {'id': 1, 'name': 'Food', 'domainId': 1},
         ]),
         ExpenseEntity.PERSIST_NAME: json.encode([
-          {'id': 1, 'categoryId': 1, 'amount': 10.0, 'date': 123456789},
+          {'id': 1, 'amount': 10.0, 'categoryId': 1, 'date': 123},
         ]),
       };
 
@@ -35,92 +37,73 @@ void main() {
           {'id': 1, 'name': 'Food', 'domainId': 1},
         ]),
         ExpenseEntity.PERSIST_NAME: json.encode([
-          {'id': 1, 'categoryId': 1, 'amount': 20.0, 'date': 987654321},
+          {'id': 1, 'amount': 20.0, 'categoryId': 1, 'date': 456},
         ]),
       };
 
-      final result = configProvider.mergeJsonFiles([file1, file2]);
+      final result = settingsProvider.mergeJsonFiles([file1, file2]);
 
       expect(result, isNotNull);
+      final domains = json.decode(result![DomainEntity.PERSIST_NAME]) as List;
+      final categories = json.decode(result[CategoryEntity.PERSIST_NAME]) as List;
+      final expenses = json.decode(result[ExpenseEntity.PERSIST_NAME]) as List;
 
-      final mergedExpenses = json.decode(result![ExpenseEntity.PERSIST_NAME]) as List<dynamic>;
-      expect(mergedExpenses.length, 2);
-      expect(mergedExpenses[0]['id'], 1);
-      expect(mergedExpenses[1]['id'], 2); // Remapped
-      expect(mergedExpenses[1]['amount'], 20.0);
+      expect(domains.length, 1);
+      expect(categories.length, 1);
+      expect(expenses.length, 2);
+      expect(expenses[1]['id'], 2); // ID should be incremented
+      expect(expenses[1]['amount'], 20.0);
     });
 
-    test('should fail if domain names have different IDs', () {
+    test('should return null if domain names conflict with IDs', () {
       final file1 = {
         DomainEntity.PERSIST_NAME: json.encode([
           {'id': 1, 'name': 'Personal'},
         ]),
-        CategoryEntity.PERSIST_NAME: '[]',
-        ExpenseEntity.PERSIST_NAME: '[]',
       };
-
       final file2 = {
         DomainEntity.PERSIST_NAME: json.encode([
-          {'id': 2, 'name': 'Personal'},
+          {'id': 1, 'name': 'Business'},
         ]),
-        CategoryEntity.PERSIST_NAME: '[]',
-        ExpenseEntity.PERSIST_NAME: '[]',
       };
 
-      final result = configProvider.mergeJsonFiles([file1, file2]);
+      final result = settingsProvider.mergeJsonFiles([file1, file2]);
       expect(result, isNull);
     });
 
-    test('should fail if category names have different IDs', () {
+    test('should return null if category names conflict with IDs', () {
       final file1 = {
-        DomainEntity.PERSIST_NAME: '[]',
         CategoryEntity.PERSIST_NAME: json.encode([
           {'id': 1, 'name': 'Food'},
         ]),
-        ExpenseEntity.PERSIST_NAME: '[]',
       };
-
       final file2 = {
-        DomainEntity.PERSIST_NAME: '[]',
         CategoryEntity.PERSIST_NAME: json.encode([
-          {'id': 2, 'name': 'Food'},
+          {'id': 1, 'name': 'Transport'},
         ]),
-        ExpenseEntity.PERSIST_NAME: '[]',
       };
 
-      final result = configProvider.mergeJsonFiles([file1, file2]);
+      final result = settingsProvider.mergeJsonFiles([file1, file2]);
       expect(result, isNull);
     });
 
-    test('should handle new domains and categories correctly', () {
+    test('should handle missing keys gracefully', () {
       final file1 = {
-        DomainEntity.PERSIST_NAME: json.encode([
-          {'id': 1, 'name': 'Personal'},
+        ExpenseEntity.PERSIST_NAME: json.encode([
+          {'id': 1, 'amount': 10.0, 'categoryId': 1, 'date': 123},
         ]),
-        CategoryEntity.PERSIST_NAME: json.encode([
-          {'id': 1, 'name': 'Food'},
-        ]),
-        ExpenseEntity.PERSIST_NAME: '[]',
       };
-
       final file2 = {
-        DomainEntity.PERSIST_NAME: json.encode([
-          {'id': 2, 'name': 'Work'},
+        ExpenseEntity.PERSIST_NAME: json.encode([
+          {'id': 1, 'amount': 20.0, 'categoryId': 1, 'date': 456},
         ]),
-        CategoryEntity.PERSIST_NAME: json.encode([
-          {'id': 2, 'name': 'Software'},
-        ]),
-        ExpenseEntity.PERSIST_NAME: '[]',
       };
 
-      final result = configProvider.mergeJsonFiles([file1, file2]);
+      final result = settingsProvider.mergeJsonFiles([file1, file2]);
 
       expect(result, isNotNull);
-      final mergedDomains = json.decode(result![DomainEntity.PERSIST_NAME]) as List<dynamic>;
-      final mergedCategories = json.decode(result![CategoryEntity.PERSIST_NAME]) as List<dynamic>;
-
-      expect(mergedDomains.length, 2);
-      expect(mergedCategories.length, 2);
+      final expenses = json.decode(result![ExpenseEntity.PERSIST_NAME]) as List;
+      expect(expenses.length, 2);
     });
   });
 }
